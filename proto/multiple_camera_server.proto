@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+package multiple_camera_server;
+
+service FaceProcessing {
+    rpc register_images(RegistrationReq) returns (RegistrationResp) {}
+    rpc recognize_face_js (stream JSReq) returns (stream JSResp) {}
+    rpc check_connection (CheckConnectionReq) returns (CheckConnectionResp) {}
+}
+
+message CheckConnectionReq{}
+
+message CheckConnectionResp{
+    string connection_response = 1;
+}
+
+message RegistrationReq {
+    repeated bytes image_bytes = 1;
+}
+
+message RegistrationResp {
+    repeated FaceInfo face_infos = 1;
+}
+
+message FaceInfo {
+    repeated int32 bbox = 1;
+    bytes feature_vector = 2;
+}
+
+message JSReq {
+    repeated UnlabeledFace faces = 1;
+}
+
+message JSResp {
+    repeated LabeledFace faces = 1;
+}
+
+message UnlabeledFace {
+    string track_id = 1;
+    bytes image_bytes = 2;
+    repeated int32 landmarks = 3;
+}
+
+message LabeledFace {
+    string track_id = 1;
+    string registration_id = 2;
+    string person_name = 3;
+    float confidence = 4;
+}
