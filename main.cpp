@@ -11,6 +11,8 @@
 #include <grpcpp/create_channel.h>
 #include <grpcpp/security/credentials.h>
 #include "multiple_camera_server.grpc.pb.h"
+#include <opencv2/opencv.hpp>
+#include "utils/base64.h"
 
 using grpc::Channel;
 using grpc::ClientContext;
@@ -24,21 +26,26 @@ using multiple_camera_server::JSResp;
 using multiple_camera_server::LabeledFace;
 using multiple_camera_server::UnlabeledFace;
 
-UnlabeledFace MakeUnlabeledFace(){
-    UnlabeledFace face;
-    face.set_track_id("sfsfsdf");
-    face.set_image_bytes("sfsfdg");
-    for( int i = 0; i < 10; i = i + 1 ) {
-        face.set_landmarks(0, 32);
-    }
-    return face;
-}
 
-//JSReq MakeJSReq(){
-//    JSReq jsReq;
-//    *jsReq.mutable_faces() = {MakeUnlabeledFace(), MakeUnlabeledFace()};
-//    return jsReq;
-//}
+JSReq MakeJSReq(){
+    JSReq jsReq;
+    cv::Mat img = cv::imread("/home/d/CLionProjects/vgate-control-camera-client/9cf798c3-07ec-4cda-a90c-3c37c0d3a492.jpeg");
+    std::vector<uchar> buf;
+    bool success = cv::imencode(".jpg", img, buf);
+    auto *enc_msg = reinterpret_cast<unsigned char*>(buf.data());
+    std::string encoded = base64_encode(enc_msg, buf.size());
+
+    for (int i = 0; i < 2; ++i){
+        UnlabeledFace* face = jsReq.add_faces();
+        face->set_track_id("sfsfsfsdfsdf");
+        face->set_image_bytes(encoded);
+        for(int k = 0; k < 10; ++k){
+            face->add_landmarks(k*10);
+        }
+        face->add_landmarks(0);
+    }
+    return jsReq;
+}
 
 class CameraClient {
 public:
@@ -47,7 +54,13 @@ public:
         ClientContext context;
         std::shared_ptr<ClientReaderWriter<JSReq, JSResp> > stream(stub_->recognize_face_js(&context));
         std::thread writer([stream]() {
-            std::vector<JSReq> reqs{};
+            std::vector<JSReq> reqs{
+                MakeJSReq(),
+                MakeJSReq(),
+                MakeJSReq(),
+
+                MakeJSReq()
+            };
             for (const JSReq& req :reqs) {
                 stream->Write(req);
             }

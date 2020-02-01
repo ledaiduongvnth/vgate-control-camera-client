@@ -9,6 +9,8 @@ cmake_minimum_required(VERSION 3.2)
 
 PROJECT(camera_client CXX)
 
+find_package( OpenCV REQUIRED )
+
 find_package(Protobuf REQUIRED)
 find_package(gRPC CONFIG REQUIRED)
 message(STATUS "Using gRPC ${gRPC_VERSION}")
@@ -22,16 +24,19 @@ add_executable(
         main.cpp
         proto/multiple_camera_server.grpc.pb.cc
         proto/multiple_camera_server.pb.cc
+        utils/base64.cpp
 )
 
 target_include_directories(
         camera_client
         PRIVATE
         proto
+        utils
 )
 
 target_link_libraries(
         camera_client
         ${GRPC_CPP_LIB}
         ${Protobuf_LIBRARIES}
+        ${OpenCV_LIBS}
 )
