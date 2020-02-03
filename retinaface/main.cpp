@@ -104,7 +104,7 @@ private:
 };
 
 int main(int argc, char** argv) {
-    string path = "/home/d/CLionProjects/retinaface/model";
+    string path = "../model";
     RetinaFace* rf = new RetinaFace(path, "net3");
     CameraClient client(grpc::CreateChannel(
             "localhost:50051", grpc::InsecureChannelCredentials()));
