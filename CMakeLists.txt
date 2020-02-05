@@ -11,10 +11,10 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0")
 
 if(USE_ARM64)
-    add_definitions(-DUSE_ARM64)
-    SET(CMAKE_SYSTEM_NAME Linux)
-    SET(CMAKE_C_COMPILER "aarch64-linux-gnu-gcc")
-    SET(CMAKE_CXX_COMPILER "aarch64-linux-gnu-g++")
+        add_definitions(-DUSE_ARM64)
+        SET(CMAKE_SYSTEM_NAME Linux)
+        SET(CMAKE_C_COMPILER "aarch64-linux-gnu-gcc")
+        SET(CMAKE_CXX_COMPILER "aarch64-linux-gnu-g++")
 endif()
 
 if(USE_ARM64)
@@ -43,18 +43,21 @@ set(GRPC_CPP_LIB gRPC::grpc++_unsecure)
 set(GRPC_PLUGIN_EXEC $<TARGET_FILE:gRPC::grpc_cpp_plugin>)
 
 include_directories (
-    "facedetect"
-    "facedetect/tensorrt"
-    "/usr/local/TensorRT/include"
-    "/usr/local/cuda/include"
-    proto
-    utils
+        "facedetect"
+        "facedetect/tensorrt"
+        "/usr/local/TensorRT/include"
+        "/usr/local/cuda/include"
+        proto
+        utils
+        tracking
 )
 
 AUX_SOURCE_DIRECTORY(facedetect DIR_SRCS)
 AUX_SOURCE_DIRECTORY(facedetect/tensorrt DIR_SRCS_CUDA)
 AUX_SOURCE_DIRECTORY(./proto PROTO)
 AUX_SOURCE_DIRECTORY(./utils UTILS)
+AUX_SOURCE_DIRECTORY(./utils TRACKING)
+
 file( GLOB  core_cuda_files  "facedetect/*.cu")
 cuda_add_executable(
         camera_client
@@ -64,6 +67,7 @@ cuda_add_executable(
         ${core_cuda_files}
         ${PROTO}
         ${UTILS}
+        ${TRACKING}
 )
 
 target_link_libraries(

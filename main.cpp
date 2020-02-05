@@ -44,16 +44,22 @@ public:
             int new_left;
             int new_top;
             float scale;
+            int is_send = 0;
             while(cap.read(img)) {
                 JSReq jsReq;
                 tie(faceInfo, scale) = rf->detect(img.clone(), 0.9);
                 if (!faceInfo.empty()){
-                    for (int t = 0; t < faceInfo.size(); ++t){
+                    is_send = is_send + 1;
+                    if (is_send == 4){
+                        is_send = 0;
+                    }
+                    facesOut = this->work_queue.pop();
+                    for (auto & t : faceInfo){
                         tie(cropedImage, new_left, new_top) = CropFaceImageWithMargin(img,
-                                                                                      faceInfo[t].rect.x1 * scale,
-                                                                                      faceInfo[t].rect.y1 * scale,
-                                                                                      faceInfo[t].rect.x2 * scale,
-                                                                                      faceInfo[t].rect.y2 * scale,1.3);
+                                                                                      t.rect.x1 * scale,
+                                                                                      t.rect.y1 * scale,
+                                                                                      t.rect.x2 * scale,
+                                                                                      t.rect.y2 * scale,1.3);
                         UnlabeledFace* face = jsReq.add_faces();
                         std::vector<uchar> buf;
                         success = cv::imencode(".jpg", cropedImage, buf);
@@ -66,19 +72,38 @@ public:
                             face->set_track_id(track_id);
                             face->set_image_bytes(encoded);
                             for(size_t j = 0; j < 5; j++) {
-                                face->add_landmarks(faceInfo[t].pts.y[j] * scale - new_top);
+                                face->add_landmarks(t.pts.y[j] * scale - new_top);
                             }
                             for(size_t j = 0; j < 5; j++) {
-                                face->add_landmarks(faceInfo[t].pts.x[j] * scale - new_left);
+                                face->add_landmarks(t.pts.x[j] * scale - new_left);
                             }
                             face->add_landmarks(0);
                         }
+
+                        cv::Rect rect = cv::Rect(cv::Point2f(t.rect.x1 * scale, t.rect.y1 * scale),
+                                                 cv::Point2f(t.rect.x2 * scale, t.rect.y2 * scale));
+
+                        cv::rectangle(img, rect, Scalar(0, 0, 255), 2);
+
+                        for(size_t j = 0; j < 5; j++) {
+                            cv::Point2f pt = cv::Point2f(t.pts.x[j] * scale, t.pts.y[j] * scale);
+                            cv::circle(img, pt, 1, Scalar(0, 255, 0), 2);
+                        }
+                        if (!facesOut.empty()){
+                            printf("result: %s\n", facesOut[0].person_name.c_str());
+                            cv::putText(img,
+                                        facesOut[0].person_name,
+                                        cv::Point(t.rect.x1 * scale, t.rect.y1 * scale),
+                                        cv::FONT_HERSHEY_DUPLEX,
+                                        1.0,
+                                        CV_RGB(118, 185, 0),
+                                        2);
+                        }
+
                     }
-                    stream->Write(jsReq);
-                }
-                facesOut = this->work_queue.pop();
-                if (!facesOut.empty()){
-                    printf("result: %s\n", facesOut[0].person_name.c_str());
+                    if (is_send == 0){
+                        stream->Write(jsReq);
+                    }
                 }
                 imshow("dst", img);
                 waitKey(1);
