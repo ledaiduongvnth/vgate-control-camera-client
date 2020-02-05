@@ -1,16 +1,11 @@
 #include <iostream>
 #include <RetinaFace.h>
-#include "timer.h"
 #include <opencv2/videoio.hpp>
-
 #include <chrono>
-#include <iostream>
 #include <memory>
 #include <random>
 #include <string>
 #include <thread>
-
-#include <grpc/grpc.h>
 #include <grpcpp/channel.h>
 #include <grpcpp/client_context.h>
 #include <grpcpp/create_channel.h>
@@ -18,6 +13,8 @@
 #include "multiple_camera_server.grpc.pb.h"
 #include <opencv2/opencv.hpp>
 #include "base64.h"
+#include "image_proc.h"
+#include "queue.h"
 
 using grpc::Channel;
 using grpc::ClientContext;
@@ -31,66 +28,80 @@ using multiple_camera_server::JSResp;
 using multiple_camera_server::LabeledFace;
 using multiple_camera_server::UnlabeledFace;
 
-using namespace std;
-
-std::tuple<cv::Mat, int, int> CropFaceImageWithMargin(cv::Mat srcImg, int x1, int y1, int x2, int y2, float expanded_face_scale){
-    int new_width = (int)((float)(x2 - x1) / 2 * expanded_face_scale);
-    int new_height = (int)((float)(y2 - y1) / 2 * expanded_face_scale);
-    int x_center = (x1 + x2) / 2;
-    int y_center = (y1 + y2) / 2;
-    int new_top = y_center - new_height > 0 ? (y_center - new_height) : 0;
-    int new_left = x_center - new_width > 0 ? (x_center - new_width) : 0;
-    cv::Mat face_image = srcImg(Rect(new_left, new_top, new_width * 2, new_height * 2));
-    return std::make_tuple(face_image, new_left, new_top);
-}
-
 class CameraClient {
 public:
     CameraClient(std::shared_ptr<Channel> channel):stub_(FaceProcessing::NewStub(channel)){}
     void RecognizeFace(RetinaFace* rf) {
         ClientContext context;
         std::shared_ptr<ClientReaderWriter<JSReq, JSResp> > stream(stub_->recognize_face_js(&context));
-        std::thread writer([stream, rf]() {
+        std::thread writer([stream, rf, this]() {
             cv::VideoCapture cap(0);
             cv::Mat img;
             vector<FaceDetectInfo> faceInfo;
             cv::Mat cropedImage ;
+            vector<LabeledFaceIn> facesOut;
             bool success;
             int new_left;
             int new_top;
             float scale;
             while(cap.read(img)) {
-                tie(faceInfo, scale) = rf->detect(img, 0.9);
-                tie(cropedImage, new_left, new_top) = CropFaceImageWithMargin(img,
-                        faceInfo[0].rect.x1 * scale,
-                        faceInfo[0].rect.y1 * scale,
-                        faceInfo[0].rect.x2 * scale,
-                        faceInfo[0].rect.y2 * scale,
-                        1.3);
                 JSReq jsReq;
-                std::vector<uchar> buf;
-                success = cv::imencode(".jpg", cropedImage, buf);
-                auto* enc_msg = reinterpret_cast<unsigned char*>(buf.data());
-                std::string encoded = base64_encode(enc_msg, buf.size());
-                UnlabeledFace* face = jsReq.add_faces();
-                face->set_track_id("sfsfsfsdfsdf");
-                face->set_image_bytes(encoded);
-                for(size_t j = 0; j < 5; j++) {
-                    face->add_landmarks(faceInfo[0].pts.y[j] * scale - new_top);
+                tie(faceInfo, scale) = rf->detect(img.clone(), 0.9);
+                if (!faceInfo.empty()){
+                    for (int t = 0; t < faceInfo.size(); ++t){
+                        tie(cropedImage, new_left, new_top) = CropFaceImageWithMargin(img,
+                                                                                      faceInfo[t].rect.x1 * scale,
+                                                                                      faceInfo[t].rect.y1 * scale,
+                                                                                      faceInfo[t].rect.x2 * scale,
+                                                                                      faceInfo[t].rect.y2 * scale,1.3);
+                        UnlabeledFace* face = jsReq.add_faces();
+                        std::vector<uchar> buf;
+                        success = cv::imencode(".jpg", cropedImage, buf);
+                        if (success){
+                            auto* enc_msg = reinterpret_cast<unsigned char*>(buf.data());
+                            std::string encoded = base64_encode(enc_msg, buf.size());
+                            char ch = 'A' + random()%26;
+                            string track_id ;
+                            track_id = ch;
+                            face->set_track_id(track_id);
+                            face->set_image_bytes(encoded);
+                            for(size_t j = 0; j < 5; j++) {
+                                face->add_landmarks(faceInfo[t].pts.y[j] * scale - new_top);
+                            }
+                            for(size_t j = 0; j < 5; j++) {
+                                face->add_landmarks(faceInfo[t].pts.x[j] * scale - new_left);
+                            }
+                            face->add_landmarks(0);
+                        }
+                    }
+                    stream->Write(jsReq);
                 }
-                for(size_t j = 0; j < 5; j++) {
-                    face->add_landmarks(faceInfo[0].pts.x[j] * scale - new_left);
+                facesOut = this->work_queue.pop();
+                if (!facesOut.empty()){
+                    printf("result: %s\n", facesOut[0].person_name.c_str());
                 }
-                face->add_landmarks(0);
-                stream->Write(jsReq);
                 imshow("dst", img);
                 waitKey(1);
             }
             stream->WritesDone();
         });
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         JSResp jSResp;
+        vector<LabeledFaceIn> faces;
+        LabeledFaceIn labeledFaceIn;
+        LabeledFace labeledFace;
         while (stream->Read(&jSResp)) {
-            std::cout << "Got message \n" << jSResp.faces_size();
+            if (!jSResp.faces().empty()){
+                for (int i = 0; i < jSResp.faces().size(); ++i){
+                    labeledFace = jSResp.faces(i);
+                    labeledFaceIn.track_id = labeledFace.track_id();
+                    labeledFaceIn.registration_id = labeledFace.registration_id();
+                    labeledFaceIn.person_name = labeledFace.person_name();
+                    labeledFaceIn.confidence = labeledFace.confidence();
+                    faces.emplace_back(labeledFaceIn);
+                }
+                this->work_queue.push_work(faces);
+            }
         }
         writer.join();
         Status status = stream->Finish();
@@ -98,17 +109,17 @@ public:
             std::cout << "recognize_face_js rpc failed." << std::endl;
         }
     }
-
 private:
     std::unique_ptr<FaceProcessing::Stub> stub_{};
+    WorkQueue work_queue;
+
 };
 
 int main(int argc, char** argv) {
     string path = "../model";
     RetinaFace* rf = new RetinaFace(path, "net3");
     CameraClient client(grpc::CreateChannel(
-            "localhost:50051", grpc::InsecureChannelCredentials()));
+            "localhost:50052", grpc::InsecureChannelCredentials()));
     client.RecognizeFace(rf);
     return 0;
 }
-
