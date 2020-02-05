@@ -201,7 +201,7 @@ void clip_boxes(anchor_box &box, int width, int height)
 }
 
 //######################################################################
-//retinaface
+//facedetect
 //######################################################################
 
 RetinaFace::RetinaFace(string &model, string network, float nms)
@@ -224,7 +224,7 @@ RetinaFace::RetinaFace(string &model, string network, float nms)
     else if(network == "net6") { //like pyramidbox or s3fd
         fmc = 6;
     }
-    else if(network == "net5") { //retinaface
+    else if(network == "net5") { //facedetect
         fmc = 5;
     }
     else if(network == "net5a") {

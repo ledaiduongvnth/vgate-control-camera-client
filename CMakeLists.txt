@@ -43,21 +43,22 @@ set(GRPC_CPP_LIB gRPC::grpc++_unsecure)
 set(GRPC_PLUGIN_EXEC $<TARGET_FILE:gRPC::grpc_cpp_plugin>)
 
 include_directories (
-    "./retinaface"
-    "./retinaface/tensorrt"
+    "facedetect"
+    "facedetect/tensorrt"
     "/usr/local/TensorRT/include"
     "/usr/local/cuda/include"
     proto
     utils
 )
 
-AUX_SOURCE_DIRECTORY(./retinaface DIR_SRCS)
-AUX_SOURCE_DIRECTORY(./retinaface/tensorrt DIR_SRCS_CUDA)
+AUX_SOURCE_DIRECTORY(facedetect DIR_SRCS)
+AUX_SOURCE_DIRECTORY(facedetect/tensorrt DIR_SRCS_CUDA)
 AUX_SOURCE_DIRECTORY(./proto PROTO)
 AUX_SOURCE_DIRECTORY(./utils UTILS)
-file( GLOB  core_cuda_files  "./retinaface/*.cu")
+file( GLOB  core_cuda_files  "facedetect/*.cu")
 cuda_add_executable(
         camera_client
+        main.cpp
         ${DIR_SRCS}
         ${DIR_SRCS_CUDA}
         ${core_cuda_files}
