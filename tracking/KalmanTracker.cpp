@@ -16,7 +16,7 @@ void KalmanTracker::init_kf(StateType stateMat)
 
 	measurement = Mat::zeros(measureNum, 1, CV_32F);
 
-	kf.transitionMatrix = *(Mat_<float>(stateNum, stateNum) <<
+	kf.transitionMatrix = (Mat_<float>(stateNum, stateNum) <<
 		1, 0, 0, 0, 1, 0, 0,
 		0, 1, 0, 0, 0, 1, 0,
 		0, 0, 1, 0, 0, 0, 1,
@@ -98,6 +98,24 @@ StateType KalmanTracker::get_rect_xysr(float cx, float cy, float s, float r)
 
 	return StateType(x, y, w, h);
 }
+
+string KalmanTracker::randomString() {
+    string str = "AAAAAA";
+
+    // string sequence
+    str[0] = rand() % 26 + 65;
+    str[1] = rand() % 26 + 65;
+    str[2] = rand() % 26 + 65;
+
+    // number sequence
+    str[3] = rand() % 10 + 48;
+    str[4] = rand() % 10 + 48;
+    str[5] = rand() % 10 + 48;
+
+    return str;
+}
+
+
 
 
 

@@ -11,10 +11,10 @@
 #include <grpcpp/create_channel.h>
 #include <grpcpp/security/credentials.h>
 #include "multiple_camera_server.grpc.pb.h"
-#include <opencv2/opencv.hpp>
 #include "base64.h"
 #include "image_proc.h"
 #include "queue.h"
+#include "sort.h"
 
 using grpc::Channel;
 using grpc::ClientContext;
@@ -36,18 +36,19 @@ public:
         std::shared_ptr<ClientReaderWriter<JSReq, JSResp> > stream(stub_->recognize_face_js(&context));
         std::thread writer([stream, rf, this]() {
             cv::VideoCapture cap(0);
-            cv::Mat img;
+            cv::Mat img, cropedImage;
             vector<FaceDetectInfo> faceInfo;
-            cv::Mat cropedImage ;
             vector<LabeledFaceIn> facesOut;
+            vector<TrackingBox> detFrameData;
             bool success;
-            int new_left;
-            int new_top;
+            int new_left, new_top, frame_count, is_send = 0;
             float scale;
-            int is_send = 0;
+            vector<KalmanTracker> trackers;
             while(cap.read(img)) {
+                detFrameData.clear();
                 JSReq jsReq;
                 tie(faceInfo, scale) = rf->detect(img.clone(), 0.9);
+                /* if there is any face in the image */
                 if (!faceInfo.empty()){
                     is_send = is_send + 1;
                     if (is_send == 4){
@@ -55,56 +56,73 @@ public:
                     }
                     facesOut = this->work_queue.pop();
                     for (auto & t : faceInfo){
-                        tie(cropedImage, new_left, new_top) = CropFaceImageWithMargin(img,
-                                                                                      t.rect.x1 * scale,
-                                                                                      t.rect.y1 * scale,
-                                                                                      t.rect.x2 * scale,
-                                                                                      t.rect.y2 * scale,1.3);
-                        UnlabeledFace* face = jsReq.add_faces();
-                        std::vector<uchar> buf;
-                        success = cv::imencode(".jpg", cropedImage, buf);
-                        if (success){
-                            auto* enc_msg = reinterpret_cast<unsigned char*>(buf.data());
-                            std::string encoded = base64_encode(enc_msg, buf.size());
-                            char ch = 'A' + random()%26;
-                            string track_id ;
-                            track_id = ch;
-                            face->set_track_id(track_id);
-                            face->set_image_bytes(encoded);
-                            for(size_t j = 0; j < 5; j++) {
-                                face->add_landmarks(t.pts.y[j] * scale - new_top);
-                            }
-                            for(size_t j = 0; j < 5; j++) {
-                                face->add_landmarks(t.pts.x[j] * scale - new_left);
-                            }
-                            face->add_landmarks(0);
-                        }
-
-                        cv::Rect rect = cv::Rect(cv::Point2f(t.rect.x1 * scale, t.rect.y1 * scale),
-                                                 cv::Point2f(t.rect.x2 * scale, t.rect.y2 * scale));
-
-                        cv::rectangle(img, rect, Scalar(0, 0, 255), 2);
-
+                        TrackingBox trackingBox;
+                        trackingBox.box.x = t.rect.x1*scale;
+                        trackingBox.box.y = t.rect.y1*scale;
+                        trackingBox.box.width = (t.rect.x2 - t.rect.x1)*scale;
+                        trackingBox.box.height = (t.rect.y2 - t.rect.y1)*scale;
                         for(size_t j = 0; j < 5; j++) {
-                            cv::Point2f pt = cv::Point2f(t.pts.x[j] * scale, t.pts.y[j] * scale);
-                            cv::circle(img, pt, 1, Scalar(0, 255, 0), 2);
+                            trackingBox.landmarks.push_back(t.pts.y[j] * scale);
                         }
-                        if (!facesOut.empty()){
-                            printf("result: %s\n", facesOut[0].person_name.c_str());
-                            cv::putText(img,
-                                        facesOut[0].person_name,
-                                        cv::Point(t.rect.x1 * scale, t.rect.y1 * scale),
-                                        cv::FONT_HERSHEY_DUPLEX,
-                                        1.0,
-                                        CV_RGB(118, 185, 0),
-                                        2);
+                        for(size_t j = 0; j < 5; j++) {
+                            trackingBox.landmarks.push_back(t.pts.x[j] * scale);
                         }
-
+                        detFrameData.push_back(trackingBox);
+                    }
+                    // update trackers
+                    std::tie(trackers, frame_count) = update_trackers(trackers, 1, 1, frame_count, img.size(), detFrameData, 0.2);
+                    for (auto it = trackers.begin(); it != trackers.end();)
+                    {
+                        Rect_<float> pBox = (*it).predict();
+                        if (pBox.x >= 0 && pBox.y >= 0 && pBox.x + pBox.width < img.size().width && pBox.y + pBox.height < img.size().height)
+                        {
+                            // attach detection results to the trackers
+                            if (!facesOut.empty()){
+                                for (auto & k : facesOut){
+                                    if (k.track_id == it->source_track_id){
+                                        it->name = k.person_name;
+                                    }
+                                }
+                            }
+                            // end attach detection results to the trackers
+                            // put text and draw rectangle
+                            cv::putText(img, it->name,cv::Point(pBox.x, pBox.y),cv::FONT_HERSHEY_DUPLEX,1.0,CV_RGB(0, 255, 0),2);
+                            cv::Rect rect = cv::Rect(pBox.x, pBox.y, pBox.width, pBox.height);
+                            cv::rectangle(img, rect, Scalar(0, 0, 255), 2);
+                            // end put text and draw rectangle
+                            // get face image and landmarks to make request
+                            tie(cropedImage, new_left, new_top) = CropFaceImageWithMargin(img, pBox.x, pBox.y, pBox.x + pBox.width, pBox.y + pBox.height,1.3);
+                            UnlabeledFace* face = jsReq.add_faces();
+                            std::vector<uchar> buf;
+                            success = cv::imencode(".jpg", cropedImage, buf);
+                            if (success){
+                                auto* enc_msg = reinterpret_cast<unsigned char*>(buf.data());
+                                std::string encoded = base64_encode(enc_msg, buf.size());
+                                face->set_track_id(it->source_track_id);
+                                face->set_image_bytes(encoded);
+                                for(size_t j = 0; j < 5; j++) {
+                                    face->add_landmarks(it->landmarks[j]-(float)new_top);
+                                }
+                                for(size_t j = 5; j < 10; j++) {
+                                    face->add_landmarks(it->landmarks[j]-(float)new_left);
+                                }
+                                face->add_landmarks(0);
+                            }
+                            // end get face iamge and landmarks to make request
+                            it++;
+                        }
+                        else
+                        {
+                            printf("delete track 1\n");
+                            it = trackers.erase(it);
+                        }
                     }
                     if (is_send == 0){
                         stream->Write(jsReq);
                     }
                 }
+                /* end if there is any face in the image */
+                printf("number of trackers:%zu\n", trackers.size());
                 imshow("dst", img);
                 waitKey(1);
             }

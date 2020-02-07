@@ -13,3 +13,4 @@ struct LabeledFaceIn {
     std::string person_name;
     float confidence;
 };
+

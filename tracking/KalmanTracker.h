@@ -27,7 +27,10 @@ public:
 		m_id = kf_count;
 		//kf_count++;
 	}
-	KalmanTracker(StateType initRect)
+
+    string randomString();
+
+    KalmanTracker(StateType initRect)
 	{
 		init_kf(initRect);
 		m_time_since_update = 0;
@@ -36,6 +39,8 @@ public:
 		m_age = 0;
 		m_id = kf_count;
 		kf_count++;
+		source_track_id = randomString();
+		name = "";
 	}
 
 	~KalmanTracker()
@@ -56,6 +61,9 @@ public:
 	int m_hit_streak;
 	int m_age;
 	int m_id;
+	string source_track_id;
+	string name;
+	vector<float> landmarks;
 
 private:
 	void init_kf(StateType stateMat);
@@ -67,6 +75,6 @@ private:
 };
 
 
-
-
 #endif
+
+

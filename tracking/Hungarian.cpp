@@ -22,7 +22,12 @@ HungarianAlgorithm::~HungarianAlgorithm(){}
 double HungarianAlgorithm::Solve(vector<vector<double>>& DistMatrix, vector<int>& Assignment)
 {
 	unsigned int nRows = DistMatrix.size();
-	unsigned int nCols = DistMatrix[0].size();
+    unsigned int nCols;
+	if(nRows == 0){
+	    nCols = 0;
+	} else{
+        nCols = DistMatrix[0].size();
+	}
 
 	double *distMatrixIn = new double[nRows * nCols];
 	int *assignment = new int[nRows];

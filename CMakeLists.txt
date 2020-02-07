@@ -56,7 +56,7 @@ AUX_SOURCE_DIRECTORY(facedetect DIR_SRCS)
 AUX_SOURCE_DIRECTORY(facedetect/tensorrt DIR_SRCS_CUDA)
 AUX_SOURCE_DIRECTORY(./proto PROTO)
 AUX_SOURCE_DIRECTORY(./utils UTILS)
-AUX_SOURCE_DIRECTORY(./utils TRACKING)
+AUX_SOURCE_DIRECTORY(./tracking TRACKING)
 
 file( GLOB  core_cuda_files  "facedetect/*.cu")
 cuda_add_executable(
