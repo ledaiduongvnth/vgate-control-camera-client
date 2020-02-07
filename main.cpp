@@ -41,7 +41,7 @@ public:
             vector<LabeledFaceIn> facesOut;
             vector<TrackingBox> detFrameData;
             bool success;
-            int new_left, new_top, frame_count, is_send = 0;
+            int new_left, new_top, frame_count = 0, is_send = 0;
             float scale;
             vector<KalmanTracker> trackers;
             while(cap.read(img)) {
@@ -69,10 +69,7 @@ public:
                         }
                         detFrameData.push_back(trackingBox);
                     }
-                    // update trackers
-                    std::tie(trackers, frame_count) = update_trackers(trackers, 1, 1, frame_count, img.size(), detFrameData, 0.2);
-                    for (auto it = trackers.begin(); it != trackers.end();)
-                    {
+                    for (auto it = trackers.begin(); it != trackers.end();){
                         Rect_<float> pBox = (*it).predict();
                         if (pBox.x >= 0 && pBox.y >= 0 && pBox.x + pBox.width < img.size().width && pBox.y + pBox.height < img.size().height)
                         {
@@ -122,6 +119,10 @@ public:
                     }
                 }
                 /* end if there is any face in the image */
+                // update trackers
+                std::tie(trackers, frame_count) = update_trackers(trackers, 1, 1, frame_count, img.size(), detFrameData, 0.2);
+                // end update trackers
+
                 printf("number of trackers:%zu\n", trackers.size());
                 imshow("dst", img);
                 waitKey(1);
