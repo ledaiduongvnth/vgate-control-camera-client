@@ -5,204 +5,190 @@
 
 #include <algorithm>
 
-#include <google/protobuf/stubs/common.h>
 #include <google/protobuf/io/coded_stream.h>
 #include <google/protobuf/extension_set.h>
-#include <google/protobuf/wire_format_lite_inl.h>
+#include <google/protobuf/wire_format_lite.h>
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/generated_message_reflection.h>
 #include <google/protobuf/reflection_ops.h>
 #include <google/protobuf/wire_format.h>
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
-
-extern PROTOBUF_INTERNAL_EXPORT_multiple_5fcamera_5fserver_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_FaceInfo_multiple_5fcamera_5fserver_2eproto;
-extern PROTOBUF_INTERNAL_EXPORT_multiple_5fcamera_5fserver_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_LabeledFace_multiple_5fcamera_5fserver_2eproto;
-extern PROTOBUF_INTERNAL_EXPORT_multiple_5fcamera_5fserver_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_UnlabeledFace_multiple_5fcamera_5fserver_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_multiple_5fcamera_5fserver_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_FaceInfo_multiple_5fcamera_5fserver_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_multiple_5fcamera_5fserver_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_LabeledFace_multiple_5fcamera_5fserver_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_multiple_5fcamera_5fserver_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_UnlabeledFace_multiple_5fcamera_5fserver_2eproto;
 namespace multiple_camera_server {
 class CheckConnectionReqDefaultTypeInternal {
  public:
-  ::google::protobuf::internal::ExplicitlyConstructed<CheckConnectionReq> _instance;
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<CheckConnectionReq> _instance;
 } _CheckConnectionReq_default_instance_;
 class CheckConnectionRespDefaultTypeInternal {
  public:
-  ::google::protobuf::internal::ExplicitlyConstructed<CheckConnectionResp> _instance;
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<CheckConnectionResp> _instance;
 } _CheckConnectionResp_default_instance_;
 class RegistrationReqDefaultTypeInternal {
  public:
-  ::google::protobuf::internal::ExplicitlyConstructed<RegistrationReq> _instance;
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<RegistrationReq> _instance;
 } _RegistrationReq_default_instance_;
 class RegistrationRespDefaultTypeInternal {
  public:
-  ::google::protobuf::internal::ExplicitlyConstructed<RegistrationResp> _instance;
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<RegistrationResp> _instance;
 } _RegistrationResp_default_instance_;
 class FaceInfoDefaultTypeInternal {
  public:
-  ::google::protobuf::internal::ExplicitlyConstructed<FaceInfo> _instance;
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<FaceInfo> _instance;
 } _FaceInfo_default_instance_;
 class JSReqDefaultTypeInternal {
  public:
-  ::google::protobuf::internal::ExplicitlyConstructed<JSReq> _instance;
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<JSReq> _instance;
 } _JSReq_default_instance_;
 class JSRespDefaultTypeInternal {
  public:
-  ::google::protobuf::internal::ExplicitlyConstructed<JSResp> _instance;
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<JSResp> _instance;
 } _JSResp_default_instance_;
 class UnlabeledFaceDefaultTypeInternal {
  public:
-  ::google::protobuf::internal::ExplicitlyConstructed<UnlabeledFace> _instance;
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<UnlabeledFace> _instance;
 } _UnlabeledFace_default_instance_;
 class LabeledFaceDefaultTypeInternal {
  public:
-  ::google::protobuf::internal::ExplicitlyConstructed<LabeledFace> _instance;
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<LabeledFace> _instance;
 } _LabeledFace_default_instance_;
 }  // namespace multiple_camera_server
-static void InitDefaultsCheckConnectionReq_multiple_5fcamera_5fserver_2eproto() {
+static void InitDefaultsscc_info_CheckConnectionReq_multiple_5fcamera_5fserver_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   {
     void* ptr = &::multiple_camera_server::_CheckConnectionReq_default_instance_;
     new (ptr) ::multiple_camera_server::CheckConnectionReq();
-    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
+    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
   }
   ::multiple_camera_server::CheckConnectionReq::InitAsDefaultInstance();
 }
 
-::google::protobuf::internal::SCCInfo<0> scc_info_CheckConnectionReq_multiple_5fcamera_5fserver_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsCheckConnectionReq_multiple_5fcamera_5fserver_2eproto}, {}};
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_CheckConnectionReq_multiple_5fcamera_5fserver_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_CheckConnectionReq_multiple_5fcamera_5fserver_2eproto}, {}};
 
-static void InitDefaultsCheckConnectionResp_multiple_5fcamera_5fserver_2eproto() {
+static void InitDefaultsscc_info_CheckConnectionResp_multiple_5fcamera_5fserver_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   {
     void* ptr = &::multiple_camera_server::_CheckConnectionResp_default_instance_;
     new (ptr) ::multiple_camera_server::CheckConnectionResp();
-    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
+    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
   }
   ::multiple_camera_server::CheckConnectionResp::InitAsDefaultInstance();
 }
 
-::google::protobuf::internal::SCCInfo<0> scc_info_CheckConnectionResp_multiple_5fcamera_5fserver_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsCheckConnectionResp_multiple_5fcamera_5fserver_2eproto}, {}};
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_CheckConnectionResp_multiple_5fcamera_5fserver_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_CheckConnectionResp_multiple_5fcamera_5fserver_2eproto}, {}};
 
-static void InitDefaultsRegistrationReq_multiple_5fcamera_5fserver_2eproto() {
-  GOOGLE_PROTOBUF_VERIFY_VERSION;
-
-  {
-    void* ptr = &::multiple_camera_server::_RegistrationReq_default_instance_;
-    new (ptr) ::multiple_camera_server::RegistrationReq();
-    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
-  }
-  ::multiple_camera_server::RegistrationReq::InitAsDefaultInstance();
-}
-
-::google::protobuf::internal::SCCInfo<0> scc_info_RegistrationReq_multiple_5fcamera_5fserver_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsRegistrationReq_multiple_5fcamera_5fserver_2eproto}, {}};
-
-static void InitDefaultsRegistrationResp_multiple_5fcamera_5fserver_2eproto() {
-  GOOGLE_PROTOBUF_VERIFY_VERSION;
-
-  {
-    void* ptr = &::multiple_camera_server::_RegistrationResp_default_instance_;
-    new (ptr) ::multiple_camera_server::RegistrationResp();
-    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
-  }
-  ::multiple_camera_server::RegistrationResp::InitAsDefaultInstance();
-}
-
-::google::protobuf::internal::SCCInfo<1> scc_info_RegistrationResp_multiple_5fcamera_5fserver_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 1, InitDefaultsRegistrationResp_multiple_5fcamera_5fserver_2eproto}, {
-      &scc_info_FaceInfo_multiple_5fcamera_5fserver_2eproto.base,}};
-
-static void InitDefaultsFaceInfo_multiple_5fcamera_5fserver_2eproto() {
+static void InitDefaultsscc_info_FaceInfo_multiple_5fcamera_5fserver_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   {
     void* ptr = &::multiple_camera_server::_FaceInfo_default_instance_;
     new (ptr) ::multiple_camera_server::FaceInfo();
-    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
+    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
   }
   ::multiple_camera_server::FaceInfo::InitAsDefaultInstance();
 }
 
-::google::protobuf::internal::SCCInfo<0> scc_info_FaceInfo_multiple_5fcamera_5fserver_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsFaceInfo_multiple_5fcamera_5fserver_2eproto}, {}};
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_FaceInfo_multiple_5fcamera_5fserver_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_FaceInfo_multiple_5fcamera_5fserver_2eproto}, {}};
 
-static void InitDefaultsJSReq_multiple_5fcamera_5fserver_2eproto() {
+static void InitDefaultsscc_info_JSReq_multiple_5fcamera_5fserver_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   {
     void* ptr = &::multiple_camera_server::_JSReq_default_instance_;
     new (ptr) ::multiple_camera_server::JSReq();
-    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
+    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
   }
   ::multiple_camera_server::JSReq::InitAsDefaultInstance();
 }
 
-::google::protobuf::internal::SCCInfo<1> scc_info_JSReq_multiple_5fcamera_5fserver_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 1, InitDefaultsJSReq_multiple_5fcamera_5fserver_2eproto}, {
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_JSReq_multiple_5fcamera_5fserver_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 1, 0, InitDefaultsscc_info_JSReq_multiple_5fcamera_5fserver_2eproto}, {
       &scc_info_UnlabeledFace_multiple_5fcamera_5fserver_2eproto.base,}};
 
-static void InitDefaultsJSResp_multiple_5fcamera_5fserver_2eproto() {
+static void InitDefaultsscc_info_JSResp_multiple_5fcamera_5fserver_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   {
     void* ptr = &::multiple_camera_server::_JSResp_default_instance_;
     new (ptr) ::multiple_camera_server::JSResp();
-    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
+    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
   }
   ::multiple_camera_server::JSResp::InitAsDefaultInstance();
 }
 
-::google::protobuf::internal::SCCInfo<1> scc_info_JSResp_multiple_5fcamera_5fserver_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 1, InitDefaultsJSResp_multiple_5fcamera_5fserver_2eproto}, {
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_JSResp_multiple_5fcamera_5fserver_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 1, 0, InitDefaultsscc_info_JSResp_multiple_5fcamera_5fserver_2eproto}, {
       &scc_info_LabeledFace_multiple_5fcamera_5fserver_2eproto.base,}};
 
-static void InitDefaultsUnlabeledFace_multiple_5fcamera_5fserver_2eproto() {
-  GOOGLE_PROTOBUF_VERIFY_VERSION;
-
-  {
-    void* ptr = &::multiple_camera_server::_UnlabeledFace_default_instance_;
-    new (ptr) ::multiple_camera_server::UnlabeledFace();
-    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
-  }
-  ::multiple_camera_server::UnlabeledFace::InitAsDefaultInstance();
-}
-
-::google::protobuf::internal::SCCInfo<0> scc_info_UnlabeledFace_multiple_5fcamera_5fserver_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsUnlabeledFace_multiple_5fcamera_5fserver_2eproto}, {}};
-
-static void InitDefaultsLabeledFace_multiple_5fcamera_5fserver_2eproto() {
+static void InitDefaultsscc_info_LabeledFace_multiple_5fcamera_5fserver_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   {
     void* ptr = &::multiple_camera_server::_LabeledFace_default_instance_;
     new (ptr) ::multiple_camera_server::LabeledFace();
-    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
+    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
   }
   ::multiple_camera_server::LabeledFace::InitAsDefaultInstance();
 }
 
-::google::protobuf::internal::SCCInfo<0> scc_info_LabeledFace_multiple_5fcamera_5fserver_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsLabeledFace_multiple_5fcamera_5fserver_2eproto}, {}};
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_LabeledFace_multiple_5fcamera_5fserver_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_LabeledFace_multiple_5fcamera_5fserver_2eproto}, {}};
 
-void InitDefaults_multiple_5fcamera_5fserver_2eproto() {
-  ::google::protobuf::internal::InitSCC(&scc_info_CheckConnectionReq_multiple_5fcamera_5fserver_2eproto.base);
-  ::google::protobuf::internal::InitSCC(&scc_info_CheckConnectionResp_multiple_5fcamera_5fserver_2eproto.base);
-  ::google::protobuf::internal::InitSCC(&scc_info_RegistrationReq_multiple_5fcamera_5fserver_2eproto.base);
-  ::google::protobuf::internal::InitSCC(&scc_info_RegistrationResp_multiple_5fcamera_5fserver_2eproto.base);
-  ::google::protobuf::internal::InitSCC(&scc_info_FaceInfo_multiple_5fcamera_5fserver_2eproto.base);
-  ::google::protobuf::internal::InitSCC(&scc_info_JSReq_multiple_5fcamera_5fserver_2eproto.base);
-  ::google::protobuf::internal::InitSCC(&scc_info_JSResp_multiple_5fcamera_5fserver_2eproto.base);
-  ::google::protobuf::internal::InitSCC(&scc_info_UnlabeledFace_multiple_5fcamera_5fserver_2eproto.base);
-  ::google::protobuf::internal::InitSCC(&scc_info_LabeledFace_multiple_5fcamera_5fserver_2eproto.base);
+static void InitDefaultsscc_info_RegistrationReq_multiple_5fcamera_5fserver_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::multiple_camera_server::_RegistrationReq_default_instance_;
+    new (ptr) ::multiple_camera_server::RegistrationReq();
+    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::multiple_camera_server::RegistrationReq::InitAsDefaultInstance();
 }
 
-::google::protobuf::Metadata file_level_metadata_multiple_5fcamera_5fserver_2eproto[9];
-constexpr ::google::protobuf::EnumDescriptor const** file_level_enum_descriptors_multiple_5fcamera_5fserver_2eproto = nullptr;
-constexpr ::google::protobuf::ServiceDescriptor const** file_level_service_descriptors_multiple_5fcamera_5fserver_2eproto = nullptr;
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_RegistrationReq_multiple_5fcamera_5fserver_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_RegistrationReq_multiple_5fcamera_5fserver_2eproto}, {}};
 
-const ::google::protobuf::uint32 TableStruct_multiple_5fcamera_5fserver_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
+static void InitDefaultsscc_info_RegistrationResp_multiple_5fcamera_5fserver_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::multiple_camera_server::_RegistrationResp_default_instance_;
+    new (ptr) ::multiple_camera_server::RegistrationResp();
+    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::multiple_camera_server::RegistrationResp::InitAsDefaultInstance();
+}
+
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_RegistrationResp_multiple_5fcamera_5fserver_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 1, 0, InitDefaultsscc_info_RegistrationResp_multiple_5fcamera_5fserver_2eproto}, {
+      &scc_info_FaceInfo_multiple_5fcamera_5fserver_2eproto.base,}};
+
+static void InitDefaultsscc_info_UnlabeledFace_multiple_5fcamera_5fserver_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::multiple_camera_server::_UnlabeledFace_default_instance_;
+    new (ptr) ::multiple_camera_server::UnlabeledFace();
+    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::multiple_camera_server::UnlabeledFace::InitAsDefaultInstance();
+}
+
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_UnlabeledFace_multiple_5fcamera_5fserver_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_UnlabeledFace_multiple_5fcamera_5fserver_2eproto}, {}};
+
+static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_multiple_5fcamera_5fserver_2eproto[9];
+static constexpr ::PROTOBUF_NAMESPACE_ID::EnumDescriptor const** file_level_enum_descriptors_multiple_5fcamera_5fserver_2eproto = nullptr;
+static constexpr ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor const** file_level_service_descriptors_multiple_5fcamera_5fserver_2eproto = nullptr;
+
+const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_multiple_5fcamera_5fserver_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::multiple_camera_server::CheckConnectionReq, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -263,7 +249,7 @@ const ::google::protobuf::uint32 TableStruct_multiple_5fcamera_5fserver_2eproto:
   PROTOBUF_FIELD_OFFSET(::multiple_camera_server::LabeledFace, person_name_),
   PROTOBUF_FIELD_OFFSET(::multiple_camera_server::LabeledFace, confidence_),
 };
-static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
+static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::multiple_camera_server::CheckConnectionReq)},
   { 5, -1, sizeof(::multiple_camera_server::CheckConnectionResp)},
   { 11, -1, sizeof(::multiple_camera_server::RegistrationReq)},
@@ -275,25 +261,19 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SE
   { 50, -1, sizeof(::multiple_camera_server::LabeledFace)},
 };
 
-static ::google::protobuf::Message const * const file_default_instances[] = {
-  reinterpret_cast<const ::google::protobuf::Message*>(&::multiple_camera_server::_CheckConnectionReq_default_instance_),
-  reinterpret_cast<const ::google::protobuf::Message*>(&::multiple_camera_server::_CheckConnectionResp_default_instance_),
-  reinterpret_cast<const ::google::protobuf::Message*>(&::multiple_camera_server::_RegistrationReq_default_instance_),
-  reinterpret_cast<const ::google::protobuf::Message*>(&::multiple_camera_server::_RegistrationResp_default_instance_),
-  reinterpret_cast<const ::google::protobuf::Message*>(&::multiple_camera_server::_FaceInfo_default_instance_),
-  reinterpret_cast<const ::google::protobuf::Message*>(&::multiple_camera_server::_JSReq_default_instance_),
-  reinterpret_cast<const ::google::protobuf::Message*>(&::multiple_camera_server::_JSResp_default_instance_),
-  reinterpret_cast<const ::google::protobuf::Message*>(&::multiple_camera_server::_UnlabeledFace_default_instance_),
-  reinterpret_cast<const ::google::protobuf::Message*>(&::multiple_camera_server::_LabeledFace_default_instance_),
+static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::multiple_camera_server::_CheckConnectionReq_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::multiple_camera_server::_CheckConnectionResp_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::multiple_camera_server::_RegistrationReq_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::multiple_camera_server::_RegistrationResp_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::multiple_camera_server::_FaceInfo_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::multiple_camera_server::_JSReq_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::multiple_camera_server::_JSResp_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::multiple_camera_server::_UnlabeledFace_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::multiple_camera_server::_LabeledFace_default_instance_),
 };
 
-::google::protobuf::internal::AssignDescriptorsTable assign_descriptors_table_multiple_5fcamera_5fserver_2eproto = {
-  {}, AddDescriptors_multiple_5fcamera_5fserver_2eproto, "multiple_camera_server.proto", schemas,
-  file_default_instances, TableStruct_multiple_5fcamera_5fserver_2eproto::offsets,
-  file_level_metadata_multiple_5fcamera_5fserver_2eproto, 9, file_level_enum_descriptors_multiple_5fcamera_5fserver_2eproto, file_level_service_descriptors_multiple_5fcamera_5fserver_2eproto,
-};
-
-const char descriptor_table_protodef_multiple_5fcamera_5fserver_2eproto[] =
+const char descriptor_table_protodef_multiple_5fcamera_5fserver_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
   "\n\034multiple_camera_server.proto\022\026multiple"
   "_camera_server\"\024\n\022CheckConnectionReq\"2\n\023"
   "CheckConnectionResp\022\033\n\023connection_respon"
@@ -319,41 +299,47 @@ const char descriptor_table_protodef_multiple_5fcamera_5fserver_2eproto[] =
   "camera_server.CheckConnectionResp\"\000b\006pro"
   "to3"
   ;
-::google::protobuf::internal::DescriptorTable descriptor_table_multiple_5fcamera_5fserver_2eproto = {
-  false, InitDefaults_multiple_5fcamera_5fserver_2eproto, 
-  descriptor_table_protodef_multiple_5fcamera_5fserver_2eproto,
-  "multiple_camera_server.proto", &assign_descriptors_table_multiple_5fcamera_5fserver_2eproto, 923,
+static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_multiple_5fcamera_5fserver_2eproto_deps[1] = {
+};
+static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_multiple_5fcamera_5fserver_2eproto_sccs[9] = {
+  &scc_info_CheckConnectionReq_multiple_5fcamera_5fserver_2eproto.base,
+  &scc_info_CheckConnectionResp_multiple_5fcamera_5fserver_2eproto.base,
+  &scc_info_FaceInfo_multiple_5fcamera_5fserver_2eproto.base,
+  &scc_info_JSReq_multiple_5fcamera_5fserver_2eproto.base,
+  &scc_info_JSResp_multiple_5fcamera_5fserver_2eproto.base,
+  &scc_info_LabeledFace_multiple_5fcamera_5fserver_2eproto.base,
+  &scc_info_RegistrationReq_multiple_5fcamera_5fserver_2eproto.base,
+  &scc_info_RegistrationResp_multiple_5fcamera_5fserver_2eproto.base,
+  &scc_info_UnlabeledFace_multiple_5fcamera_5fserver_2eproto.base,
+};
+static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_multiple_5fcamera_5fserver_2eproto_once;
+static bool descriptor_table_multiple_5fcamera_5fserver_2eproto_initialized = false;
+const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_multiple_5fcamera_5fserver_2eproto = {
+  &descriptor_table_multiple_5fcamera_5fserver_2eproto_initialized, descriptor_table_protodef_multiple_5fcamera_5fserver_2eproto, "multiple_camera_server.proto", 923,
+  &descriptor_table_multiple_5fcamera_5fserver_2eproto_once, descriptor_table_multiple_5fcamera_5fserver_2eproto_sccs, descriptor_table_multiple_5fcamera_5fserver_2eproto_deps, 9, 0,
+  schemas, file_default_instances, TableStruct_multiple_5fcamera_5fserver_2eproto::offsets,
+  file_level_metadata_multiple_5fcamera_5fserver_2eproto, 9, file_level_enum_descriptors_multiple_5fcamera_5fserver_2eproto, file_level_service_descriptors_multiple_5fcamera_5fserver_2eproto,
 };
 
-void AddDescriptors_multiple_5fcamera_5fserver_2eproto() {
-  static constexpr ::google::protobuf::internal::InitFunc deps[1] =
-  {
-  };
- ::google::protobuf::internal::AddDescriptors(&descriptor_table_multiple_5fcamera_5fserver_2eproto, deps, 0);
-}
-
 // Force running AddDescriptors() at dynamic initialization time.
-static bool dynamic_init_dummy_multiple_5fcamera_5fserver_2eproto = []() { AddDescriptors_multiple_5fcamera_5fserver_2eproto(); return true; }();
+static bool dynamic_init_dummy_multiple_5fcamera_5fserver_2eproto = (static_cast<void>(::PROTOBUF_NAMESPACE_ID::internal::AddDescriptors(&descriptor_table_multiple_5fcamera_5fserver_2eproto)), true);
 namespace multiple_camera_server {
 
 // ===================================================================
 
 void CheckConnectionReq::InitAsDefaultInstance() {
 }
-class CheckConnectionReq::HasBitSetters {
+class CheckConnectionReq::_Internal {
  public:
 };
 
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
-
 CheckConnectionReq::CheckConnectionReq()
-  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
+  : ::PROTOBUF_NAMESPACE_ID::Message(), _internal_metadata_(nullptr) {
   SharedCtor();
   // @@protoc_insertion_point(constructor:multiple_camera_server.CheckConnectionReq)
 }
 CheckConnectionReq::CheckConnectionReq(const CheckConnectionReq& from)
-  : ::google::protobuf::Message(),
+  : ::PROTOBUF_NAMESPACE_ID::Message(),
       _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   // @@protoc_insertion_point(copy_constructor:multiple_camera_server.CheckConnectionReq)
@@ -374,97 +360,51 @@ void CheckConnectionReq::SetCachedSize(int size) const {
   _cached_size_.Set(size);
 }
 const CheckConnectionReq& CheckConnectionReq::default_instance() {
-  ::google::protobuf::internal::InitSCC(&::scc_info_CheckConnectionReq_multiple_5fcamera_5fserver_2eproto.base);
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_CheckConnectionReq_multiple_5fcamera_5fserver_2eproto.base);
   return *internal_default_instance();
 }
 
 
 void CheckConnectionReq::Clear() {
 // @@protoc_insertion_point(message_clear_start:multiple_camera_server.CheckConnectionReq)
-  ::google::protobuf::uint32 cached_has_bits = 0;
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
   _internal_metadata_.Clear();
 }
 
-#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-const char* CheckConnectionReq::_InternalParse(const char* begin, const char* end, void* object,
-                  ::google::protobuf::internal::ParseContext* ctx) {
-  auto msg = static_cast<CheckConnectionReq*>(object);
-  ::google::protobuf::int32 size; (void)size;
-  int depth; (void)depth;
-  ::google::protobuf::uint32 tag;
-  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
-  auto ptr = begin;
-  while (ptr < end) {
-    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
-    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-    switch (tag >> 3) {
-      default: {
+const char* CheckConnectionReq::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    CHK_(ptr);
         if ((tag & 7) == 4 || tag == 0) {
-          ctx->EndGroup(tag);
-          return ptr;
+          ctx->SetLastTag(tag);
+          goto success;
         }
-        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
-          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
-        ptr = res.first;
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
-        if (res.second) return ptr;
-      }
-    }  // switch
+        ptr = UnknownFieldParse(tag, &_internal_metadata_, ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
   }  // while
-  return ptr;
-}
-#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-bool CheckConnectionReq::MergePartialFromCodedStream(
-    ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
-  ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:multiple_camera_server.CheckConnectionReq)
-  for (;;) {
-    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
-    tag = p.first;
-    if (!p.second) goto handle_unusual;
-  handle_unusual:
-    if (tag == 0) {
-      goto success;
-    }
-    DO_(::google::protobuf::internal::WireFormat::SkipField(
-          input, tag, _internal_metadata_.mutable_unknown_fields()));
-  }
 success:
-  // @@protoc_insertion_point(parse_success:multiple_camera_server.CheckConnectionReq)
-  return true;
+  return ptr;
 failure:
-  // @@protoc_insertion_point(parse_failure:multiple_camera_server.CheckConnectionReq)
-  return false;
-#undef DO_
-}
-#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-
-void CheckConnectionReq::SerializeWithCachedSizes(
-    ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:multiple_camera_server.CheckConnectionReq)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
-        _internal_metadata_.unknown_fields(), output);
-  }
-  // @@protoc_insertion_point(serialize_end:multiple_camera_server.CheckConnectionReq)
+  ptr = nullptr;
+  goto success;
+#undef CHK_
 }
 
-::google::protobuf::uint8* CheckConnectionReq::InternalSerializeWithCachedSizesToArray(
-    ::google::protobuf::uint8* target) const {
+::PROTOBUF_NAMESPACE_ID::uint8* CheckConnectionReq::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:multiple_camera_server.CheckConnectionReq)
-  ::google::protobuf::uint32 cached_has_bits = 0;
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  if (_internal_metadata_.have_unknown_fields()) {
-    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields(), target);
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields(), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:multiple_camera_server.CheckConnectionReq)
   return target;
@@ -474,29 +414,28 @@ size_t CheckConnectionReq::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:multiple_camera_server.CheckConnectionReq)
   size_t total_size = 0;
 
-  if (_internal_metadata_.have_unknown_fields()) {
-    total_size +=
-      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
-        _internal_metadata_.unknown_fields());
-  }
-  ::google::protobuf::uint32 cached_has_bits = 0;
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
   SetCachedSize(cached_size);
   return total_size;
 }
 
-void CheckConnectionReq::MergeFrom(const ::google::protobuf::Message& from) {
+void CheckConnectionReq::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
 // @@protoc_insertion_point(generalized_merge_from_start:multiple_camera_server.CheckConnectionReq)
   GOOGLE_DCHECK_NE(&from, this);
   const CheckConnectionReq* source =
-      ::google::protobuf::DynamicCastToGenerated<CheckConnectionReq>(
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<CheckConnectionReq>(
           &from);
   if (source == nullptr) {
   // @@protoc_insertion_point(generalized_merge_from_cast_fail:multiple_camera_server.CheckConnectionReq)
-    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
   } else {
   // @@protoc_insertion_point(generalized_merge_from_cast_success:multiple_camera_server.CheckConnectionReq)
     MergeFrom(*source);
@@ -507,12 +446,12 @@ void CheckConnectionReq::MergeFrom(const CheckConnectionReq& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:multiple_camera_server.CheckConnectionReq)
   GOOGLE_DCHECK_NE(&from, this);
   _internal_metadata_.MergeFrom(from._internal_metadata_);
-  ::google::protobuf::uint32 cached_has_bits = 0;
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
 }
 
-void CheckConnectionReq::CopyFrom(const ::google::protobuf::Message& from) {
+void CheckConnectionReq::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
 // @@protoc_insertion_point(generalized_copy_from_start:multiple_camera_server.CheckConnectionReq)
   if (&from == this) return;
   Clear();
@@ -530,18 +469,13 @@ bool CheckConnectionReq::IsInitialized() const {
   return true;
 }
 
-void CheckConnectionReq::Swap(CheckConnectionReq* other) {
-  if (other == this) return;
-  InternalSwap(other);
-}
 void CheckConnectionReq::InternalSwap(CheckConnectionReq* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
 }
 
-::google::protobuf::Metadata CheckConnectionReq::GetMetadata() const {
-  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_multiple_5fcamera_5fserver_2eproto);
-  return ::file_level_metadata_multiple_5fcamera_5fserver_2eproto[kIndexInFileMessages];
+::PROTOBUF_NAMESPACE_ID::Metadata CheckConnectionReq::GetMetadata() const {
+  return GetMetadataStatic();
 }
 
 
@@ -549,34 +483,29 @@ void CheckConnectionReq::InternalSwap(CheckConnectionReq* other) {
 
 void CheckConnectionResp::InitAsDefaultInstance() {
 }
-class CheckConnectionResp::HasBitSetters {
+class CheckConnectionResp::_Internal {
  public:
 };
 
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int CheckConnectionResp::kConnectionResponseFieldNumber;
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
-
 CheckConnectionResp::CheckConnectionResp()
-  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
+  : ::PROTOBUF_NAMESPACE_ID::Message(), _internal_metadata_(nullptr) {
   SharedCtor();
   // @@protoc_insertion_point(constructor:multiple_camera_server.CheckConnectionResp)
 }
 CheckConnectionResp::CheckConnectionResp(const CheckConnectionResp& from)
-  : ::google::protobuf::Message(),
+  : ::PROTOBUF_NAMESPACE_ID::Message(),
       _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
-  connection_response_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.connection_response().size() > 0) {
-    connection_response_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.connection_response_);
+  connection_response_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (!from._internal_connection_response().empty()) {
+    connection_response_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.connection_response_);
   }
   // @@protoc_insertion_point(copy_constructor:multiple_camera_server.CheckConnectionResp)
 }
 
 void CheckConnectionResp::SharedCtor() {
-  ::google::protobuf::internal::InitSCC(
-      &scc_info_CheckConnectionResp_multiple_5fcamera_5fserver_2eproto.base);
-  connection_response_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_CheckConnectionResp_multiple_5fcamera_5fserver_2eproto.base);
+  connection_response_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 
 CheckConnectionResp::~CheckConnectionResp() {
@@ -585,170 +514,83 @@ CheckConnectionResp::~CheckConnectionResp() {
 }
 
 void CheckConnectionResp::SharedDtor() {
-  connection_response_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  connection_response_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 
 void CheckConnectionResp::SetCachedSize(int size) const {
   _cached_size_.Set(size);
 }
 const CheckConnectionResp& CheckConnectionResp::default_instance() {
-  ::google::protobuf::internal::InitSCC(&::scc_info_CheckConnectionResp_multiple_5fcamera_5fserver_2eproto.base);
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_CheckConnectionResp_multiple_5fcamera_5fserver_2eproto.base);
   return *internal_default_instance();
 }
 
 
 void CheckConnectionResp::Clear() {
 // @@protoc_insertion_point(message_clear_start:multiple_camera_server.CheckConnectionResp)
-  ::google::protobuf::uint32 cached_has_bits = 0;
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  connection_response_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  connection_response_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   _internal_metadata_.Clear();
 }
 
-#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-const char* CheckConnectionResp::_InternalParse(const char* begin, const char* end, void* object,
-                  ::google::protobuf::internal::ParseContext* ctx) {
-  auto msg = static_cast<CheckConnectionResp*>(object);
-  ::google::protobuf::int32 size; (void)size;
-  int depth; (void)depth;
-  ::google::protobuf::uint32 tag;
-  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
-  auto ptr = begin;
-  while (ptr < end) {
-    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
-    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+const char* CheckConnectionResp::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    CHK_(ptr);
     switch (tag >> 3) {
       // string connection_response = 1;
-      case 1: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
-        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        ctx->extra_parse_data().SetFieldName("multiple_camera_server.CheckConnectionResp.connection_response");
-        object = msg->mutable_connection_response();
-        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
-          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
-          goto string_till_end;
-        }
-        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
-        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
-        ptr += size;
-        break;
-      }
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+          auto str = _internal_mutable_connection_response();
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "multiple_camera_server.CheckConnectionResp.connection_response"));
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
       default: {
       handle_unusual:
         if ((tag & 7) == 4 || tag == 0) {
-          ctx->EndGroup(tag);
-          return ptr;
+          ctx->SetLastTag(tag);
+          goto success;
         }
-        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
-          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
-        ptr = res.first;
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
-        if (res.second) return ptr;
+        ptr = UnknownFieldParse(tag, &_internal_metadata_, ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
       }
     }  // switch
   }  // while
-  return ptr;
-string_till_end:
-  static_cast<::std::string*>(object)->clear();
-  static_cast<::std::string*>(object)->reserve(size);
-  goto len_delim_till_end;
-len_delim_till_end:
-  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
-                               {parser_till_end, object}, size);
-}
-#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-bool CheckConnectionResp::MergePartialFromCodedStream(
-    ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
-  ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:multiple_camera_server.CheckConnectionResp)
-  for (;;) {
-    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
-    tag = p.first;
-    if (!p.second) goto handle_unusual;
-    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // string connection_response = 1;
-      case 1: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_connection_response()));
-          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->connection_response().data(), static_cast<int>(this->connection_response().length()),
-            ::google::protobuf::internal::WireFormatLite::PARSE,
-            "multiple_camera_server.CheckConnectionResp.connection_response"));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      default: {
-      handle_unusual:
-        if (tag == 0) {
-          goto success;
-        }
-        DO_(::google::protobuf::internal::WireFormat::SkipField(
-              input, tag, _internal_metadata_.mutable_unknown_fields()));
-        break;
-      }
-    }
-  }
 success:
-  // @@protoc_insertion_point(parse_success:multiple_camera_server.CheckConnectionResp)
-  return true;
+  return ptr;
 failure:
-  // @@protoc_insertion_point(parse_failure:multiple_camera_server.CheckConnectionResp)
-  return false;
-#undef DO_
-}
-#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-
-void CheckConnectionResp::SerializeWithCachedSizes(
-    ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:multiple_camera_server.CheckConnectionResp)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  // string connection_response = 1;
-  if (this->connection_response().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->connection_response().data(), static_cast<int>(this->connection_response().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "multiple_camera_server.CheckConnectionResp.connection_response");
-    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      1, this->connection_response(), output);
-  }
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
-        _internal_metadata_.unknown_fields(), output);
-  }
-  // @@protoc_insertion_point(serialize_end:multiple_camera_server.CheckConnectionResp)
+  ptr = nullptr;
+  goto success;
+#undef CHK_
 }
 
-::google::protobuf::uint8* CheckConnectionResp::InternalSerializeWithCachedSizesToArray(
-    ::google::protobuf::uint8* target) const {
+::PROTOBUF_NAMESPACE_ID::uint8* CheckConnectionResp::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:multiple_camera_server.CheckConnectionResp)
-  ::google::protobuf::uint32 cached_has_bits = 0;
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
   // string connection_response = 1;
   if (this->connection_response().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->connection_response().data(), static_cast<int>(this->connection_response().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_connection_response().data(), static_cast<int>(this->_internal_connection_response().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
       "multiple_camera_server.CheckConnectionResp.connection_response");
-    target =
-      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        1, this->connection_response(), target);
+    target = stream->WriteStringMaybeAliased(
+        1, this->_internal_connection_response(), target);
   }
 
-  if (_internal_metadata_.have_unknown_fields()) {
-    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields(), target);
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields(), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:multiple_camera_server.CheckConnectionResp)
   return target;
@@ -758,36 +600,35 @@ size_t CheckConnectionResp::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:multiple_camera_server.CheckConnectionResp)
   size_t total_size = 0;
 
-  if (_internal_metadata_.have_unknown_fields()) {
-    total_size +=
-      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
-        _internal_metadata_.unknown_fields());
-  }
-  ::google::protobuf::uint32 cached_has_bits = 0;
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
   // string connection_response = 1;
   if (this->connection_response().size() > 0) {
     total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::StringSize(
-        this->connection_response());
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_connection_response());
   }
 
-  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
   SetCachedSize(cached_size);
   return total_size;
 }
 
-void CheckConnectionResp::MergeFrom(const ::google::protobuf::Message& from) {
+void CheckConnectionResp::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
 // @@protoc_insertion_point(generalized_merge_from_start:multiple_camera_server.CheckConnectionResp)
   GOOGLE_DCHECK_NE(&from, this);
   const CheckConnectionResp* source =
-      ::google::protobuf::DynamicCastToGenerated<CheckConnectionResp>(
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<CheckConnectionResp>(
           &from);
   if (source == nullptr) {
   // @@protoc_insertion_point(generalized_merge_from_cast_fail:multiple_camera_server.CheckConnectionResp)
-    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
   } else {
   // @@protoc_insertion_point(generalized_merge_from_cast_success:multiple_camera_server.CheckConnectionResp)
     MergeFrom(*source);
@@ -798,16 +639,16 @@ void CheckConnectionResp::MergeFrom(const CheckConnectionResp& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:multiple_camera_server.CheckConnectionResp)
   GOOGLE_DCHECK_NE(&from, this);
   _internal_metadata_.MergeFrom(from._internal_metadata_);
-  ::google::protobuf::uint32 cached_has_bits = 0;
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
   if (from.connection_response().size() > 0) {
 
-    connection_response_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.connection_response_);
+    connection_response_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.connection_response_);
   }
 }
 
-void CheckConnectionResp::CopyFrom(const ::google::protobuf::Message& from) {
+void CheckConnectionResp::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
 // @@protoc_insertion_point(generalized_copy_from_start:multiple_camera_server.CheckConnectionResp)
   if (&from == this) return;
   Clear();
@@ -825,20 +666,15 @@ bool CheckConnectionResp::IsInitialized() const {
   return true;
 }
 
-void CheckConnectionResp::Swap(CheckConnectionResp* other) {
-  if (other == this) return;
-  InternalSwap(other);
-}
 void CheckConnectionResp::InternalSwap(CheckConnectionResp* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
-  connection_response_.Swap(&other->connection_response_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+  connection_response_.Swap(&other->connection_response_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
 }
 
-::google::protobuf::Metadata CheckConnectionResp::GetMetadata() const {
-  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_multiple_5fcamera_5fserver_2eproto);
-  return ::file_level_metadata_multiple_5fcamera_5fserver_2eproto[kIndexInFileMessages];
+::PROTOBUF_NAMESPACE_ID::Metadata CheckConnectionResp::GetMetadata() const {
+  return GetMetadataStatic();
 }
 
 
@@ -846,21 +682,17 @@ void CheckConnectionResp::InternalSwap(CheckConnectionResp* other) {
 
 void RegistrationReq::InitAsDefaultInstance() {
 }
-class RegistrationReq::HasBitSetters {
+class RegistrationReq::_Internal {
  public:
 };
 
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int RegistrationReq::kImageBytesFieldNumber;
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
-
 RegistrationReq::RegistrationReq()
-  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
+  : ::PROTOBUF_NAMESPACE_ID::Message(), _internal_metadata_(nullptr) {
   SharedCtor();
   // @@protoc_insertion_point(constructor:multiple_camera_server.RegistrationReq)
 }
 RegistrationReq::RegistrationReq(const RegistrationReq& from)
-  : ::google::protobuf::Message(),
+  : ::PROTOBUF_NAMESPACE_ID::Message(),
       _internal_metadata_(nullptr),
       image_bytes_(from.image_bytes_) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
@@ -868,8 +700,7 @@ RegistrationReq::RegistrationReq(const RegistrationReq& from)
 }
 
 void RegistrationReq::SharedCtor() {
-  ::google::protobuf::internal::InitSCC(
-      &scc_info_RegistrationReq_multiple_5fcamera_5fserver_2eproto.base);
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_RegistrationReq_multiple_5fcamera_5fserver_2eproto.base);
 }
 
 RegistrationReq::~RegistrationReq() {
@@ -884,14 +715,14 @@ void RegistrationReq::SetCachedSize(int size) const {
   _cached_size_.Set(size);
 }
 const RegistrationReq& RegistrationReq::default_instance() {
-  ::google::protobuf::internal::InitSCC(&::scc_info_RegistrationReq_multiple_5fcamera_5fserver_2eproto.base);
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_RegistrationReq_multiple_5fcamera_5fserver_2eproto.base);
   return *internal_default_instance();
 }
 
 
 void RegistrationReq::Clear() {
 // @@protoc_insertion_point(message_clear_start:multiple_camera_server.RegistrationReq)
-  ::google::protobuf::uint32 cached_has_bits = 0;
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -899,137 +730,61 @@ void RegistrationReq::Clear() {
   _internal_metadata_.Clear();
 }
 
-#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-const char* RegistrationReq::_InternalParse(const char* begin, const char* end, void* object,
-                  ::google::protobuf::internal::ParseContext* ctx) {
-  auto msg = static_cast<RegistrationReq*>(object);
-  ::google::protobuf::int32 size; (void)size;
-  int depth; (void)depth;
-  ::google::protobuf::uint32 tag;
-  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
-  auto ptr = begin;
-  while (ptr < end) {
-    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
-    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+const char* RegistrationReq::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    CHK_(ptr);
     switch (tag >> 3) {
       // repeated bytes image_bytes = 1;
-      case 1: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
-        do {
-          ptr = ::google::protobuf::io::ReadSize(ptr, &size);
-          GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-          object = msg->add_image_bytes();
-          if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
-            parser_till_end = ::google::protobuf::internal::GreedyStringParser;
-            goto string_till_end;
-          }
-          GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheck(ptr, size, ctx));
-          ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
-          ptr += size;
-          if (ptr >= end) break;
-        } while ((::google::protobuf::io::UnalignedLoad<::google::protobuf::uint64>(ptr) & 255) == 10 && (ptr += 1));
-        break;
-      }
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+          ptr -= 1;
+          do {
+            ptr += 1;
+            auto str = _internal_add_image_bytes();
+            ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+            CHK_(ptr);
+            if (!ctx->DataAvailable(ptr)) break;
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<10>(ptr));
+        } else goto handle_unusual;
+        continue;
       default: {
       handle_unusual:
         if ((tag & 7) == 4 || tag == 0) {
-          ctx->EndGroup(tag);
-          return ptr;
+          ctx->SetLastTag(tag);
+          goto success;
         }
-        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
-          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
-        ptr = res.first;
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
-        if (res.second) return ptr;
+        ptr = UnknownFieldParse(tag, &_internal_metadata_, ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
       }
     }  // switch
   }  // while
-  return ptr;
-string_till_end:
-  static_cast<::std::string*>(object)->clear();
-  static_cast<::std::string*>(object)->reserve(size);
-  goto len_delim_till_end;
-len_delim_till_end:
-  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
-                               {parser_till_end, object}, size);
-}
-#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-bool RegistrationReq::MergePartialFromCodedStream(
-    ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
-  ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:multiple_camera_server.RegistrationReq)
-  for (;;) {
-    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
-    tag = p.first;
-    if (!p.second) goto handle_unusual;
-    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // repeated bytes image_bytes = 1;
-      case 1: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadBytes(
-                input, this->add_image_bytes()));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      default: {
-      handle_unusual:
-        if (tag == 0) {
-          goto success;
-        }
-        DO_(::google::protobuf::internal::WireFormat::SkipField(
-              input, tag, _internal_metadata_.mutable_unknown_fields()));
-        break;
-      }
-    }
-  }
 success:
-  // @@protoc_insertion_point(parse_success:multiple_camera_server.RegistrationReq)
-  return true;
+  return ptr;
 failure:
-  // @@protoc_insertion_point(parse_failure:multiple_camera_server.RegistrationReq)
-  return false;
-#undef DO_
-}
-#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-
-void RegistrationReq::SerializeWithCachedSizes(
-    ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:multiple_camera_server.RegistrationReq)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  // repeated bytes image_bytes = 1;
-  for (int i = 0, n = this->image_bytes_size(); i < n; i++) {
-    ::google::protobuf::internal::WireFormatLite::WriteBytes(
-      1, this->image_bytes(i), output);
-  }
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
-        _internal_metadata_.unknown_fields(), output);
-  }
-  // @@protoc_insertion_point(serialize_end:multiple_camera_server.RegistrationReq)
+  ptr = nullptr;
+  goto success;
+#undef CHK_
 }
 
-::google::protobuf::uint8* RegistrationReq::InternalSerializeWithCachedSizesToArray(
-    ::google::protobuf::uint8* target) const {
+::PROTOBUF_NAMESPACE_ID::uint8* RegistrationReq::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:multiple_camera_server.RegistrationReq)
-  ::google::protobuf::uint32 cached_has_bits = 0;
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
   // repeated bytes image_bytes = 1;
-  for (int i = 0, n = this->image_bytes_size(); i < n; i++) {
-    target = ::google::protobuf::internal::WireFormatLite::
-      WriteBytesToArray(1, this->image_bytes(i), target);
+  for (int i = 0, n = this->_internal_image_bytes_size(); i < n; i++) {
+    const auto& s = this->_internal_image_bytes(i);
+    target = stream->WriteBytes(1, s, target);
   }
 
-  if (_internal_metadata_.have_unknown_fields()) {
-    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields(), target);
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields(), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:multiple_camera_server.RegistrationReq)
   return target;
@@ -1039,37 +794,36 @@ size_t RegistrationReq::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:multiple_camera_server.RegistrationReq)
   size_t total_size = 0;
 
-  if (_internal_metadata_.have_unknown_fields()) {
-    total_size +=
-      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
-        _internal_metadata_.unknown_fields());
-  }
-  ::google::protobuf::uint32 cached_has_bits = 0;
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
   // repeated bytes image_bytes = 1;
   total_size += 1 *
-      ::google::protobuf::internal::FromIntSize(this->image_bytes_size());
-  for (int i = 0, n = this->image_bytes_size(); i < n; i++) {
-    total_size += ::google::protobuf::internal::WireFormatLite::BytesSize(
-      this->image_bytes(i));
+      ::PROTOBUF_NAMESPACE_ID::internal::FromIntSize(image_bytes_.size());
+  for (int i = 0, n = image_bytes_.size(); i < n; i++) {
+    total_size += ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::BytesSize(
+      image_bytes_.Get(i));
   }
 
-  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
   SetCachedSize(cached_size);
   return total_size;
 }
 
-void RegistrationReq::MergeFrom(const ::google::protobuf::Message& from) {
+void RegistrationReq::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
 // @@protoc_insertion_point(generalized_merge_from_start:multiple_camera_server.RegistrationReq)
   GOOGLE_DCHECK_NE(&from, this);
   const RegistrationReq* source =
-      ::google::protobuf::DynamicCastToGenerated<RegistrationReq>(
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<RegistrationReq>(
           &from);
   if (source == nullptr) {
   // @@protoc_insertion_point(generalized_merge_from_cast_fail:multiple_camera_server.RegistrationReq)
-    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
   } else {
   // @@protoc_insertion_point(generalized_merge_from_cast_success:multiple_camera_server.RegistrationReq)
     MergeFrom(*source);
@@ -1080,13 +834,13 @@ void RegistrationReq::MergeFrom(const RegistrationReq& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:multiple_camera_server.RegistrationReq)
   GOOGLE_DCHECK_NE(&from, this);
   _internal_metadata_.MergeFrom(from._internal_metadata_);
-  ::google::protobuf::uint32 cached_has_bits = 0;
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
   image_bytes_.MergeFrom(from.image_bytes_);
 }
 
-void RegistrationReq::CopyFrom(const ::google::protobuf::Message& from) {
+void RegistrationReq::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
 // @@protoc_insertion_point(generalized_copy_from_start:multiple_camera_server.RegistrationReq)
   if (&from == this) return;
   Clear();
@@ -1104,19 +858,14 @@ bool RegistrationReq::IsInitialized() const {
   return true;
 }
 
-void RegistrationReq::Swap(RegistrationReq* other) {
-  if (other == this) return;
-  InternalSwap(other);
-}
 void RegistrationReq::InternalSwap(RegistrationReq* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
-  image_bytes_.InternalSwap(CastToBase(&other->image_bytes_));
+  image_bytes_.InternalSwap(&other->image_bytes_);
 }
 
-::google::protobuf::Metadata RegistrationReq::GetMetadata() const {
-  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_multiple_5fcamera_5fserver_2eproto);
-  return ::file_level_metadata_multiple_5fcamera_5fserver_2eproto[kIndexInFileMessages];
+::PROTOBUF_NAMESPACE_ID::Metadata RegistrationReq::GetMetadata() const {
+  return GetMetadataStatic();
 }
 
 
@@ -1124,21 +873,17 @@ void RegistrationReq::InternalSwap(RegistrationReq* other) {
 
 void RegistrationResp::InitAsDefaultInstance() {
 }
-class RegistrationResp::HasBitSetters {
+class RegistrationResp::_Internal {
  public:
 };
 
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int RegistrationResp::kFaceInfosFieldNumber;
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
-
 RegistrationResp::RegistrationResp()
-  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
+  : ::PROTOBUF_NAMESPACE_ID::Message(), _internal_metadata_(nullptr) {
   SharedCtor();
   // @@protoc_insertion_point(constructor:multiple_camera_server.RegistrationResp)
 }
 RegistrationResp::RegistrationResp(const RegistrationResp& from)
-  : ::google::protobuf::Message(),
+  : ::PROTOBUF_NAMESPACE_ID::Message(),
       _internal_metadata_(nullptr),
       face_infos_(from.face_infos_) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
@@ -1146,8 +891,7 @@ RegistrationResp::RegistrationResp(const RegistrationResp& from)
 }
 
 void RegistrationResp::SharedCtor() {
-  ::google::protobuf::internal::InitSCC(
-      &scc_info_RegistrationResp_multiple_5fcamera_5fserver_2eproto.base);
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_RegistrationResp_multiple_5fcamera_5fserver_2eproto.base);
 }
 
 RegistrationResp::~RegistrationResp() {
@@ -1162,14 +906,14 @@ void RegistrationResp::SetCachedSize(int size) const {
   _cached_size_.Set(size);
 }
 const RegistrationResp& RegistrationResp::default_instance() {
-  ::google::protobuf::internal::InitSCC(&::scc_info_RegistrationResp_multiple_5fcamera_5fserver_2eproto.base);
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_RegistrationResp_multiple_5fcamera_5fserver_2eproto.base);
   return *internal_default_instance();
 }
 
 
 void RegistrationResp::Clear() {
 // @@protoc_insertion_point(message_clear_start:multiple_camera_server.RegistrationResp)
-  ::google::protobuf::uint32 cached_has_bits = 0;
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -1177,136 +921,62 @@ void RegistrationResp::Clear() {
   _internal_metadata_.Clear();
 }
 
-#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-const char* RegistrationResp::_InternalParse(const char* begin, const char* end, void* object,
-                  ::google::protobuf::internal::ParseContext* ctx) {
-  auto msg = static_cast<RegistrationResp*>(object);
-  ::google::protobuf::int32 size; (void)size;
-  int depth; (void)depth;
-  ::google::protobuf::uint32 tag;
-  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
-  auto ptr = begin;
-  while (ptr < end) {
-    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
-    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+const char* RegistrationResp::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    CHK_(ptr);
     switch (tag >> 3) {
       // repeated .multiple_camera_server.FaceInfo face_infos = 1;
-      case 1: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
-        do {
-          ptr = ::google::protobuf::io::ReadSize(ptr, &size);
-          GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-          parser_till_end = ::multiple_camera_server::FaceInfo::_InternalParse;
-          object = msg->add_face_infos();
-          if (size > end - ptr) goto len_delim_till_end;
-          ptr += size;
-          GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
-              {parser_till_end, object}, ptr - size, ptr));
-          if (ptr >= end) break;
-        } while ((::google::protobuf::io::UnalignedLoad<::google::protobuf::uint64>(ptr) & 255) == 10 && (ptr += 1));
-        break;
-      }
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+          ptr -= 1;
+          do {
+            ptr += 1;
+            ptr = ctx->ParseMessage(_internal_add_face_infos(), ptr);
+            CHK_(ptr);
+            if (!ctx->DataAvailable(ptr)) break;
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<10>(ptr));
+        } else goto handle_unusual;
+        continue;
       default: {
       handle_unusual:
         if ((tag & 7) == 4 || tag == 0) {
-          ctx->EndGroup(tag);
-          return ptr;
+          ctx->SetLastTag(tag);
+          goto success;
         }
-        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
-          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
-        ptr = res.first;
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
-        if (res.second) return ptr;
+        ptr = UnknownFieldParse(tag, &_internal_metadata_, ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
       }
     }  // switch
   }  // while
-  return ptr;
-len_delim_till_end:
-  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
-                               {parser_till_end, object}, size);
-}
-#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-bool RegistrationResp::MergePartialFromCodedStream(
-    ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
-  ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:multiple_camera_server.RegistrationResp)
-  for (;;) {
-    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
-    tag = p.first;
-    if (!p.second) goto handle_unusual;
-    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // repeated .multiple_camera_server.FaceInfo face_infos = 1;
-      case 1: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
-                input, add_face_infos()));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      default: {
-      handle_unusual:
-        if (tag == 0) {
-          goto success;
-        }
-        DO_(::google::protobuf::internal::WireFormat::SkipField(
-              input, tag, _internal_metadata_.mutable_unknown_fields()));
-        break;
-      }
-    }
-  }
 success:
-  // @@protoc_insertion_point(parse_success:multiple_camera_server.RegistrationResp)
-  return true;
+  return ptr;
 failure:
-  // @@protoc_insertion_point(parse_failure:multiple_camera_server.RegistrationResp)
-  return false;
-#undef DO_
-}
-#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-
-void RegistrationResp::SerializeWithCachedSizes(
-    ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:multiple_camera_server.RegistrationResp)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  // repeated .multiple_camera_server.FaceInfo face_infos = 1;
-  for (unsigned int i = 0,
-      n = static_cast<unsigned int>(this->face_infos_size()); i < n; i++) {
-    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      1,
-      this->face_infos(static_cast<int>(i)),
-      output);
-  }
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
-        _internal_metadata_.unknown_fields(), output);
-  }
-  // @@protoc_insertion_point(serialize_end:multiple_camera_server.RegistrationResp)
+  ptr = nullptr;
+  goto success;
+#undef CHK_
 }
 
-::google::protobuf::uint8* RegistrationResp::InternalSerializeWithCachedSizesToArray(
-    ::google::protobuf::uint8* target) const {
+::PROTOBUF_NAMESPACE_ID::uint8* RegistrationResp::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:multiple_camera_server.RegistrationResp)
-  ::google::protobuf::uint32 cached_has_bits = 0;
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
   // repeated .multiple_camera_server.FaceInfo face_infos = 1;
   for (unsigned int i = 0,
-      n = static_cast<unsigned int>(this->face_infos_size()); i < n; i++) {
-    target = ::google::protobuf::internal::WireFormatLite::
-      InternalWriteMessageToArray(
-        1, this->face_infos(static_cast<int>(i)), target);
+      n = static_cast<unsigned int>(this->_internal_face_infos_size()); i < n; i++) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(1, this->_internal_face_infos(i), target, stream);
   }
 
-  if (_internal_metadata_.have_unknown_fields()) {
-    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields(), target);
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields(), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:multiple_camera_server.RegistrationResp)
   return target;
@@ -1316,40 +986,35 @@ size_t RegistrationResp::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:multiple_camera_server.RegistrationResp)
   size_t total_size = 0;
 
-  if (_internal_metadata_.have_unknown_fields()) {
-    total_size +=
-      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
-        _internal_metadata_.unknown_fields());
-  }
-  ::google::protobuf::uint32 cached_has_bits = 0;
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
   // repeated .multiple_camera_server.FaceInfo face_infos = 1;
-  {
-    unsigned int count = static_cast<unsigned int>(this->face_infos_size());
-    total_size += 1UL * count;
-    for (unsigned int i = 0; i < count; i++) {
-      total_size +=
-        ::google::protobuf::internal::WireFormatLite::MessageSize(
-          this->face_infos(static_cast<int>(i)));
-    }
+  total_size += 1UL * this->_internal_face_infos_size();
+  for (const auto& msg : this->face_infos_) {
+    total_size +=
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
   }
 
-  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
   SetCachedSize(cached_size);
   return total_size;
 }
 
-void RegistrationResp::MergeFrom(const ::google::protobuf::Message& from) {
+void RegistrationResp::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
 // @@protoc_insertion_point(generalized_merge_from_start:multiple_camera_server.RegistrationResp)
   GOOGLE_DCHECK_NE(&from, this);
   const RegistrationResp* source =
-      ::google::protobuf::DynamicCastToGenerated<RegistrationResp>(
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<RegistrationResp>(
           &from);
   if (source == nullptr) {
   // @@protoc_insertion_point(generalized_merge_from_cast_fail:multiple_camera_server.RegistrationResp)
-    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
   } else {
   // @@protoc_insertion_point(generalized_merge_from_cast_success:multiple_camera_server.RegistrationResp)
     MergeFrom(*source);
@@ -1360,13 +1025,13 @@ void RegistrationResp::MergeFrom(const RegistrationResp& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:multiple_camera_server.RegistrationResp)
   GOOGLE_DCHECK_NE(&from, this);
   _internal_metadata_.MergeFrom(from._internal_metadata_);
-  ::google::protobuf::uint32 cached_has_bits = 0;
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
   face_infos_.MergeFrom(from.face_infos_);
 }
 
-void RegistrationResp::CopyFrom(const ::google::protobuf::Message& from) {
+void RegistrationResp::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
 // @@protoc_insertion_point(generalized_copy_from_start:multiple_camera_server.RegistrationResp)
   if (&from == this) return;
   Clear();
@@ -1384,19 +1049,14 @@ bool RegistrationResp::IsInitialized() const {
   return true;
 }
 
-void RegistrationResp::Swap(RegistrationResp* other) {
-  if (other == this) return;
-  InternalSwap(other);
-}
 void RegistrationResp::InternalSwap(RegistrationResp* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
-  CastToBase(&face_infos_)->InternalSwap(CastToBase(&other->face_infos_));
+  face_infos_.InternalSwap(&other->face_infos_);
 }
 
-::google::protobuf::Metadata RegistrationResp::GetMetadata() const {
-  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_multiple_5fcamera_5fserver_2eproto);
-  return ::file_level_metadata_multiple_5fcamera_5fserver_2eproto[kIndexInFileMessages];
+::PROTOBUF_NAMESPACE_ID::Metadata RegistrationResp::GetMetadata() const {
+  return GetMetadataStatic();
 }
 
 
@@ -1404,36 +1064,30 @@ void RegistrationResp::InternalSwap(RegistrationResp* other) {
 
 void FaceInfo::InitAsDefaultInstance() {
 }
-class FaceInfo::HasBitSetters {
+class FaceInfo::_Internal {
  public:
 };
 
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int FaceInfo::kBboxFieldNumber;
-const int FaceInfo::kFeatureVectorFieldNumber;
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
-
 FaceInfo::FaceInfo()
-  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
+  : ::PROTOBUF_NAMESPACE_ID::Message(), _internal_metadata_(nullptr) {
   SharedCtor();
   // @@protoc_insertion_point(constructor:multiple_camera_server.FaceInfo)
 }
 FaceInfo::FaceInfo(const FaceInfo& from)
-  : ::google::protobuf::Message(),
+  : ::PROTOBUF_NAMESPACE_ID::Message(),
       _internal_metadata_(nullptr),
       bbox_(from.bbox_) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
-  feature_vector_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.feature_vector().size() > 0) {
-    feature_vector_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.feature_vector_);
+  feature_vector_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (!from._internal_feature_vector().empty()) {
+    feature_vector_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.feature_vector_);
   }
   // @@protoc_insertion_point(copy_constructor:multiple_camera_server.FaceInfo)
 }
 
 void FaceInfo::SharedCtor() {
-  ::google::protobuf::internal::InitSCC(
-      &scc_info_FaceInfo_multiple_5fcamera_5fserver_2eproto.base);
-  feature_vector_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_FaceInfo_multiple_5fcamera_5fserver_2eproto.base);
+  feature_vector_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 
 FaceInfo::~FaceInfo() {
@@ -1442,218 +1096,98 @@ FaceInfo::~FaceInfo() {
 }
 
 void FaceInfo::SharedDtor() {
-  feature_vector_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  feature_vector_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 
 void FaceInfo::SetCachedSize(int size) const {
   _cached_size_.Set(size);
 }
 const FaceInfo& FaceInfo::default_instance() {
-  ::google::protobuf::internal::InitSCC(&::scc_info_FaceInfo_multiple_5fcamera_5fserver_2eproto.base);
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_FaceInfo_multiple_5fcamera_5fserver_2eproto.base);
   return *internal_default_instance();
 }
 
 
 void FaceInfo::Clear() {
 // @@protoc_insertion_point(message_clear_start:multiple_camera_server.FaceInfo)
-  ::google::protobuf::uint32 cached_has_bits = 0;
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
   bbox_.Clear();
-  feature_vector_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  feature_vector_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   _internal_metadata_.Clear();
 }
 
-#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-const char* FaceInfo::_InternalParse(const char* begin, const char* end, void* object,
-                  ::google::protobuf::internal::ParseContext* ctx) {
-  auto msg = static_cast<FaceInfo*>(object);
-  ::google::protobuf::int32 size; (void)size;
-  int depth; (void)depth;
-  ::google::protobuf::uint32 tag;
-  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
-  auto ptr = begin;
-  while (ptr < end) {
-    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
-    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+const char* FaceInfo::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    CHK_(ptr);
     switch (tag >> 3) {
       // repeated int32 bbox = 1;
-      case 1: {
-        if (static_cast<::google::protobuf::uint8>(tag) == 10) {
-          ptr = ::google::protobuf::io::ReadSize(ptr, &size);
-          GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-          parser_till_end = ::google::protobuf::internal::PackedInt32Parser;
-          object = msg->mutable_bbox();
-          if (size > end - ptr) goto len_delim_till_end;
-          auto newend = ptr + size;
-          if (size) ptr = parser_till_end(ptr, newend, object, ctx);
-          GOOGLE_PROTOBUF_PARSER_ASSERT(ptr == newend);
-          break;
-        } else if (static_cast<::google::protobuf::uint8>(tag) != 8) goto handle_unusual;
-        do {
-          msg->add_bbox(::google::protobuf::internal::ReadVarint(&ptr));
-          GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-          if (ptr >= end) break;
-        } while ((::google::protobuf::io::UnalignedLoad<::google::protobuf::uint64>(ptr) & 255) == 8 && (ptr += 1));
-        break;
-      }
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedInt32Parser(_internal_mutable_bbox(), ptr, ctx);
+          CHK_(ptr);
+        } else if (static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8) {
+          _internal_add_bbox(::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr));
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
       // bytes feature_vector = 2;
-      case 2: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 18) goto handle_unusual;
-        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        object = msg->mutable_feature_vector();
-        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
-          parser_till_end = ::google::protobuf::internal::GreedyStringParser;
-          goto string_till_end;
-        }
-        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheck(ptr, size, ctx));
-        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
-        ptr += size;
-        break;
-      }
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
+          auto str = _internal_mutable_feature_vector();
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
       default: {
       handle_unusual:
         if ((tag & 7) == 4 || tag == 0) {
-          ctx->EndGroup(tag);
-          return ptr;
+          ctx->SetLastTag(tag);
+          goto success;
         }
-        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
-          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
-        ptr = res.first;
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
-        if (res.second) return ptr;
+        ptr = UnknownFieldParse(tag, &_internal_metadata_, ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
       }
     }  // switch
   }  // while
+success:
   return ptr;
-string_till_end:
-  static_cast<::std::string*>(object)->clear();
-  static_cast<::std::string*>(object)->reserve(size);
-  goto len_delim_till_end;
-len_delim_till_end:
-  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
-                               {parser_till_end, object}, size);
+failure:
+  ptr = nullptr;
+  goto success;
+#undef CHK_
 }
-#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-bool FaceInfo::MergePartialFromCodedStream(
-    ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
-  ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:multiple_camera_server.FaceInfo)
-  for (;;) {
-    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
-    tag = p.first;
-    if (!p.second) goto handle_unusual;
-    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // repeated int32 bbox = 1;
-      case 1: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPackedPrimitive<
-                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
-                 input, this->mutable_bbox())));
-        } else if (static_cast< ::google::protobuf::uint8>(tag) == (8 & 0xFF)) {
-          DO_((::google::protobuf::internal::WireFormatLite::ReadRepeatedPrimitiveNoInline<
-                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
-                 1, 10u, input, this->mutable_bbox())));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
 
-      // bytes feature_vector = 2;
-      case 2: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadBytes(
-                input, this->mutable_feature_vector()));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
+::PROTOBUF_NAMESPACE_ID::uint8* FaceInfo::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:multiple_camera_server.FaceInfo)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
 
-      default: {
-      handle_unusual:
-        if (tag == 0) {
-          goto success;
-        }
-        DO_(::google::protobuf::internal::WireFormat::SkipField(
-              input, tag, _internal_metadata_.mutable_unknown_fields()));
-        break;
-      }
+  // repeated int32 bbox = 1;
+  {
+    int byte_size = _bbox_cached_byte_size_.load(std::memory_order_relaxed);
+    if (byte_size > 0) {
+      target = stream->WriteInt32Packed(
+          1, _internal_bbox(), byte_size, target);
     }
   }
-success:
-  // @@protoc_insertion_point(parse_success:multiple_camera_server.FaceInfo)
-  return true;
-failure:
-  // @@protoc_insertion_point(parse_failure:multiple_camera_server.FaceInfo)
-  return false;
-#undef DO_
-}
-#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-
-void FaceInfo::SerializeWithCachedSizes(
-    ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:multiple_camera_server.FaceInfo)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  // repeated int32 bbox = 1;
-  if (this->bbox_size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteTag(1, ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED, output);
-    output->WriteVarint32(_bbox_cached_byte_size_.load(
-        std::memory_order_relaxed));
-  }
-  for (int i = 0, n = this->bbox_size(); i < n; i++) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt32NoTag(
-      this->bbox(i), output);
-  }
 
   // bytes feature_vector = 2;
   if (this->feature_vector().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteBytesMaybeAliased(
-      2, this->feature_vector(), output);
+    target = stream->WriteBytesMaybeAliased(
+        2, this->_internal_feature_vector(), target);
   }
 
-  if (_internal_metadata_.have_unknown_fields()) {
-    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
-        _internal_metadata_.unknown_fields(), output);
-  }
-  // @@protoc_insertion_point(serialize_end:multiple_camera_server.FaceInfo)
-}
-
-::google::protobuf::uint8* FaceInfo::InternalSerializeWithCachedSizesToArray(
-    ::google::protobuf::uint8* target) const {
-  // @@protoc_insertion_point(serialize_to_array_start:multiple_camera_server.FaceInfo)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  // repeated int32 bbox = 1;
-  if (this->bbox_size() > 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteTagToArray(
-      1,
-      ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED,
-      target);
-    target = ::google::protobuf::io::CodedOutputStream::WriteVarint32ToArray(
-        _bbox_cached_byte_size_.load(std::memory_order_relaxed),
-         target);
-    target = ::google::protobuf::internal::WireFormatLite::
-      WriteInt32NoTagToArray(this->bbox_, target);
-  }
-
-  // bytes feature_vector = 2;
-  if (this->feature_vector().size() > 0) {
-    target =
-      ::google::protobuf::internal::WireFormatLite::WriteBytesToArray(
-        2, this->feature_vector(), target);
-  }
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields(), target);
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields(), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:multiple_camera_server.FaceInfo)
   return target;
@@ -1663,25 +1197,20 @@ size_t FaceInfo::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:multiple_camera_server.FaceInfo)
   size_t total_size = 0;
 
-  if (_internal_metadata_.have_unknown_fields()) {
-    total_size +=
-      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
-        _internal_metadata_.unknown_fields());
-  }
-  ::google::protobuf::uint32 cached_has_bits = 0;
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
   // repeated int32 bbox = 1;
   {
-    size_t data_size = ::google::protobuf::internal::WireFormatLite::
+    size_t data_size = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
       Int32Size(this->bbox_);
     if (data_size > 0) {
       total_size += 1 +
-        ::google::protobuf::internal::WireFormatLite::Int32Size(
-            static_cast<::google::protobuf::int32>(data_size));
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+            static_cast<::PROTOBUF_NAMESPACE_ID::int32>(data_size));
     }
-    int cached_size = ::google::protobuf::internal::ToCachedSize(data_size);
+    int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(data_size);
     _bbox_cached_byte_size_.store(cached_size,
                                     std::memory_order_relaxed);
     total_size += data_size;
@@ -1690,24 +1219,28 @@ size_t FaceInfo::ByteSizeLong() const {
   // bytes feature_vector = 2;
   if (this->feature_vector().size() > 0) {
     total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::BytesSize(
-        this->feature_vector());
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::BytesSize(
+        this->_internal_feature_vector());
   }
 
-  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
   SetCachedSize(cached_size);
   return total_size;
 }
 
-void FaceInfo::MergeFrom(const ::google::protobuf::Message& from) {
+void FaceInfo::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
 // @@protoc_insertion_point(generalized_merge_from_start:multiple_camera_server.FaceInfo)
   GOOGLE_DCHECK_NE(&from, this);
   const FaceInfo* source =
-      ::google::protobuf::DynamicCastToGenerated<FaceInfo>(
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<FaceInfo>(
           &from);
   if (source == nullptr) {
   // @@protoc_insertion_point(generalized_merge_from_cast_fail:multiple_camera_server.FaceInfo)
-    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
   } else {
   // @@protoc_insertion_point(generalized_merge_from_cast_success:multiple_camera_server.FaceInfo)
     MergeFrom(*source);
@@ -1718,17 +1251,17 @@ void FaceInfo::MergeFrom(const FaceInfo& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:multiple_camera_server.FaceInfo)
   GOOGLE_DCHECK_NE(&from, this);
   _internal_metadata_.MergeFrom(from._internal_metadata_);
-  ::google::protobuf::uint32 cached_has_bits = 0;
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
   bbox_.MergeFrom(from.bbox_);
   if (from.feature_vector().size() > 0) {
 
-    feature_vector_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.feature_vector_);
+    feature_vector_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.feature_vector_);
   }
 }
 
-void FaceInfo::CopyFrom(const ::google::protobuf::Message& from) {
+void FaceInfo::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
 // @@protoc_insertion_point(generalized_copy_from_start:multiple_camera_server.FaceInfo)
   if (&from == this) return;
   Clear();
@@ -1746,21 +1279,16 @@ bool FaceInfo::IsInitialized() const {
   return true;
 }
 
-void FaceInfo::Swap(FaceInfo* other) {
-  if (other == this) return;
-  InternalSwap(other);
-}
 void FaceInfo::InternalSwap(FaceInfo* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
   bbox_.InternalSwap(&other->bbox_);
-  feature_vector_.Swap(&other->feature_vector_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+  feature_vector_.Swap(&other->feature_vector_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
 }
 
-::google::protobuf::Metadata FaceInfo::GetMetadata() const {
-  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_multiple_5fcamera_5fserver_2eproto);
-  return ::file_level_metadata_multiple_5fcamera_5fserver_2eproto[kIndexInFileMessages];
+::PROTOBUF_NAMESPACE_ID::Metadata FaceInfo::GetMetadata() const {
+  return GetMetadataStatic();
 }
 
 
@@ -1768,21 +1296,17 @@ void FaceInfo::InternalSwap(FaceInfo* other) {
 
 void JSReq::InitAsDefaultInstance() {
 }
-class JSReq::HasBitSetters {
+class JSReq::_Internal {
  public:
 };
 
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int JSReq::kFacesFieldNumber;
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
-
 JSReq::JSReq()
-  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
+  : ::PROTOBUF_NAMESPACE_ID::Message(), _internal_metadata_(nullptr) {
   SharedCtor();
   // @@protoc_insertion_point(constructor:multiple_camera_server.JSReq)
 }
 JSReq::JSReq(const JSReq& from)
-  : ::google::protobuf::Message(),
+  : ::PROTOBUF_NAMESPACE_ID::Message(),
       _internal_metadata_(nullptr),
       faces_(from.faces_) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
@@ -1790,8 +1314,7 @@ JSReq::JSReq(const JSReq& from)
 }
 
 void JSReq::SharedCtor() {
-  ::google::protobuf::internal::InitSCC(
-      &scc_info_JSReq_multiple_5fcamera_5fserver_2eproto.base);
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_JSReq_multiple_5fcamera_5fserver_2eproto.base);
 }
 
 JSReq::~JSReq() {
@@ -1806,14 +1329,14 @@ void JSReq::SetCachedSize(int size) const {
   _cached_size_.Set(size);
 }
 const JSReq& JSReq::default_instance() {
-  ::google::protobuf::internal::InitSCC(&::scc_info_JSReq_multiple_5fcamera_5fserver_2eproto.base);
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_JSReq_multiple_5fcamera_5fserver_2eproto.base);
   return *internal_default_instance();
 }
 
 
 void JSReq::Clear() {
 // @@protoc_insertion_point(message_clear_start:multiple_camera_server.JSReq)
-  ::google::protobuf::uint32 cached_has_bits = 0;
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -1821,136 +1344,62 @@ void JSReq::Clear() {
   _internal_metadata_.Clear();
 }
 
-#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-const char* JSReq::_InternalParse(const char* begin, const char* end, void* object,
-                  ::google::protobuf::internal::ParseContext* ctx) {
-  auto msg = static_cast<JSReq*>(object);
-  ::google::protobuf::int32 size; (void)size;
-  int depth; (void)depth;
-  ::google::protobuf::uint32 tag;
-  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
-  auto ptr = begin;
-  while (ptr < end) {
-    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
-    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+const char* JSReq::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    CHK_(ptr);
     switch (tag >> 3) {
       // repeated .multiple_camera_server.UnlabeledFace faces = 1;
-      case 1: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
-        do {
-          ptr = ::google::protobuf::io::ReadSize(ptr, &size);
-          GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-          parser_till_end = ::multiple_camera_server::UnlabeledFace::_InternalParse;
-          object = msg->add_faces();
-          if (size > end - ptr) goto len_delim_till_end;
-          ptr += size;
-          GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
-              {parser_till_end, object}, ptr - size, ptr));
-          if (ptr >= end) break;
-        } while ((::google::protobuf::io::UnalignedLoad<::google::protobuf::uint64>(ptr) & 255) == 10 && (ptr += 1));
-        break;
-      }
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+          ptr -= 1;
+          do {
+            ptr += 1;
+            ptr = ctx->ParseMessage(_internal_add_faces(), ptr);
+            CHK_(ptr);
+            if (!ctx->DataAvailable(ptr)) break;
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<10>(ptr));
+        } else goto handle_unusual;
+        continue;
       default: {
       handle_unusual:
         if ((tag & 7) == 4 || tag == 0) {
-          ctx->EndGroup(tag);
-          return ptr;
+          ctx->SetLastTag(tag);
+          goto success;
         }
-        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
-          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
-        ptr = res.first;
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
-        if (res.second) return ptr;
+        ptr = UnknownFieldParse(tag, &_internal_metadata_, ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
       }
     }  // switch
   }  // while
-  return ptr;
-len_delim_till_end:
-  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
-                               {parser_till_end, object}, size);
-}
-#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-bool JSReq::MergePartialFromCodedStream(
-    ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
-  ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:multiple_camera_server.JSReq)
-  for (;;) {
-    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
-    tag = p.first;
-    if (!p.second) goto handle_unusual;
-    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // repeated .multiple_camera_server.UnlabeledFace faces = 1;
-      case 1: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
-                input, add_faces()));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      default: {
-      handle_unusual:
-        if (tag == 0) {
-          goto success;
-        }
-        DO_(::google::protobuf::internal::WireFormat::SkipField(
-              input, tag, _internal_metadata_.mutable_unknown_fields()));
-        break;
-      }
-    }
-  }
 success:
-  // @@protoc_insertion_point(parse_success:multiple_camera_server.JSReq)
-  return true;
+  return ptr;
 failure:
-  // @@protoc_insertion_point(parse_failure:multiple_camera_server.JSReq)
-  return false;
-#undef DO_
-}
-#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-
-void JSReq::SerializeWithCachedSizes(
-    ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:multiple_camera_server.JSReq)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  // repeated .multiple_camera_server.UnlabeledFace faces = 1;
-  for (unsigned int i = 0,
-      n = static_cast<unsigned int>(this->faces_size()); i < n; i++) {
-    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      1,
-      this->faces(static_cast<int>(i)),
-      output);
-  }
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
-        _internal_metadata_.unknown_fields(), output);
-  }
-  // @@protoc_insertion_point(serialize_end:multiple_camera_server.JSReq)
+  ptr = nullptr;
+  goto success;
+#undef CHK_
 }
 
-::google::protobuf::uint8* JSReq::InternalSerializeWithCachedSizesToArray(
-    ::google::protobuf::uint8* target) const {
+::PROTOBUF_NAMESPACE_ID::uint8* JSReq::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:multiple_camera_server.JSReq)
-  ::google::protobuf::uint32 cached_has_bits = 0;
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
   // repeated .multiple_camera_server.UnlabeledFace faces = 1;
   for (unsigned int i = 0,
-      n = static_cast<unsigned int>(this->faces_size()); i < n; i++) {
-    target = ::google::protobuf::internal::WireFormatLite::
-      InternalWriteMessageToArray(
-        1, this->faces(static_cast<int>(i)), target);
+      n = static_cast<unsigned int>(this->_internal_faces_size()); i < n; i++) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(1, this->_internal_faces(i), target, stream);
   }
 
-  if (_internal_metadata_.have_unknown_fields()) {
-    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields(), target);
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields(), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:multiple_camera_server.JSReq)
   return target;
@@ -1960,40 +1409,35 @@ size_t JSReq::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:multiple_camera_server.JSReq)
   size_t total_size = 0;
 
-  if (_internal_metadata_.have_unknown_fields()) {
-    total_size +=
-      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
-        _internal_metadata_.unknown_fields());
-  }
-  ::google::protobuf::uint32 cached_has_bits = 0;
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
   // repeated .multiple_camera_server.UnlabeledFace faces = 1;
-  {
-    unsigned int count = static_cast<unsigned int>(this->faces_size());
-    total_size += 1UL * count;
-    for (unsigned int i = 0; i < count; i++) {
-      total_size +=
-        ::google::protobuf::internal::WireFormatLite::MessageSize(
-          this->faces(static_cast<int>(i)));
-    }
+  total_size += 1UL * this->_internal_faces_size();
+  for (const auto& msg : this->faces_) {
+    total_size +=
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
   }
 
-  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
   SetCachedSize(cached_size);
   return total_size;
 }
 
-void JSReq::MergeFrom(const ::google::protobuf::Message& from) {
+void JSReq::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
 // @@protoc_insertion_point(generalized_merge_from_start:multiple_camera_server.JSReq)
   GOOGLE_DCHECK_NE(&from, this);
   const JSReq* source =
-      ::google::protobuf::DynamicCastToGenerated<JSReq>(
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<JSReq>(
           &from);
   if (source == nullptr) {
   // @@protoc_insertion_point(generalized_merge_from_cast_fail:multiple_camera_server.JSReq)
-    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
   } else {
   // @@protoc_insertion_point(generalized_merge_from_cast_success:multiple_camera_server.JSReq)
     MergeFrom(*source);
@@ -2004,13 +1448,13 @@ void JSReq::MergeFrom(const JSReq& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:multiple_camera_server.JSReq)
   GOOGLE_DCHECK_NE(&from, this);
   _internal_metadata_.MergeFrom(from._internal_metadata_);
-  ::google::protobuf::uint32 cached_has_bits = 0;
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
   faces_.MergeFrom(from.faces_);
 }
 
-void JSReq::CopyFrom(const ::google::protobuf::Message& from) {
+void JSReq::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
 // @@protoc_insertion_point(generalized_copy_from_start:multiple_camera_server.JSReq)
   if (&from == this) return;
   Clear();
@@ -2028,19 +1472,14 @@ bool JSReq::IsInitialized() const {
   return true;
 }
 
-void JSReq::Swap(JSReq* other) {
-  if (other == this) return;
-  InternalSwap(other);
-}
 void JSReq::InternalSwap(JSReq* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
-  CastToBase(&faces_)->InternalSwap(CastToBase(&other->faces_));
+  faces_.InternalSwap(&other->faces_);
 }
 
-::google::protobuf::Metadata JSReq::GetMetadata() const {
-  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_multiple_5fcamera_5fserver_2eproto);
-  return ::file_level_metadata_multiple_5fcamera_5fserver_2eproto[kIndexInFileMessages];
+::PROTOBUF_NAMESPACE_ID::Metadata JSReq::GetMetadata() const {
+  return GetMetadataStatic();
 }
 
 
@@ -2048,21 +1487,17 @@ void JSReq::InternalSwap(JSReq* other) {
 
 void JSResp::InitAsDefaultInstance() {
 }
-class JSResp::HasBitSetters {
+class JSResp::_Internal {
  public:
 };
 
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int JSResp::kFacesFieldNumber;
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
-
 JSResp::JSResp()
-  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
+  : ::PROTOBUF_NAMESPACE_ID::Message(), _internal_metadata_(nullptr) {
   SharedCtor();
   // @@protoc_insertion_point(constructor:multiple_camera_server.JSResp)
 }
 JSResp::JSResp(const JSResp& from)
-  : ::google::protobuf::Message(),
+  : ::PROTOBUF_NAMESPACE_ID::Message(),
       _internal_metadata_(nullptr),
       faces_(from.faces_) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
@@ -2070,8 +1505,7 @@ JSResp::JSResp(const JSResp& from)
 }
 
 void JSResp::SharedCtor() {
-  ::google::protobuf::internal::InitSCC(
-      &scc_info_JSResp_multiple_5fcamera_5fserver_2eproto.base);
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_JSResp_multiple_5fcamera_5fserver_2eproto.base);
 }
 
 JSResp::~JSResp() {
@@ -2086,14 +1520,14 @@ void JSResp::SetCachedSize(int size) const {
   _cached_size_.Set(size);
 }
 const JSResp& JSResp::default_instance() {
-  ::google::protobuf::internal::InitSCC(&::scc_info_JSResp_multiple_5fcamera_5fserver_2eproto.base);
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_JSResp_multiple_5fcamera_5fserver_2eproto.base);
   return *internal_default_instance();
 }
 
 
 void JSResp::Clear() {
 // @@protoc_insertion_point(message_clear_start:multiple_camera_server.JSResp)
-  ::google::protobuf::uint32 cached_has_bits = 0;
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -2101,136 +1535,62 @@ void JSResp::Clear() {
   _internal_metadata_.Clear();
 }
 
-#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-const char* JSResp::_InternalParse(const char* begin, const char* end, void* object,
-                  ::google::protobuf::internal::ParseContext* ctx) {
-  auto msg = static_cast<JSResp*>(object);
-  ::google::protobuf::int32 size; (void)size;
-  int depth; (void)depth;
-  ::google::protobuf::uint32 tag;
-  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
-  auto ptr = begin;
-  while (ptr < end) {
-    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
-    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+const char* JSResp::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    CHK_(ptr);
     switch (tag >> 3) {
       // repeated .multiple_camera_server.LabeledFace faces = 1;
-      case 1: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
-        do {
-          ptr = ::google::protobuf::io::ReadSize(ptr, &size);
-          GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-          parser_till_end = ::multiple_camera_server::LabeledFace::_InternalParse;
-          object = msg->add_faces();
-          if (size > end - ptr) goto len_delim_till_end;
-          ptr += size;
-          GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
-              {parser_till_end, object}, ptr - size, ptr));
-          if (ptr >= end) break;
-        } while ((::google::protobuf::io::UnalignedLoad<::google::protobuf::uint64>(ptr) & 255) == 10 && (ptr += 1));
-        break;
-      }
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+          ptr -= 1;
+          do {
+            ptr += 1;
+            ptr = ctx->ParseMessage(_internal_add_faces(), ptr);
+            CHK_(ptr);
+            if (!ctx->DataAvailable(ptr)) break;
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<10>(ptr));
+        } else goto handle_unusual;
+        continue;
       default: {
       handle_unusual:
         if ((tag & 7) == 4 || tag == 0) {
-          ctx->EndGroup(tag);
-          return ptr;
+          ctx->SetLastTag(tag);
+          goto success;
         }
-        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
-          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
-        ptr = res.first;
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
-        if (res.second) return ptr;
+        ptr = UnknownFieldParse(tag, &_internal_metadata_, ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
       }
     }  // switch
   }  // while
-  return ptr;
-len_delim_till_end:
-  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
-                               {parser_till_end, object}, size);
-}
-#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-bool JSResp::MergePartialFromCodedStream(
-    ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
-  ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:multiple_camera_server.JSResp)
-  for (;;) {
-    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
-    tag = p.first;
-    if (!p.second) goto handle_unusual;
-    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // repeated .multiple_camera_server.LabeledFace faces = 1;
-      case 1: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
-                input, add_faces()));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      default: {
-      handle_unusual:
-        if (tag == 0) {
-          goto success;
-        }
-        DO_(::google::protobuf::internal::WireFormat::SkipField(
-              input, tag, _internal_metadata_.mutable_unknown_fields()));
-        break;
-      }
-    }
-  }
 success:
-  // @@protoc_insertion_point(parse_success:multiple_camera_server.JSResp)
-  return true;
+  return ptr;
 failure:
-  // @@protoc_insertion_point(parse_failure:multiple_camera_server.JSResp)
-  return false;
-#undef DO_
-}
-#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-
-void JSResp::SerializeWithCachedSizes(
-    ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:multiple_camera_server.JSResp)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  // repeated .multiple_camera_server.LabeledFace faces = 1;
-  for (unsigned int i = 0,
-      n = static_cast<unsigned int>(this->faces_size()); i < n; i++) {
-    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      1,
-      this->faces(static_cast<int>(i)),
-      output);
-  }
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
-        _internal_metadata_.unknown_fields(), output);
-  }
-  // @@protoc_insertion_point(serialize_end:multiple_camera_server.JSResp)
+  ptr = nullptr;
+  goto success;
+#undef CHK_
 }
 
-::google::protobuf::uint8* JSResp::InternalSerializeWithCachedSizesToArray(
-    ::google::protobuf::uint8* target) const {
+::PROTOBUF_NAMESPACE_ID::uint8* JSResp::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:multiple_camera_server.JSResp)
-  ::google::protobuf::uint32 cached_has_bits = 0;
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
   // repeated .multiple_camera_server.LabeledFace faces = 1;
   for (unsigned int i = 0,
-      n = static_cast<unsigned int>(this->faces_size()); i < n; i++) {
-    target = ::google::protobuf::internal::WireFormatLite::
-      InternalWriteMessageToArray(
-        1, this->faces(static_cast<int>(i)), target);
+      n = static_cast<unsigned int>(this->_internal_faces_size()); i < n; i++) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(1, this->_internal_faces(i), target, stream);
   }
 
-  if (_internal_metadata_.have_unknown_fields()) {
-    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields(), target);
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields(), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:multiple_camera_server.JSResp)
   return target;
@@ -2240,40 +1600,35 @@ size_t JSResp::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:multiple_camera_server.JSResp)
   size_t total_size = 0;
 
-  if (_internal_metadata_.have_unknown_fields()) {
-    total_size +=
-      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
-        _internal_metadata_.unknown_fields());
-  }
-  ::google::protobuf::uint32 cached_has_bits = 0;
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
   // repeated .multiple_camera_server.LabeledFace faces = 1;
-  {
-    unsigned int count = static_cast<unsigned int>(this->faces_size());
-    total_size += 1UL * count;
-    for (unsigned int i = 0; i < count; i++) {
-      total_size +=
-        ::google::protobuf::internal::WireFormatLite::MessageSize(
-          this->faces(static_cast<int>(i)));
-    }
+  total_size += 1UL * this->_internal_faces_size();
+  for (const auto& msg : this->faces_) {
+    total_size +=
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
   }
 
-  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
   SetCachedSize(cached_size);
   return total_size;
 }
 
-void JSResp::MergeFrom(const ::google::protobuf::Message& from) {
+void JSResp::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
 // @@protoc_insertion_point(generalized_merge_from_start:multiple_camera_server.JSResp)
   GOOGLE_DCHECK_NE(&from, this);
   const JSResp* source =
-      ::google::protobuf::DynamicCastToGenerated<JSResp>(
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<JSResp>(
           &from);
   if (source == nullptr) {
   // @@protoc_insertion_point(generalized_merge_from_cast_fail:multiple_camera_server.JSResp)
-    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
   } else {
   // @@protoc_insertion_point(generalized_merge_from_cast_success:multiple_camera_server.JSResp)
     MergeFrom(*source);
@@ -2284,13 +1639,13 @@ void JSResp::MergeFrom(const JSResp& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:multiple_camera_server.JSResp)
   GOOGLE_DCHECK_NE(&from, this);
   _internal_metadata_.MergeFrom(from._internal_metadata_);
-  ::google::protobuf::uint32 cached_has_bits = 0;
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
   faces_.MergeFrom(from.faces_);
 }
 
-void JSResp::CopyFrom(const ::google::protobuf::Message& from) {
+void JSResp::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
 // @@protoc_insertion_point(generalized_copy_from_start:multiple_camera_server.JSResp)
   if (&from == this) return;
   Clear();
@@ -2308,19 +1663,14 @@ bool JSResp::IsInitialized() const {
   return true;
 }
 
-void JSResp::Swap(JSResp* other) {
-  if (other == this) return;
-  InternalSwap(other);
-}
 void JSResp::InternalSwap(JSResp* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
-  CastToBase(&faces_)->InternalSwap(CastToBase(&other->faces_));
+  faces_.InternalSwap(&other->faces_);
 }
 
-::google::protobuf::Metadata JSResp::GetMetadata() const {
-  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_multiple_5fcamera_5fserver_2eproto);
-  return ::file_level_metadata_multiple_5fcamera_5fserver_2eproto[kIndexInFileMessages];
+::PROTOBUF_NAMESPACE_ID::Metadata JSResp::GetMetadata() const {
+  return GetMetadataStatic();
 }
 
 
@@ -2328,42 +1678,35 @@ void JSResp::InternalSwap(JSResp* other) {
 
 void UnlabeledFace::InitAsDefaultInstance() {
 }
-class UnlabeledFace::HasBitSetters {
+class UnlabeledFace::_Internal {
  public:
 };
 
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int UnlabeledFace::kTrackIdFieldNumber;
-const int UnlabeledFace::kImageBytesFieldNumber;
-const int UnlabeledFace::kLandmarksFieldNumber;
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
-
 UnlabeledFace::UnlabeledFace()
-  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
+  : ::PROTOBUF_NAMESPACE_ID::Message(), _internal_metadata_(nullptr) {
   SharedCtor();
   // @@protoc_insertion_point(constructor:multiple_camera_server.UnlabeledFace)
 }
 UnlabeledFace::UnlabeledFace(const UnlabeledFace& from)
-  : ::google::protobuf::Message(),
+  : ::PROTOBUF_NAMESPACE_ID::Message(),
       _internal_metadata_(nullptr),
       landmarks_(from.landmarks_) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
-  track_id_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.track_id().size() > 0) {
-    track_id_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.track_id_);
+  track_id_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (!from._internal_track_id().empty()) {
+    track_id_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.track_id_);
   }
-  image_bytes_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.image_bytes().size() > 0) {
-    image_bytes_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.image_bytes_);
+  image_bytes_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (!from._internal_image_bytes().empty()) {
+    image_bytes_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.image_bytes_);
   }
   // @@protoc_insertion_point(copy_constructor:multiple_camera_server.UnlabeledFace)
 }
 
 void UnlabeledFace::SharedCtor() {
-  ::google::protobuf::internal::InitSCC(
-      &scc_info_UnlabeledFace_multiple_5fcamera_5fserver_2eproto.base);
-  track_id_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  image_bytes_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_UnlabeledFace_multiple_5fcamera_5fserver_2eproto.base);
+  track_id_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  image_bytes_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 
 UnlabeledFace::~UnlabeledFace() {
@@ -2372,272 +1715,119 @@ UnlabeledFace::~UnlabeledFace() {
 }
 
 void UnlabeledFace::SharedDtor() {
-  track_id_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  image_bytes_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  track_id_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  image_bytes_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 
 void UnlabeledFace::SetCachedSize(int size) const {
   _cached_size_.Set(size);
 }
 const UnlabeledFace& UnlabeledFace::default_instance() {
-  ::google::protobuf::internal::InitSCC(&::scc_info_UnlabeledFace_multiple_5fcamera_5fserver_2eproto.base);
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_UnlabeledFace_multiple_5fcamera_5fserver_2eproto.base);
   return *internal_default_instance();
 }
 
 
 void UnlabeledFace::Clear() {
 // @@protoc_insertion_point(message_clear_start:multiple_camera_server.UnlabeledFace)
-  ::google::protobuf::uint32 cached_has_bits = 0;
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
   landmarks_.Clear();
-  track_id_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  image_bytes_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  track_id_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  image_bytes_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   _internal_metadata_.Clear();
 }
 
-#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-const char* UnlabeledFace::_InternalParse(const char* begin, const char* end, void* object,
-                  ::google::protobuf::internal::ParseContext* ctx) {
-  auto msg = static_cast<UnlabeledFace*>(object);
-  ::google::protobuf::int32 size; (void)size;
-  int depth; (void)depth;
-  ::google::protobuf::uint32 tag;
-  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
-  auto ptr = begin;
-  while (ptr < end) {
-    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
-    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+const char* UnlabeledFace::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    CHK_(ptr);
     switch (tag >> 3) {
       // string track_id = 1;
-      case 1: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
-        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        ctx->extra_parse_data().SetFieldName("multiple_camera_server.UnlabeledFace.track_id");
-        object = msg->mutable_track_id();
-        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
-          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
-          goto string_till_end;
-        }
-        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
-        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
-        ptr += size;
-        break;
-      }
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+          auto str = _internal_mutable_track_id();
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "multiple_camera_server.UnlabeledFace.track_id"));
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
       // bytes image_bytes = 2;
-      case 2: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 18) goto handle_unusual;
-        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        object = msg->mutable_image_bytes();
-        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
-          parser_till_end = ::google::protobuf::internal::GreedyStringParser;
-          goto string_till_end;
-        }
-        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheck(ptr, size, ctx));
-        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
-        ptr += size;
-        break;
-      }
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
+          auto str = _internal_mutable_image_bytes();
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
       // repeated int32 landmarks = 3;
-      case 3: {
-        if (static_cast<::google::protobuf::uint8>(tag) == 26) {
-          ptr = ::google::protobuf::io::ReadSize(ptr, &size);
-          GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-          parser_till_end = ::google::protobuf::internal::PackedInt32Parser;
-          object = msg->mutable_landmarks();
-          if (size > end - ptr) goto len_delim_till_end;
-          auto newend = ptr + size;
-          if (size) ptr = parser_till_end(ptr, newend, object, ctx);
-          GOOGLE_PROTOBUF_PARSER_ASSERT(ptr == newend);
-          break;
-        } else if (static_cast<::google::protobuf::uint8>(tag) != 24) goto handle_unusual;
-        do {
-          msg->add_landmarks(::google::protobuf::internal::ReadVarint(&ptr));
-          GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-          if (ptr >= end) break;
-        } while ((::google::protobuf::io::UnalignedLoad<::google::protobuf::uint64>(ptr) & 255) == 24 && (ptr += 1));
-        break;
-      }
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 26)) {
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedInt32Parser(_internal_mutable_landmarks(), ptr, ctx);
+          CHK_(ptr);
+        } else if (static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 24) {
+          _internal_add_landmarks(::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr));
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
       default: {
       handle_unusual:
         if ((tag & 7) == 4 || tag == 0) {
-          ctx->EndGroup(tag);
-          return ptr;
+          ctx->SetLastTag(tag);
+          goto success;
         }
-        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
-          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
-        ptr = res.first;
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
-        if (res.second) return ptr;
+        ptr = UnknownFieldParse(tag, &_internal_metadata_, ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
       }
     }  // switch
   }  // while
+success:
   return ptr;
-string_till_end:
-  static_cast<::std::string*>(object)->clear();
-  static_cast<::std::string*>(object)->reserve(size);
-  goto len_delim_till_end;
-len_delim_till_end:
-  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
-                               {parser_till_end, object}, size);
+failure:
+  ptr = nullptr;
+  goto success;
+#undef CHK_
 }
-#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-bool UnlabeledFace::MergePartialFromCodedStream(
-    ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
-  ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:multiple_camera_server.UnlabeledFace)
-  for (;;) {
-    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
-    tag = p.first;
-    if (!p.second) goto handle_unusual;
-    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // string track_id = 1;
-      case 1: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_track_id()));
-          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->track_id().data(), static_cast<int>(this->track_id().length()),
-            ::google::protobuf::internal::WireFormatLite::PARSE,
-            "multiple_camera_server.UnlabeledFace.track_id"));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
 
-      // bytes image_bytes = 2;
-      case 2: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadBytes(
-                input, this->mutable_image_bytes()));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
+::PROTOBUF_NAMESPACE_ID::uint8* UnlabeledFace::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:multiple_camera_server.UnlabeledFace)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
 
-      // repeated int32 landmarks = 3;
-      case 3: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (26 & 0xFF)) {
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPackedPrimitive<
-                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
-                 input, this->mutable_landmarks())));
-        } else if (static_cast< ::google::protobuf::uint8>(tag) == (24 & 0xFF)) {
-          DO_((::google::protobuf::internal::WireFormatLite::ReadRepeatedPrimitiveNoInline<
-                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
-                 1, 26u, input, this->mutable_landmarks())));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
+  // string track_id = 1;
+  if (this->track_id().size() > 0) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_track_id().data(), static_cast<int>(this->_internal_track_id().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "multiple_camera_server.UnlabeledFace.track_id");
+    target = stream->WriteStringMaybeAliased(
+        1, this->_internal_track_id(), target);
+  }
 
-      default: {
-      handle_unusual:
-        if (tag == 0) {
-          goto success;
-        }
-        DO_(::google::protobuf::internal::WireFormat::SkipField(
-              input, tag, _internal_metadata_.mutable_unknown_fields()));
-        break;
-      }
+  // bytes image_bytes = 2;
+  if (this->image_bytes().size() > 0) {
+    target = stream->WriteBytesMaybeAliased(
+        2, this->_internal_image_bytes(), target);
+  }
+
+  // repeated int32 landmarks = 3;
+  {
+    int byte_size = _landmarks_cached_byte_size_.load(std::memory_order_relaxed);
+    if (byte_size > 0) {
+      target = stream->WriteInt32Packed(
+          3, _internal_landmarks(), byte_size, target);
     }
   }
-success:
-  // @@protoc_insertion_point(parse_success:multiple_camera_server.UnlabeledFace)
-  return true;
-failure:
-  // @@protoc_insertion_point(parse_failure:multiple_camera_server.UnlabeledFace)
-  return false;
-#undef DO_
-}
-#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 
-void UnlabeledFace::SerializeWithCachedSizes(
-    ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:multiple_camera_server.UnlabeledFace)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  // string track_id = 1;
-  if (this->track_id().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->track_id().data(), static_cast<int>(this->track_id().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "multiple_camera_server.UnlabeledFace.track_id");
-    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      1, this->track_id(), output);
-  }
-
-  // bytes image_bytes = 2;
-  if (this->image_bytes().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteBytesMaybeAliased(
-      2, this->image_bytes(), output);
-  }
-
-  // repeated int32 landmarks = 3;
-  if (this->landmarks_size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteTag(3, ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED, output);
-    output->WriteVarint32(_landmarks_cached_byte_size_.load(
-        std::memory_order_relaxed));
-  }
-  for (int i = 0, n = this->landmarks_size(); i < n; i++) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt32NoTag(
-      this->landmarks(i), output);
-  }
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
-        _internal_metadata_.unknown_fields(), output);
-  }
-  // @@protoc_insertion_point(serialize_end:multiple_camera_server.UnlabeledFace)
-}
-
-::google::protobuf::uint8* UnlabeledFace::InternalSerializeWithCachedSizesToArray(
-    ::google::protobuf::uint8* target) const {
-  // @@protoc_insertion_point(serialize_to_array_start:multiple_camera_server.UnlabeledFace)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  // string track_id = 1;
-  if (this->track_id().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->track_id().data(), static_cast<int>(this->track_id().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "multiple_camera_server.UnlabeledFace.track_id");
-    target =
-      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        1, this->track_id(), target);
-  }
-
-  // bytes image_bytes = 2;
-  if (this->image_bytes().size() > 0) {
-    target =
-      ::google::protobuf::internal::WireFormatLite::WriteBytesToArray(
-        2, this->image_bytes(), target);
-  }
-
-  // repeated int32 landmarks = 3;
-  if (this->landmarks_size() > 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteTagToArray(
-      3,
-      ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED,
-      target);
-    target = ::google::protobuf::io::CodedOutputStream::WriteVarint32ToArray(
-        _landmarks_cached_byte_size_.load(std::memory_order_relaxed),
-         target);
-    target = ::google::protobuf::internal::WireFormatLite::
-      WriteInt32NoTagToArray(this->landmarks_, target);
-  }
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields(), target);
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields(), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:multiple_camera_server.UnlabeledFace)
   return target;
@@ -2647,25 +1837,20 @@ size_t UnlabeledFace::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:multiple_camera_server.UnlabeledFace)
   size_t total_size = 0;
 
-  if (_internal_metadata_.have_unknown_fields()) {
-    total_size +=
-      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
-        _internal_metadata_.unknown_fields());
-  }
-  ::google::protobuf::uint32 cached_has_bits = 0;
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
   // repeated int32 landmarks = 3;
   {
-    size_t data_size = ::google::protobuf::internal::WireFormatLite::
+    size_t data_size = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
       Int32Size(this->landmarks_);
     if (data_size > 0) {
       total_size += 1 +
-        ::google::protobuf::internal::WireFormatLite::Int32Size(
-            static_cast<::google::protobuf::int32>(data_size));
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+            static_cast<::PROTOBUF_NAMESPACE_ID::int32>(data_size));
     }
-    int cached_size = ::google::protobuf::internal::ToCachedSize(data_size);
+    int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(data_size);
     _landmarks_cached_byte_size_.store(cached_size,
                                     std::memory_order_relaxed);
     total_size += data_size;
@@ -2674,31 +1859,35 @@ size_t UnlabeledFace::ByteSizeLong() const {
   // string track_id = 1;
   if (this->track_id().size() > 0) {
     total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::StringSize(
-        this->track_id());
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_track_id());
   }
 
   // bytes image_bytes = 2;
   if (this->image_bytes().size() > 0) {
     total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::BytesSize(
-        this->image_bytes());
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::BytesSize(
+        this->_internal_image_bytes());
   }
 
-  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
   SetCachedSize(cached_size);
   return total_size;
 }
 
-void UnlabeledFace::MergeFrom(const ::google::protobuf::Message& from) {
+void UnlabeledFace::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
 // @@protoc_insertion_point(generalized_merge_from_start:multiple_camera_server.UnlabeledFace)
   GOOGLE_DCHECK_NE(&from, this);
   const UnlabeledFace* source =
-      ::google::protobuf::DynamicCastToGenerated<UnlabeledFace>(
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<UnlabeledFace>(
           &from);
   if (source == nullptr) {
   // @@protoc_insertion_point(generalized_merge_from_cast_fail:multiple_camera_server.UnlabeledFace)
-    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
   } else {
   // @@protoc_insertion_point(generalized_merge_from_cast_success:multiple_camera_server.UnlabeledFace)
     MergeFrom(*source);
@@ -2709,21 +1898,21 @@ void UnlabeledFace::MergeFrom(const UnlabeledFace& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:multiple_camera_server.UnlabeledFace)
   GOOGLE_DCHECK_NE(&from, this);
   _internal_metadata_.MergeFrom(from._internal_metadata_);
-  ::google::protobuf::uint32 cached_has_bits = 0;
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
   landmarks_.MergeFrom(from.landmarks_);
   if (from.track_id().size() > 0) {
 
-    track_id_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.track_id_);
+    track_id_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.track_id_);
   }
   if (from.image_bytes().size() > 0) {
 
-    image_bytes_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.image_bytes_);
+    image_bytes_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.image_bytes_);
   }
 }
 
-void UnlabeledFace::CopyFrom(const ::google::protobuf::Message& from) {
+void UnlabeledFace::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
 // @@protoc_insertion_point(generalized_copy_from_start:multiple_camera_server.UnlabeledFace)
   if (&from == this) return;
   Clear();
@@ -2741,23 +1930,18 @@ bool UnlabeledFace::IsInitialized() const {
   return true;
 }
 
-void UnlabeledFace::Swap(UnlabeledFace* other) {
-  if (other == this) return;
-  InternalSwap(other);
-}
 void UnlabeledFace::InternalSwap(UnlabeledFace* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
   landmarks_.InternalSwap(&other->landmarks_);
-  track_id_.Swap(&other->track_id_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+  track_id_.Swap(&other->track_id_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
-  image_bytes_.Swap(&other->image_bytes_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+  image_bytes_.Swap(&other->image_bytes_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
 }
 
-::google::protobuf::Metadata UnlabeledFace::GetMetadata() const {
-  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_multiple_5fcamera_5fserver_2eproto);
-  return ::file_level_metadata_multiple_5fcamera_5fserver_2eproto[kIndexInFileMessages];
+::PROTOBUF_NAMESPACE_ID::Metadata UnlabeledFace::GetMetadata() const {
+  return GetMetadataStatic();
 }
 
 
@@ -2765,48 +1949,40 @@ void UnlabeledFace::InternalSwap(UnlabeledFace* other) {
 
 void LabeledFace::InitAsDefaultInstance() {
 }
-class LabeledFace::HasBitSetters {
+class LabeledFace::_Internal {
  public:
 };
 
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int LabeledFace::kTrackIdFieldNumber;
-const int LabeledFace::kRegistrationIdFieldNumber;
-const int LabeledFace::kPersonNameFieldNumber;
-const int LabeledFace::kConfidenceFieldNumber;
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
-
 LabeledFace::LabeledFace()
-  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
+  : ::PROTOBUF_NAMESPACE_ID::Message(), _internal_metadata_(nullptr) {
   SharedCtor();
   // @@protoc_insertion_point(constructor:multiple_camera_server.LabeledFace)
 }
 LabeledFace::LabeledFace(const LabeledFace& from)
-  : ::google::protobuf::Message(),
+  : ::PROTOBUF_NAMESPACE_ID::Message(),
       _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
-  track_id_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.track_id().size() > 0) {
-    track_id_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.track_id_);
+  track_id_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (!from._internal_track_id().empty()) {
+    track_id_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.track_id_);
   }
-  registration_id_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.registration_id().size() > 0) {
-    registration_id_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.registration_id_);
+  registration_id_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (!from._internal_registration_id().empty()) {
+    registration_id_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.registration_id_);
   }
-  person_name_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.person_name().size() > 0) {
-    person_name_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.person_name_);
+  person_name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (!from._internal_person_name().empty()) {
+    person_name_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.person_name_);
   }
   confidence_ = from.confidence_;
   // @@protoc_insertion_point(copy_constructor:multiple_camera_server.LabeledFace)
 }
 
 void LabeledFace::SharedCtor() {
-  ::google::protobuf::internal::InitSCC(
-      &scc_info_LabeledFace_multiple_5fcamera_5fserver_2eproto.base);
-  track_id_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  registration_id_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  person_name_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_LabeledFace_multiple_5fcamera_5fserver_2eproto.base);
+  track_id_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  registration_id_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  person_name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   confidence_ = 0;
 }
 
@@ -2816,309 +1992,139 @@ LabeledFace::~LabeledFace() {
 }
 
 void LabeledFace::SharedDtor() {
-  track_id_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  registration_id_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  person_name_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  track_id_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  registration_id_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  person_name_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 
 void LabeledFace::SetCachedSize(int size) const {
   _cached_size_.Set(size);
 }
 const LabeledFace& LabeledFace::default_instance() {
-  ::google::protobuf::internal::InitSCC(&::scc_info_LabeledFace_multiple_5fcamera_5fserver_2eproto.base);
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_LabeledFace_multiple_5fcamera_5fserver_2eproto.base);
   return *internal_default_instance();
 }
 
 
 void LabeledFace::Clear() {
 // @@protoc_insertion_point(message_clear_start:multiple_camera_server.LabeledFace)
-  ::google::protobuf::uint32 cached_has_bits = 0;
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  track_id_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  registration_id_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  person_name_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  track_id_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  registration_id_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  person_name_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   confidence_ = 0;
   _internal_metadata_.Clear();
 }
 
-#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-const char* LabeledFace::_InternalParse(const char* begin, const char* end, void* object,
-                  ::google::protobuf::internal::ParseContext* ctx) {
-  auto msg = static_cast<LabeledFace*>(object);
-  ::google::protobuf::int32 size; (void)size;
-  int depth; (void)depth;
-  ::google::protobuf::uint32 tag;
-  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
-  auto ptr = begin;
-  while (ptr < end) {
-    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
-    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+const char* LabeledFace::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    CHK_(ptr);
     switch (tag >> 3) {
       // string track_id = 1;
-      case 1: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
-        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        ctx->extra_parse_data().SetFieldName("multiple_camera_server.LabeledFace.track_id");
-        object = msg->mutable_track_id();
-        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
-          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
-          goto string_till_end;
-        }
-        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
-        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
-        ptr += size;
-        break;
-      }
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+          auto str = _internal_mutable_track_id();
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "multiple_camera_server.LabeledFace.track_id"));
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
       // string registration_id = 2;
-      case 2: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 18) goto handle_unusual;
-        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        ctx->extra_parse_data().SetFieldName("multiple_camera_server.LabeledFace.registration_id");
-        object = msg->mutable_registration_id();
-        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
-          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
-          goto string_till_end;
-        }
-        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
-        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
-        ptr += size;
-        break;
-      }
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
+          auto str = _internal_mutable_registration_id();
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "multiple_camera_server.LabeledFace.registration_id"));
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
       // string person_name = 3;
-      case 3: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 26) goto handle_unusual;
-        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        ctx->extra_parse_data().SetFieldName("multiple_camera_server.LabeledFace.person_name");
-        object = msg->mutable_person_name();
-        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
-          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
-          goto string_till_end;
-        }
-        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
-        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
-        ptr += size;
-        break;
-      }
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 26)) {
+          auto str = _internal_mutable_person_name();
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "multiple_camera_server.LabeledFace.person_name"));
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
       // float confidence = 4;
-      case 4: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 37) goto handle_unusual;
-        msg->set_confidence(::google::protobuf::io::UnalignedLoad<float>(ptr));
-        ptr += sizeof(float);
-        break;
-      }
+      case 4:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 37)) {
+          confidence_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
       default: {
       handle_unusual:
         if ((tag & 7) == 4 || tag == 0) {
-          ctx->EndGroup(tag);
-          return ptr;
+          ctx->SetLastTag(tag);
+          goto success;
         }
-        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
-          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
-        ptr = res.first;
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
-        if (res.second) return ptr;
+        ptr = UnknownFieldParse(tag, &_internal_metadata_, ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
       }
     }  // switch
   }  // while
-  return ptr;
-string_till_end:
-  static_cast<::std::string*>(object)->clear();
-  static_cast<::std::string*>(object)->reserve(size);
-  goto len_delim_till_end;
-len_delim_till_end:
-  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
-                               {parser_till_end, object}, size);
-}
-#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-bool LabeledFace::MergePartialFromCodedStream(
-    ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
-  ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:multiple_camera_server.LabeledFace)
-  for (;;) {
-    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
-    tag = p.first;
-    if (!p.second) goto handle_unusual;
-    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // string track_id = 1;
-      case 1: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_track_id()));
-          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->track_id().data(), static_cast<int>(this->track_id().length()),
-            ::google::protobuf::internal::WireFormatLite::PARSE,
-            "multiple_camera_server.LabeledFace.track_id"));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      // string registration_id = 2;
-      case 2: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_registration_id()));
-          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->registration_id().data(), static_cast<int>(this->registration_id().length()),
-            ::google::protobuf::internal::WireFormatLite::PARSE,
-            "multiple_camera_server.LabeledFace.registration_id"));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      // string person_name = 3;
-      case 3: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (26 & 0xFF)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_person_name()));
-          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->person_name().data(), static_cast<int>(this->person_name().length()),
-            ::google::protobuf::internal::WireFormatLite::PARSE,
-            "multiple_camera_server.LabeledFace.person_name"));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      // float confidence = 4;
-      case 4: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (37 & 0xFF)) {
-
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
-                 input, &confidence_)));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      default: {
-      handle_unusual:
-        if (tag == 0) {
-          goto success;
-        }
-        DO_(::google::protobuf::internal::WireFormat::SkipField(
-              input, tag, _internal_metadata_.mutable_unknown_fields()));
-        break;
-      }
-    }
-  }
 success:
-  // @@protoc_insertion_point(parse_success:multiple_camera_server.LabeledFace)
-  return true;
+  return ptr;
 failure:
-  // @@protoc_insertion_point(parse_failure:multiple_camera_server.LabeledFace)
-  return false;
-#undef DO_
-}
-#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-
-void LabeledFace::SerializeWithCachedSizes(
-    ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:multiple_camera_server.LabeledFace)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  // string track_id = 1;
-  if (this->track_id().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->track_id().data(), static_cast<int>(this->track_id().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "multiple_camera_server.LabeledFace.track_id");
-    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      1, this->track_id(), output);
-  }
-
-  // string registration_id = 2;
-  if (this->registration_id().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->registration_id().data(), static_cast<int>(this->registration_id().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "multiple_camera_server.LabeledFace.registration_id");
-    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      2, this->registration_id(), output);
-  }
-
-  // string person_name = 3;
-  if (this->person_name().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->person_name().data(), static_cast<int>(this->person_name().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "multiple_camera_server.LabeledFace.person_name");
-    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      3, this->person_name(), output);
-  }
-
-  // float confidence = 4;
-  if (this->confidence() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteFloat(4, this->confidence(), output);
-  }
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
-        _internal_metadata_.unknown_fields(), output);
-  }
-  // @@protoc_insertion_point(serialize_end:multiple_camera_server.LabeledFace)
+  ptr = nullptr;
+  goto success;
+#undef CHK_
 }
 
-::google::protobuf::uint8* LabeledFace::InternalSerializeWithCachedSizesToArray(
-    ::google::protobuf::uint8* target) const {
+::PROTOBUF_NAMESPACE_ID::uint8* LabeledFace::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:multiple_camera_server.LabeledFace)
-  ::google::protobuf::uint32 cached_has_bits = 0;
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
   // string track_id = 1;
   if (this->track_id().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->track_id().data(), static_cast<int>(this->track_id().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_track_id().data(), static_cast<int>(this->_internal_track_id().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
       "multiple_camera_server.LabeledFace.track_id");
-    target =
-      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        1, this->track_id(), target);
+    target = stream->WriteStringMaybeAliased(
+        1, this->_internal_track_id(), target);
   }
 
   // string registration_id = 2;
   if (this->registration_id().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->registration_id().data(), static_cast<int>(this->registration_id().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_registration_id().data(), static_cast<int>(this->_internal_registration_id().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
       "multiple_camera_server.LabeledFace.registration_id");
-    target =
-      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        2, this->registration_id(), target);
+    target = stream->WriteStringMaybeAliased(
+        2, this->_internal_registration_id(), target);
   }
 
   // string person_name = 3;
   if (this->person_name().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->person_name().data(), static_cast<int>(this->person_name().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_person_name().data(), static_cast<int>(this->_internal_person_name().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
       "multiple_camera_server.LabeledFace.person_name");
-    target =
-      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        3, this->person_name(), target);
+    target = stream->WriteStringMaybeAliased(
+        3, this->_internal_person_name(), target);
   }
 
   // float confidence = 4;
-  if (this->confidence() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteFloatToArray(4, this->confidence(), target);
+  if (!(this->confidence() <= 0 && this->confidence() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(4, this->_internal_confidence(), target);
   }
 
-  if (_internal_metadata_.have_unknown_fields()) {
-    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields(), target);
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields(), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:multiple_camera_server.LabeledFace)
   return target;
@@ -3128,55 +2134,54 @@ size_t LabeledFace::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:multiple_camera_server.LabeledFace)
   size_t total_size = 0;
 
-  if (_internal_metadata_.have_unknown_fields()) {
-    total_size +=
-      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
-        _internal_metadata_.unknown_fields());
-  }
-  ::google::protobuf::uint32 cached_has_bits = 0;
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
   // string track_id = 1;
   if (this->track_id().size() > 0) {
     total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::StringSize(
-        this->track_id());
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_track_id());
   }
 
   // string registration_id = 2;
   if (this->registration_id().size() > 0) {
     total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::StringSize(
-        this->registration_id());
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_registration_id());
   }
 
   // string person_name = 3;
   if (this->person_name().size() > 0) {
     total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::StringSize(
-        this->person_name());
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_person_name());
   }
 
   // float confidence = 4;
-  if (this->confidence() != 0) {
+  if (!(this->confidence() <= 0 && this->confidence() >= 0)) {
     total_size += 1 + 4;
   }
 
-  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
   SetCachedSize(cached_size);
   return total_size;
 }
 
-void LabeledFace::MergeFrom(const ::google::protobuf::Message& from) {
+void LabeledFace::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
 // @@protoc_insertion_point(generalized_merge_from_start:multiple_camera_server.LabeledFace)
   GOOGLE_DCHECK_NE(&from, this);
   const LabeledFace* source =
-      ::google::protobuf::DynamicCastToGenerated<LabeledFace>(
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<LabeledFace>(
           &from);
   if (source == nullptr) {
   // @@protoc_insertion_point(generalized_merge_from_cast_fail:multiple_camera_server.LabeledFace)
-    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
   } else {
   // @@protoc_insertion_point(generalized_merge_from_cast_success:multiple_camera_server.LabeledFace)
     MergeFrom(*source);
@@ -3187,27 +2192,27 @@ void LabeledFace::MergeFrom(const LabeledFace& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:multiple_camera_server.LabeledFace)
   GOOGLE_DCHECK_NE(&from, this);
   _internal_metadata_.MergeFrom(from._internal_metadata_);
-  ::google::protobuf::uint32 cached_has_bits = 0;
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
   if (from.track_id().size() > 0) {
 
-    track_id_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.track_id_);
+    track_id_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.track_id_);
   }
   if (from.registration_id().size() > 0) {
 
-    registration_id_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.registration_id_);
+    registration_id_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.registration_id_);
   }
   if (from.person_name().size() > 0) {
 
-    person_name_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.person_name_);
+    person_name_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.person_name_);
   }
-  if (from.confidence() != 0) {
-    set_confidence(from.confidence());
+  if (!(from.confidence() <= 0 && from.confidence() >= 0)) {
+    _internal_set_confidence(from._internal_confidence());
   }
 }
 
-void LabeledFace::CopyFrom(const ::google::protobuf::Message& from) {
+void LabeledFace::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
 // @@protoc_insertion_point(generalized_copy_from_start:multiple_camera_server.LabeledFace)
   if (&from == this) return;
   Clear();
@@ -3225,32 +2230,26 @@ bool LabeledFace::IsInitialized() const {
   return true;
 }
 
-void LabeledFace::Swap(LabeledFace* other) {
-  if (other == this) return;
-  InternalSwap(other);
-}
 void LabeledFace::InternalSwap(LabeledFace* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
-  track_id_.Swap(&other->track_id_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+  track_id_.Swap(&other->track_id_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
-  registration_id_.Swap(&other->registration_id_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+  registration_id_.Swap(&other->registration_id_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
-  person_name_.Swap(&other->person_name_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+  person_name_.Swap(&other->person_name_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
   swap(confidence_, other->confidence_);
 }
 
-::google::protobuf::Metadata LabeledFace::GetMetadata() const {
-  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_multiple_5fcamera_5fserver_2eproto);
-  return ::file_level_metadata_multiple_5fcamera_5fserver_2eproto[kIndexInFileMessages];
+::PROTOBUF_NAMESPACE_ID::Metadata LabeledFace::GetMetadata() const {
+  return GetMetadataStatic();
 }
 
 
 // @@protoc_insertion_point(namespace_scope)
 }  // namespace multiple_camera_server
-namespace google {
-namespace protobuf {
+PROTOBUF_NAMESPACE_OPEN
 template<> PROTOBUF_NOINLINE ::multiple_camera_server::CheckConnectionReq* Arena::CreateMaybeMessage< ::multiple_camera_server::CheckConnectionReq >(Arena* arena) {
   return Arena::CreateInternal< ::multiple_camera_server::CheckConnectionReq >(arena);
 }
@@ -3278,8 +2277,7 @@ template<> PROTOBUF_NOINLINE ::multiple_camera_server::UnlabeledFace* Arena::Cre
 template<> PROTOBUF_NOINLINE ::multiple_camera_server::LabeledFace* Arena::CreateMaybeMessage< ::multiple_camera_server::LabeledFace >(Arena* arena) {
   return Arena::CreateInternal< ::multiple_camera_server::LabeledFace >(arena);
 }
-}  // namespace protobuf
-}  // namespace google
+PROTOBUF_NAMESPACE_CLOSE
 
 // @@protoc_insertion_point(global_scope)
 #include <google/protobuf/port_undef.inc>
