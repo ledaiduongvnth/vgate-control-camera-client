@@ -14,67 +14,74 @@ using namespace cv;
 
 
 // This class represents the internel state of individual tracked objects observed as bounding box.
-class KalmanTracker
-{
+class KalmanTracker {
 public:
-	KalmanTracker()
-	{
-		init_kf(StateType());
-		m_time_since_update = 0;
-		m_hits = 0;
-		m_hit_streak = 0;
-		m_age = 0;
-		m_id = kf_count;
-		//kf_count++;
-	}
+    KalmanTracker(int hits_to_start = 3) {
+        init_kf(StateType());
+        m_time_since_update = 0;
+        m_hits = 0;
+        m_hit_streak = 0;
+        m_age = 0;
+        m_id = kf_count;
+        //kf_count++;
+
+        m_is_tracking = false;
+        m_hits_to_start = hits_to_start;
+
+    }
 
     string randomString();
 
-    KalmanTracker(StateType initRect)
-	{
-		init_kf(initRect);
-		m_time_since_update = 0;
-		m_hits = 0;
-		m_hit_streak = 0;
-		m_age = 0;
-		m_id = kf_count;
-		kf_count++;
-		source_track_id = randomString();
-		name = "";
-	}
+    KalmanTracker(StateType initRect, int hits_to_start = 3) {
+        init_kf(initRect);
+        m_time_since_update = 0;
+        m_hits = 0;
+        m_hit_streak = 0;
+        m_age = 0;
+        m_id = kf_count;
+        kf_count++;
 
-	~KalmanTracker()
-	{
-		m_history.clear();
-	}
+        m_is_tracking = false;
+        m_hits_to_start = hits_to_start;
+        source_track_id = randomString();
+        name = "";
+    }
 
-	StateType predict();
-	void update(StateType stateMat);
-	
-	StateType get_state();
-	StateType get_rect_xysr(float cx, float cy, float s, float r);
+    ~KalmanTracker() {
+        m_history.clear();
+    }
 
-	static int kf_count;
+    StateType predict();
 
-	int m_time_since_update;
-	int m_hits;
-	int m_hit_streak;
-	int m_age;
-	int m_id;
-	string source_track_id;
-	string name;
-	vector<float> landmarks;
+    void update(StateType stateMat);
+
+    StateType get_state();
+
+    StateType get_rect_xysr(float cx, float cy, float s, float r);
+
+    static int kf_count;
+
+    int m_time_since_update;
+    int m_hits;
+    int m_hit_streak;
+    int m_age;
+    int m_id;
+
+    int m_hits_to_start;
+    bool m_is_tracking;
+    string source_track_id;
+    string name;
+    Rect_<float> box;
+    vector<float> landmarks;
 
 private:
-	void init_kf(StateType stateMat);
+    void init_kf(StateType stateMat);
 
-	cv::KalmanFilter kf;
-	cv::Mat measurement;
+    cv::KalmanFilter kf;
+    cv::Mat measurement;
 
-	std::vector<StateType> m_history;
+    std::vector<StateType > m_history;
 };
 
 
 #endif
-
-
