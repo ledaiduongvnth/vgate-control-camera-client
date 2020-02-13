@@ -36,7 +36,7 @@ public:
         ClientContext context;
         std::shared_ptr<ClientReaderWriter<JSReq, JSResp> > stream(stub_->recognize_face_js(&context));
         std::thread writer([stream, rf, this]() {
-            cv::VideoCapture cap(0);
+            cv::VideoCapture cap("rtsp://root:abcd1234@172.16.10.151/axis-media/media.amp");
             cv::Mat img, cropedImage;
             vector<FaceDetectInfo> faceInfo;
             vector<LabeledFaceIn> facesOut;
