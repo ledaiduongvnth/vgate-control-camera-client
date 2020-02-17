@@ -1,0 +1,11 @@
+{
+  "multiple-camera-host": "172.16.10.12:50052",
+  "camera_source": "rtsp://root:abcd1234@172.16.10.151/axis-media/media.amp",
+  "model_path": "../model",
+  "files-store-host": "http://10.61.189.142:5001/get-images",
+  "registration_set_id": 1,
+  "max_size_profile_image_db": 10,
+  "vertical_margin": 40,
+  "horizontal_margin": 40,
+  "distance_between_windows": 20
+}

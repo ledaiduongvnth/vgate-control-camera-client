@@ -3,7 +3,6 @@
 #include <opencv2/videoio.hpp>
 #include <chrono>
 #include <memory>
-#include <random>
 #include <string>
 #include <thread>
 #include <grpcpp/channel.h>
@@ -15,6 +14,9 @@
 #include "image_proc.h"
 #include "queue.h"
 #include "SORTtracker.h"
+#include <jsoncpp/json/value.h>
+#include "jsoncpp/json/json.h"
+
 
 using grpc::Channel;
 using grpc::ClientContext;
@@ -32,11 +34,11 @@ class CameraClient {
 public:
     CameraClient(std::shared_ptr<Channel> channel) : stub_(FaceProcessing::NewStub(channel)) {}
 
-    void RecognizeFace(RetinaFace *rf) {
+    void RecognizeFace(RetinaFace *rf, string camera_source) {
         ClientContext context;
         std::shared_ptr<ClientReaderWriter<JSReq, JSResp> > stream(stub_->recognize_face_js(&context));
-        std::thread writer([stream, rf, this]() {
-            cv::VideoCapture cap("rtsp://root:abcd1234@172.16.10.151/axis-media/media.amp");
+        std::thread writer([stream, rf, camera_source, this]() {
+            cv::VideoCapture cap(camera_source);
             cv::Mat img, cropedImage;
             vector<FaceDetectInfo> faceInfo;
             vector<LabeledFaceIn> facesOut;
@@ -164,10 +166,15 @@ private:
 };
 
 int main(int argc, char **argv) {
-    string path = "../model";
-    RetinaFace *rf = new RetinaFace(path, "net3");
-    CameraClient client(grpc::CreateChannel(
-            "localhost:50052", grpc::InsecureChannelCredentials()));
-    client.RecognizeFace(rf);
+    std::ifstream file_input("../config/config.json");
+    Json::Reader reader;
+    Json::Value configs;
+    reader.parse(file_input, configs);
+    string multiple_camera_host = configs["multiple-camera-host"].asString();
+    string camera_source = configs["camera_source"].asString();
+    string model_path = configs["model_path"].asString();
+    RetinaFace *rf = new RetinaFace(model_path, "net3");
+    CameraClient client(grpc::CreateChannel(multiple_camera_host, grpc::InsecureChannelCredentials()));
+    client.RecognizeFace(rf, camera_source);
     return 0;
 }
