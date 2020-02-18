@@ -1,7 +1,5 @@
-#include <iostream>
 #include <RetinaFace.h>
 #include <opencv2/videoio.hpp>
-#include <chrono>
 #include <memory>
 #include <string>
 #include <thread>
@@ -16,6 +14,7 @@
 #include "SORTtracker.h"
 #include <jsoncpp/json/value.h>
 #include "jsoncpp/json/json.h"
+#include "X11/Xlib.h"
 
 
 using grpc::Channel;
@@ -23,7 +22,6 @@ using grpc::ClientContext;
 using grpc::ClientReader;
 using grpc::ClientReaderWriter;
 using grpc::ClientWriter;
-using grpc::Status;
 using multiple_camera_server::FaceProcessing;
 using multiple_camera_server::JSReq;
 using multiple_camera_server::JSResp;
@@ -34,58 +32,56 @@ class CameraClient {
 public:
     CameraClient(std::shared_ptr<Channel> channel) : stub_(FaceProcessing::NewStub(channel)) {}
 
-    void RecognizeFace(RetinaFace *rf, string camera_source) {
+    void RecognizeFace(RetinaFace *rf, string camera_source, Screen* screen) {
         ClientContext context;
         std::shared_ptr<ClientReaderWriter<JSReq, JSResp> > stream(stub_->recognize_face_js(&context));
-        std::thread writer([stream, rf, camera_source, this]() {
+        std::thread writer([stream, rf, camera_source, screen, this]() {
             cv::VideoCapture cap(camera_source);
-            cv::Mat img, cropedImage;
+            cv::Mat origin_image, display_image, cropedImage;
             vector<FaceDetectInfo> faceInfo;
             vector<LabeledFaceIn> facesOut;
             vector<TrackingBox> tmp_det;
-            int max_age = 10;
-            int min_hits = 5;
+            int max_age = 2;
+            int min_hits = 4;
             SORTtracker tracker(max_age, min_hits, 0.05);
             bool success, first_detections = true;
             int new_left, new_top, is_send = 0;
             float scale;
-            while (cap.read(img)) {
+            while (cap.read(origin_image)) {
+                display_image = origin_image.clone();
                 tmp_det.clear();
                 JSReq jsReq;
-                tie(faceInfo, scale) = rf->detect(img.clone(), 0.9);
+                tie(faceInfo, scale) = rf->detect(origin_image.clone(), 0.8);
                 /* if there is any face in the image */
                 is_send = is_send + 1;
                 if (is_send == 4) {
                     is_send = 0;
                 }
                 facesOut = this->work_queue.pop();
-
-                if (!faceInfo.empty()) {
-                    for (auto &t : faceInfo) {
-                        TrackingBox trackingBox;
-                        trackingBox.box.x = t.rect.x1 * scale;
-                        trackingBox.box.y = t.rect.y1 * scale;
-                        trackingBox.box.width = (t.rect.x2 - t.rect.x1) * scale;
-                        trackingBox.box.height = (t.rect.y2 - t.rect.y1) * scale;
-                        for (size_t j = 0; j < 5; j++) {
-                            trackingBox.landmarks.push_back(t.pts.y[j] * scale);
-                        }
-                        for (size_t j = 0; j < 5; j++) {
-                            trackingBox.landmarks.push_back(t.pts.x[j] * scale);
-                        }
-                        tmp_det.push_back(trackingBox);
+                for (auto &t : faceInfo) {
+                    TrackingBox trackingBox;
+                    trackingBox.box.x = t.rect.x1 * scale;
+                    trackingBox.box.y = t.rect.y1 * scale;
+                    trackingBox.box.width = (t.rect.x2 - t.rect.x1) * scale;
+                    trackingBox.box.height = (t.rect.y2 - t.rect.y1) * scale;
+                    for (size_t j = 0; j < 5; j++) {
+                        trackingBox.landmarks.push_back(t.pts.y[j] * scale);
                     }
-                    if (first_detections) {
-                        tracker.init(tmp_det);
-                        first_detections = false;
+                    for (size_t j = 0; j < 5; j++) {
+                        trackingBox.landmarks.push_back(t.pts.x[j] * scale);
                     }
+                    tmp_det.push_back(trackingBox);
                 }
-                tracker.step(tmp_det, img.size());
+                if (first_detections) {
+                    tracker.init(tmp_det);
+                    first_detections = false;
+                }
+                tracker.step(tmp_det, origin_image.size());
                 if (!faceInfo.empty()) {
                     for (auto it = tracker.trackers.begin(); it != tracker.trackers.end();) {
                         Rect_<float> pBox = (*it).box;
-                        if (pBox.x > 0 && pBox.y > 0 && pBox.x + pBox.width < img.size().width &&
-                            pBox.y + pBox.height < img.size().height) {
+                        if (pBox.x > 0 && pBox.y > 0 && pBox.x + pBox.width < origin_image.size().width &&
+                            pBox.y + pBox.height < origin_image.size().height) {
                             // attach detection results to the trackers
                             if (!facesOut.empty()) {
                                 for (auto &k : facesOut) {
@@ -96,13 +92,13 @@ public:
                             }
                             // end attach detection results to the trackers
                             // put text and draw rectangle
-                            cv::putText(img, it->name, cv::Point(pBox.x, pBox.y), cv::FONT_HERSHEY_DUPLEX, 1.0,
+                            cv::putText(display_image, it->name, cv::Point(pBox.x, pBox.y), cv::FONT_HERSHEY_DUPLEX, 1.0,
                                         CV_RGB(0, 255, 0), 2);
                             cv::Rect rect = cv::Rect(pBox.x, pBox.y, pBox.width, pBox.height);
-                            cv::rectangle(img, rect, Scalar(0, 0, 255), 2);
+                            cv::rectangle(display_image, rect, Scalar(0, 0, 255), 2);
                             // end put text and draw rectangle
                             // get face image and landmarks to make request
-                            tie(cropedImage, new_left, new_top) = CropFaceImageWithMargin(img, pBox.x, pBox.y,
+                            tie(cropedImage, new_left, new_top) = CropFaceImageWithMargin(origin_image, pBox.x, pBox.y,
                                                                                           pBox.x + pBox.width,
                                                                                           pBox.y + pBox.height, 1.3);
                             UnlabeledFace *face = jsReq.add_faces();
@@ -129,7 +125,12 @@ public:
                     }
                 }
                 printf("number of trackers:%zu\n", tracker.trackers.size());
-                imshow("dst", img);
+
+                namedWindow("camera_client", WND_PROP_FULLSCREEN);
+                setWindowProperty("camera_client", WND_PROP_FULLSCREEN, WINDOW_FULLSCREEN);
+                resize(display_image, display_image, cv::Size(screen->width, screen->height));
+
+                imshow("camera_client", display_image);
                 waitKey(1);
             }
             stream->WritesDone();
@@ -153,10 +154,6 @@ public:
             }
         }
         writer.join();
-        Status status = stream->Finish();
-        if (!status.ok()) {
-            std::cout << "recognize_face_js rpc failed." << std::endl;
-        }
     }
 
 private:
@@ -173,8 +170,10 @@ int main(int argc, char **argv) {
     string multiple_camera_host = configs["multiple-camera-host"].asString();
     string camera_source = configs["camera_source"].asString();
     string model_path = configs["model_path"].asString();
+    Display* d = XOpenDisplay(NULL);
+    Screen*  screen = DefaultScreenOfDisplay(d);
     RetinaFace *rf = new RetinaFace(model_path, "net3");
     CameraClient client(grpc::CreateChannel(multiple_camera_host, grpc::InsecureChannelCredentials()));
-    client.RecognizeFace(rf, camera_source);
+    client.RecognizeFace(rf, camera_source, screen);
     return 0;
 }

@@ -74,7 +74,7 @@ target_link_libraries(
         camera_client
         -L/usr/local/cuda/lib64
         -L/usr/local/TensorRT/lib
-        -lnvinfer -lnvcaffe_parser -ljsoncpp
+        -lnvinfer -lnvcaffe_parser -ljsoncpp -lX11
         -lcuda -lcudart -lcublas -lcudnn -lcurand
         -lboost_thread -lboost_system -lnppig
         -lnppicc -lnppc -lnppidei -lnppist
