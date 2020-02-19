@@ -6,7 +6,6 @@ option (USE_ARM64    "Set switch to build at ARM 64 platform mode"   OFF)
 set(USE_TENSORRT ON)
 add_definitions(-DUSE_TENSORRT)
 set(USE_NPP ON)
-add_definitions(-DUSE_NPP)
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0")
 

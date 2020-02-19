@@ -51,7 +51,7 @@ public:
                 display_image = origin_image.clone();
                 tmp_det.clear();
                 JSReq jsReq;
-                tie(faceInfo, scale) = rf->detect(origin_image.clone(), 0.8);
+                tie(faceInfo, scale) = rf->detect(origin_image.clone(), 0.4);
                 /* if there is any face in the image */
                 is_send = is_send + 1;
                 if (is_send == 4) {
@@ -124,8 +124,6 @@ public:
                         stream->Write(jsReq);
                     }
                 }
-                printf("number of trackers:%zu\n", tracker.trackers.size());
-
                 namedWindow("camera_client", WND_PROP_FULLSCREEN);
                 setWindowProperty("camera_client", WND_PROP_FULLSCREEN, WINDOW_FULLSCREEN);
                 resize(display_image, display_image, cv::Size(screen->width, screen->height));
