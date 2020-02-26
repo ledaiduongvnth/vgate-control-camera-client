@@ -51,7 +51,15 @@ public:
                 display_image = origin_image.clone();
                 tmp_det.clear();
                 JSReq jsReq;
+
+                double t1 = (double) getTickCount();
                 tie(faceInfo, scale) = rf->detect(origin_image.clone(), 0.4);
+                t1 = (double) getTickCount() - t1;
+                std::cout << "total time :" << t1 * 1000.0 / cv::getTickFrequency() << " ms \n";
+                printf("number faces:%zu\n", faceInfo.size());
+
+
+
                 /* if there is any face in the image */
                 is_send = is_send + 1;
                 if (is_send == 4) {

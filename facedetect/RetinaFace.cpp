@@ -201,7 +201,7 @@ void clip_boxes(anchor_box &box, int width, int height)
 }
 
 //######################################################################
-//facedetect
+//retinaface
 //######################################################################
 
 RetinaFace::RetinaFace(string &model, string network, float nms)
@@ -224,7 +224,7 @@ RetinaFace::RetinaFace(string &model, string network, float nms)
     else if(network == "net6") { //like pyramidbox or s3fd
         fmc = 6;
     }
-    else if(network == "net5") { //facedetect
+    else if(network == "net5") { //retinaface
         fmc = 5;
     }
     else if(network == "net5a") {
@@ -275,10 +275,10 @@ RetinaFace::RetinaFace(string &model, string network, float nms)
     //加载网络
 #ifdef USE_TENSORRT
     trtNet = new TrtRetinaFaceNet("retina");
-    trtNet->buildTrtContext(model + "/mnet-deconv-0517.prototxt", model + "/mnet-deconv-0517.caffemodel");
+    trtNet->buildTrtContext(model + "/mnet-deconv-0517.prototxt", model + "/mnet-deconv-0517.table.int8");
 
     TrtRetinaFaceNet *acfc = new TrtRetinaFaceNet("retinaww");
-    acfc->buildTrtContext(model + "/mnet-deconv-0517.prototxt", model + "/mnet-deconv-0517.caffemodel");
+    acfc->buildTrtContext(model + "/mnet-deconv-0517.prototxt", model + "/mnet-deconv-0517.table.int8");
 
     int maxbatchsize = trtNet->getMaxBatchSize();
     int channels = trtNet->getChannel();
@@ -493,87 +493,6 @@ std::vector<FaceDetectInfo> RetinaFace::nms(std::vector<FaceDetectInfo>& bboxes,
     return bboxes_nms;
 }
 
-#ifdef USE_TENSORRT
-vector<FaceDetectInfo> RetinaFace::postProcess(int inputW, int inputH, float threshold)
-{
-    string name_bbox = "face_rpn_bbox_pred_";
-    string name_score ="face_rpn_cls_prob_reshape_";
-    string name_landmark ="face_rpn_landmark_pred_";
-
-    vector<FaceDetectInfo> faceInfo;
-    for(size_t i = 0; i < _feat_stride_fpn.size(); i++) {
-///////////////////////////////////////////////
-        double s1 = (double)getTickCount();
-///////////////////////////////////////////////
-        string key = "stride" + std::to_string(_feat_stride_fpn[i]);
-
-        string str = name_score + key;
-        TrtBlob* score_blob = trtNet->blob_by_name(str);
-        std::vector<float> score = score_blob->result[0];
-        std::vector<float>::iterator begin = score.begin() + score.size() / 2;
-        std::vector<float>::iterator end = score.end();
-        score = std::vector<float>(begin, end);
-
-        str = name_bbox + key;
-        TrtBlob* bbox_blob = trtNet->blob_by_name(str);
-        std::vector<float> bbox_delta = bbox_blob->result[0];
-
-        str = name_landmark + key;
-        TrtBlob* landmark_blob = trtNet->blob_by_name(str);
-        std::vector<float> landmark_delta = landmark_blob->result[0];
-
-        int width = score_blob->outputDims.w();
-        int height = score_blob->outputDims.h();
-        size_t count = width * height;
-        size_t num_anchor = _num_anchors[key];
-
-///////////////////////////////////////////////
-        s1 = (double)getTickCount() - s1;
-        std::cout << "s1 compute time :" << s1*1000.0 / cv::getTickFrequency() << " ms \n";
-///////////////////////////////////////////////
-
-        for(size_t num = 0; num < num_anchor; num++) {
-            for(size_t j = 0; j < count; j++) {
-                //置信度小于阈值跳过
-                float conf = score[j + count * num];
-                if(conf <= threshold) {
-                    continue;
-                }
-
-                cv::Vec4f regress;
-                float dx = bbox_delta[j + count * (0 + num * 4)];
-                float dy = bbox_delta[j + count * (1 + num * 4)];
-                float dw = bbox_delta[j + count * (2 + num * 4)];
-                float dh = bbox_delta[j + count * (3 + num * 4)];
-                regress = cv::Vec4f(dx, dy, dw, dh);
-
-                //回归人脸框
-                anchor_box rect = bbox_pred(_anchors[key][j + count * num], regress);
-                //越界处理
-                clip_boxes(rect, inputW, inputH);
-
-                FacePts pts;
-                for(size_t k = 0; k < 5; k++) {
-                    pts.x[k] = landmark_delta[j + count * (num * 10 + k * 2)];
-                    pts.y[k] = landmark_delta[j + count * (num * 10 + k * 2 + 1)];
-                }
-                //回归人脸关键点
-                FacePts landmarks = landmark_pred(_anchors[key][j + count * num], pts);
-
-                FaceDetectInfo tmp;
-                tmp.score = conf;
-                tmp.rect = rect;
-                tmp.pts = landmarks;
-                faceInfo.push_back(tmp);
-            }
-        }
-    }
-
-    //排序nms
-    faceInfo = nms(faceInfo, 0.4);
-
-    return faceInfo;
-}
 
 std::tuple< vector<FaceDetectInfo>, float>  RetinaFace::detect(const Mat &img, float threshold, float scales)
 {
@@ -585,8 +504,8 @@ std::tuple< vector<FaceDetectInfo>, float>  RetinaFace::detect(const Mat &img, f
 
     //double pre = (double)getTickCount();
 
-    int inputW = trtNet->getNetWidth();
-    int inputH = trtNet->getNetHeight();
+    int inputW = 640;
+    int inputH = 640;
 
     float scale = 1.0;
     float sw = 1.0 * img.cols / inputW;
@@ -626,6 +545,12 @@ std::tuple< vector<FaceDetectInfo>, float>  RetinaFace::detect(const Mat &img, f
         //直接补边到目标大小
         cv::copyMakeBorder(img, resize, 0, inputH - img.rows, 0, inputW - img.cols, cv::BORDER_CONSTANT,cv::Scalar(0));
     }
+
+    printf("%d\n", resize.rows);
+    printf("%d\n", resize.cols);
+
+//    imshow("test", resize);
+//    waitKey(0);
 
     //to float
     resize.convertTo(resize, CV_32FC3);
@@ -669,18 +594,18 @@ std::tuple< vector<FaceDetectInfo>, float>  RetinaFace::detect(const Mat &img, f
     for(size_t i = 0; i < _feat_stride_fpn.size(); i++) {
         string key = "stride" + std::to_string(_feat_stride_fpn[i]);
 
-        string str = name_score + key;
+        string str = name_score + key + "_Reshape_Y";
         TrtBlob* score_blob = trtNet->blob_by_name(str);
         std::vector<float> score = score_blob->result[0];
         std::vector<float>::iterator begin = score.begin() + score.size() / 2;
         std::vector<float>::iterator end = score.end();
         score = std::vector<float>(begin, end);
 
-        str = name_bbox + key;
+        str = name_bbox + key + "_Y";
         TrtBlob* bbox_blob = trtNet->blob_by_name(str);
         std::vector<float> bbox_delta = bbox_blob->result[0];
 
-        str = name_landmark + key;
+        str = name_landmark + key + "_Y";
         TrtBlob* landmark_blob = trtNet->blob_by_name(str);
         std::vector<float> landmark_delta = landmark_blob->result[0];
 
@@ -728,372 +653,4 @@ std::tuple< vector<FaceDetectInfo>, float>  RetinaFace::detect(const Mat &img, f
     //排序nms
     faceInfo = nms(faceInfo, nms_threshold);
     return std::make_tuple(faceInfo, scale);
-
-    //post = (double)getTickCount() - post;
-    //std::cout << "post compute time :" << post*1000.0 / cv::getTickFrequency() << " ms \n";
-
-//    cv::Mat src = img.clone();
-//    for(size_t i = 0; i < faceInfo.size(); i++) {
-//        cv::Rect rect = cv::Rect(cv::Point2f(faceInfo[i].rect.x1 * scale, faceInfo[i].rect.y1 * scale),
-//                                 cv::Point2f(faceInfo[i].rect.x2 * scale, faceInfo[i].rect.y2 * scale));
-//
-//        cv::rectangle(src, rect, Scalar(0, 0, 255), 2);
-//
-//        for(size_t j = 0; j < 5; j++) {
-//            cv::Point2f pt = cv::Point2f(faceInfo[i].pts.x[j] * scale, faceInfo[i].pts.y[j] * scale);
-//            cv::circle(src, pt, 1, Scalar(0, 255, 0), 2);
-//        }
-//    }
-//
-//    //如果使用这张图片显示循环画框会出现问题，需clone()到另一张图显示
-//    imshow("dst", src);
-//    //imwrite("trt_result.jpg", img);
-//    waitKey(0);
 }
-
-void RetinaFace::detectBatchImages(vector<cv::Mat> imgs, float threshold)
-{
-    //预处理
-    int inputW = trtNet->getNetWidth();
-    int inputH = trtNet->getNetHeight();
-
-    vector<float> scales(imgs.size(), 1.0);
-
-    double t2 = (double)getTickCount();
-#ifdef USE_NPP
-    float *inputData = (float*)trtNet->getBuffer(0);
-    for(size_t i = 0; i < imgs.size(); i++) {
-        float sw = 1.0 * imgs[i].cols / inputW;
-        float sh = 1.0 * imgs[i].rows / inputH;
-        scales[i] = sw > sh ? sw : sh;
-        scales[i] = scales[i] > 1.0 ? scales[i] : 1.0;
-
-        cudaMemcpy(_gpu_data8u.data, imgs[i].data, imgs[i].cols * imgs[i].rows * 3, cudaMemcpyHostToDevice);
-        _gpu_data8u.width = imgs[i].cols;
-        _gpu_data8u.height = imgs[i].rows;
-
-        //注：输入图片大小不一样，使用统一buffer会引入脏数据，所以每次置０
-        cudaMemset(_resize_gpu_data8u.data, 0, inputW * inputH * 3);
-        cv::Rect roi = cv::Rect(0, 0, _gpu_data8u.width, _gpu_data8u.height);
-        imageROIResize8U3C(_gpu_data8u.data, _gpu_data8u.width, _gpu_data8u.height,
-                           roi, _resize_gpu_data8u.data, inputW, inputH);
-        _resize_gpu_data8u.width = inputW;
-        _resize_gpu_data8u.height = inputH;
-
-        convertBGR2RGBfloat(_resize_gpu_data8u.data, _resize_gpu_data32f.data, inputW, inputH, NULL);
-
-        imageSplit(_resize_gpu_data32f.data, inputData, inputW, inputH, NULL);
-        inputData += inputW * inputH * 3;
-    }
-    cudaDeviceSynchronize();
-#else
-    for(size_t i = 0; i < imgs.size(); i++) {
-        float sw = 1.0 * imgs[i].cols / inputW;
-        float sh = 1.0 * imgs[i].rows / inputH;
-        scales[i] = sw > sh ? sw : sh;
-        scales[i] = scales[i] > 1.0 ? scales[i] : 1.0;
-
-        if(sw > 1.0 || sh > 1.0) {
-            if(sw > sh) {
-                cv::resize(imgs[i], imgs[i], cv::Size(), 1 /sw, 1 / sw);
-                cv::copyMakeBorder(imgs[i], imgs[i], 0, inputH - imgs[i].rows, 0, 0, cv::BORDER_CONSTANT,cv::Scalar(0));
-            }
-            else {
-                cv::resize(imgs[i], imgs[i], cv::Size(), 1 /sh, 1 / sh);
-                cv::copyMakeBorder(imgs[i], imgs[i], 0, 0, 0, inputW - imgs[i].cols, cv::BORDER_CONSTANT,cv::Scalar(0));
-            }
-        }
-        else {
-            //直接补边到目标大小
-            cv::copyMakeBorder(imgs[i], imgs[i], 0, inputH - imgs[i].rows, 0, inputW - imgs[i].cols, cv::BORDER_CONSTANT,cv::Scalar(0));
-        }
-
-        //to float
-        imgs[i].convertTo(imgs[i], CV_32FC3);
-
-        //rgb
-        cvtColor(imgs[i], imgs[i], CV_BGR2RGB);
-    }
-
-    //填充数据
-    vector<vector<Mat>> input_channels;
-    float* input_data = (float *)cpuBuffers;
-    for(size_t j = 0; j < imgs.size(); j++) {
-        vector<Mat> input_chans;
-        for (int i = 0; i < trtNet->getChannel(); ++i) {
-            Mat channel(inputH, inputW, CV_32FC1, input_data);
-            input_chans.push_back(channel);
-            input_data += inputW * inputH;
-        }
-        input_channels.push_back(input_chans);
-    }
-
-    /* This operation will write the separate BGR planes directly to the
-    * input layer of the network because it is wrapped by the Mat
-    * objects in input_channels. */
-    for(size_t j = 0; j < imgs.size(); j++) {
-        split(imgs[j], input_channels[j]);
-    }
-    
-    float *inputData = (float*)trtNet->getBuffer(0);
-    cudaMemcpy(inputData, cpuBuffers, imgs.size() * inputW * inputH * 3 * sizeof(float), cudaMemcpyHostToDevice);
-#endif
-    t2 = (double)getTickCount() - t2;
-    //std::cout << "pre process compute time :" << t2*1000.0 / cv::getTickFrequency() << " ms \n";
-
-    //LOG(INFO) << "Start net_->Forward()";
-    double t1 = (double)getTickCount();
-    trtNet->doInference(imgs.size());
-    t1 = (double)getTickCount() - t1;
-    //std::cout << "doInference compute time :" << t1*1000.0 / cv::getTickFrequency() << " ms \n";
-    //LOG(INFO) << "Done net_->Forward()";
-
-    double post = (double)getTickCount();
-    string name_bbox = "face_rpn_bbox_pred_";
-    string name_score ="face_rpn_cls_prob_reshape_";
-    string name_landmark ="face_rpn_landmark_pred_";
-
-    vector<vector<FaceDetectInfo>> faceInfos;
-    for(size_t batch = 0; batch < imgs.size(); batch++) {
-        vector<FaceDetectInfo> faceInfo;
-        for(size_t i = 0; i < _feat_stride_fpn.size(); i++) {
-            string key = "stride" + std::to_string(_feat_stride_fpn[i]);
-            string str = name_score + key;
-            TrtBlob* score_blob = trtNet->blob_by_name(str);
-            std::vector<float> score = score_blob->result[batch];
-            std::vector<float>::iterator begin = score.begin() + score.size() / 2;
-            std::vector<float>::iterator end = score.end();
-            score = std::vector<float>(begin, end);
-
-            str = name_bbox + key;
-            TrtBlob* bbox_blob = trtNet->blob_by_name(str);
-            std::vector<float> bbox_delta = bbox_blob->result[batch];
-
-            str = name_landmark + key;
-            TrtBlob* landmark_blob = trtNet->blob_by_name(str);
-            std::vector<float> landmark_delta = landmark_blob->result[batch];
-
-            int width = score_blob->outputDims.w();
-            int height = score_blob->outputDims.h();
-            size_t count = width * height;
-            size_t num_anchor = _num_anchors[key];
-
-            for(size_t num = 0; num < num_anchor; num++) {
-                for(size_t j = 0; j < count; j++) {
-                    //置信度小于阈值跳过
-                    float conf = score[j + count * num];
-                    if(conf <= threshold) {
-                        continue;
-                    }
-
-                    cv::Vec4f regress;
-                    float dx = bbox_delta[j + count * (0 + num * 4)];
-                    float dy = bbox_delta[j + count * (1 + num * 4)];
-                    float dw = bbox_delta[j + count * (2 + num * 4)];
-                    float dh = bbox_delta[j + count * (3 + num * 4)];
-                    regress = cv::Vec4f(dx, dy, dw, dh);
-
-                    //回归人脸框
-                    anchor_box rect = bbox_pred(_anchors[key][j + count * num], regress);
-                    //越界处理
-                    clip_boxes(rect, inputW, inputH);
-
-                    FacePts pts;
-                    for(size_t k = 0; k < 5; k++) {
-                        pts.x[k] = landmark_delta[j + count * (num * 10 + k * 2)];
-                        pts.y[k] = landmark_delta[j + count * (num * 10 + k * 2 + 1)];
-                    }
-                    //回归人脸关键点
-                    FacePts landmarks = landmark_pred(_anchors[key][j + count * num], pts);
-
-                    FaceDetectInfo tmp;
-                    tmp.score = conf;
-                    tmp.rect = rect;
-                    tmp.pts = landmarks;
-                    faceInfo.push_back(tmp);
-                }
-            }  
-        }
-
-        faceInfos.push_back(faceInfo);
-    }
-    //排序nms
-    for(size_t batch = 0; batch < imgs.size(); batch++){
-        faceInfos[batch] = nms(faceInfos[batch], nms_threshold);
-    }
-
-    post = (double)getTickCount() - post;
-    //std::cout << "post compute time :" << post*1000.0 / cv::getTickFrequency() << " ms \n";
-//    for(size_t batch = 0; batch < imgs.size(); batch++){
-//        for(size_t i = 0; i < faceInfos[batch].size(); i++) {
-//            cv::Rect rect = cv::Rect(cv::Point2f(faceInfos[batch][i].rect.x1, faceInfos[batch][i].rect.y1),
-//                                     cv::Point2f(faceInfos[batch][i].rect.x2, faceInfos[batch][i].rect.y2));
-//            cv::rectangle(imgs[batch], rect, Scalar(0, 0, 255), 2);
-
-//            for(size_t j = 0; j < 5; j++) {
-//                cv::Point2f pt = cv::Point2f(faceInfos[batch][i].pts.x[j], faceInfos[batch][i].pts.y[j]);
-//                cv::circle(imgs[batch], pt, 1, Scalar(0, 255, 0), 2);
-//            }
-//        }
-
-//        string win = "dst" + std::to_string(batch);
-//        imshow(win, imgs[batch]);
-//    }
-
-//    //imwrite("trt_result.jpg", imgs);
-//    waitKey(0);
-}
-
-#else
-void RetinaFace::detect(Mat img, float threshold, float scales)
-{
-    if(img.empty()) {
-        return;
-    }
-
-    double pre = (double)getTickCount();
-    int ws = (img.cols + 31) / 32 * 32;
-    int hs = (img.rows + 31) / 32 * 32;
-
-    cv::copyMakeBorder(img, img, 0, hs - img.rows, 0, ws - img.cols, cv::BORDER_CONSTANT,cv::Scalar(0));
-
-    cv::Mat src = img.clone();
-
-    //to float
-    img.convertTo(img, CV_32FC3);
-
-    //rgb
-    cvtColor(img, img, CV_BGR2RGB);
-
-    Blob<float>* input_layer = Net_->input_blobs()[0];
-
-    input_layer->Reshape(1, 3, img.rows, img.cols);
-    Net_->Reshape();
-
-    vector<Mat> input_channels;
-    int width = input_layer->width();
-    int height = input_layer->height();
-    float* input_data = input_layer->mutable_cpu_data();
-    for (int i = 0; i < input_layer->channels(); ++i) {
-        Mat channel(height, width, CV_32FC1, input_data);
-        input_channels.push_back(channel);
-        input_data += width * height;
-    }
-
-    /* This operation will write the separate BGR planes directly to the
-    * input layer of the network because it is wrapped by the Mat
-    * objects in input_channels. */
-    split(img, input_channels);
-
-    pre = (double)getTickCount() - pre;
-    std::cout << "pre compute time :" << pre*1000.0 / cv::getTickFrequency() << " ms \n";
-
-    //LOG(INFO) << "Start net_->Forward()";
-    double t1 = (double)getTickCount();
-    Net_->Forward();
-    t1 = (double)getTickCount() - t1;
-    std::cout << "infer compute time :" << t1*1000.0 / cv::getTickFrequency() << " ms \n";
-    //LOG(INFO) << "Done net_->Forward()";
-
-    double post = (double)getTickCount();
-    string name_bbox = "face_rpn_bbox_pred_";
-    string name_score ="face_rpn_cls_prob_reshape_";
-    string name_landmark ="face_rpn_landmark_pred_";
-
-    vector<FaceDetectInfo> faceInfo;
-    for(size_t i = 0; i < _feat_stride_fpn.size(); i++) {
-///////////////////////////////////////////////
-        double s1 = (double)getTickCount();
-///////////////////////////////////////////////
-        string key = "stride" + std::to_string(_feat_stride_fpn[i]);
-        int stride = _feat_stride_fpn[i];
-
-        string str = name_score + key;
-        const boost::shared_ptr<Blob<float>> score_blob = Net_->blob_by_name(str);
-        const float* scoreB = score_blob->cpu_data() + score_blob->count() / 2;
-        const float* scoreE = scoreB + score_blob->count() / 2;
-        std::vector<float> score = std::vector<float>(scoreB, scoreE);
-
-        str = name_bbox + key;
-        const boost::shared_ptr<Blob<float>> bbox_blob = Net_->blob_by_name(str);
-        const float* bboxB = bbox_blob->cpu_data();
-        const float* bboxE = bboxB + bbox_blob->count();
-        std::vector<float> bbox_delta = std::vector<float>(bboxB, bboxE);
-
-        str = name_landmark + key;
-        const boost::shared_ptr<Blob<float>> landmark_blob = Net_->blob_by_name(str);
-        const float* landmarkB = landmark_blob->cpu_data();
-        const float* landmarkE = landmarkB + landmark_blob->count();
-        std::vector<float> landmark_delta = std::vector<float>(landmarkB, landmarkE);
-
-        int width = score_blob->width();
-        int height = score_blob->height();
-        size_t count = width * height;
-        size_t num_anchor = _num_anchors[key];
-
-///////////////////////////////////////////////
-        s1 = (double)getTickCount() - s1;
-        std::cout << "s1 compute time :" << s1*1000.0 / cv::getTickFrequency() << " ms \n";
-///////////////////////////////////////////////
-
-        //存储顺序 h * w * num_anchor
-        vector<anchor_box> anchors = anchors_plane(height, width, stride, _anchors_fpn[key]);
-
-        for(size_t num = 0; num < num_anchor; num++) {
-            for(size_t j = 0; j < count; j++) {
-                //置信度小于阈值跳过
-                float conf = score[j + count * num];
-                if(conf <= threshold) {
-                    continue;
-                }
-
-                cv::Vec4f regress;
-                float dx = bbox_delta[j + count * (0 + num * 4)];
-                float dy = bbox_delta[j + count * (1 + num * 4)];
-                float dw = bbox_delta[j + count * (2 + num * 4)];
-                float dh = bbox_delta[j + count * (3 + num * 4)];
-                regress = cv::Vec4f(dx, dy, dw, dh);
-
-                //回归人脸框
-                anchor_box rect = bbox_pred(anchors[j + count * num], regress);
-                //越界处理
-                clip_boxes(rect, ws, hs);
-
-                FacePts pts;
-                for(size_t k = 0; k < 5; k++) {
-                    pts.x[k] = landmark_delta[j + count * (num * 10 + k * 2)];
-                    pts.y[k] = landmark_delta[j + count * (num * 10 + k * 2 + 1)];
-                }
-                //回归人脸关键点
-                FacePts landmarks = landmark_pred(anchors[j + count * num], pts);
-
-                FaceDetectInfo tmp;
-                tmp.score = conf;
-                tmp.rect = rect;
-                tmp.pts = landmarks;
-                faceInfo.push_back(tmp);
-            }
-        }
-    }
-
-    //排序nms
-    faceInfo = nms(faceInfo, nms_threshold);
-
-    post = (double)getTickCount() - post;
-    std::cout << "post compute time :" << post*1000.0 / cv::getTickFrequency() << " ms \n";
-
-
-    for(size_t i = 0; i < faceInfo.size(); i++) {
-        cv::Rect rect = cv::Rect(cv::Point2f(faceInfo[i].rect.x1, faceInfo[i].rect.y1), cv::Point2f(faceInfo[i].rect.x2, faceInfo[i].rect.y2));
-        cv::rectangle(src, rect, Scalar(0, 0, 255), 2);
-
-        for(size_t j = 0; j < 5; j++) {
-            cv::Point2f pt = cv::Point2f(faceInfo[i].pts.x[j], faceInfo[i].pts.y[j]);
-            cv::circle(src, pt, 1, Scalar(0, 255, 0), 2);
-        }
-    }
-
-    imshow("dst", src);
-    waitKey(0);
-}
-#endif

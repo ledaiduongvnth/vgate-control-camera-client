@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <iterator>
 #include <memory>
+#include "NvOnnxParser.h"
 
 using namespace std;
 
@@ -198,13 +199,13 @@ bool TrtNetBase::parseNet(const string& deployfile)
 
 void TrtNetBase::buildTrtContext(const std::string& deployfile, const std::string& modelfile, bool bUseCPUBuf)
 {
-    if (!parseNet(deployfile)) {
-        printf("parse net failed, exit!\n");
-        exit(0);
-    }
+//    if (!parseNet(deployfile)) {
+//        printf("parse net failed, exit!\n");
+//        exit(0);
+//    }
     string cacheFile = netWorkName + ".cache";
     ifstream trtModelFile(cacheFile);
-    if (trtModelFile.good()) {
+    if (false) {
         // get cache file length
         size_t size = 0;
         size_t i = 0;
@@ -261,71 +262,42 @@ void TrtNetBase::caffeToTRTModel(const std::string& deployFile, const std::strin
     IBuilder* builder = createInferBuilder(*pLogger);
     INetworkDefinition* network = builder->createNetwork();
 
-    // parse the caffe model to populate the network, then set the outputs
-    ICaffeParser* parser = createCaffeParser();
-    parser->setPluginFactory(pluginFactory);
-
     bool useFp16 = builder->platformHasFastFp16();
     // if user specify
     if ( useFp32 ) {
         useFp16 = 0;
     }
 
-    DataType modelDataType = useFp16 ? DataType::kHALF : DataType::kFLOAT; // create a 16-bit model if it's natively supported
-    // network definition that the parser will populate
-    const IBlobNameToTensor *blobNameToTensor =
-           parser->parse(deployFile.c_str(), modelFile.c_str(), *network, modelDataType);
+    DataType modelDataType = useFp16 ? DataType::kHALF : DataType::kFLOAT;
+    Logger gLogger;
 
-    assert(blobNameToTensor != nullptr);
-    // the caffe file has no notion of outputs, so we need to manually say which tensors the engine should generate
-
-    for (auto& s : outputs) {
-        network->markOutput(*blobNameToTensor->find(s.c_str()));
-        printf("outputs %s\n", s.c_str());
-    }
-
-    // Build the engine
-    builder->setMaxBatchSize(maxBatchSize);
-    builder->setMaxWorkspaceSize(workSpaceSize);
-
-    // Eliminate the side-effect from the delay of GPU frequency boost
-    //builder->setMinFindIterations(3);
-    //builder->setAverageFindIterations(2);
-
-#ifdef USE_TENSORRT_INT8
-    // Calibrator life time needs to last until after the engine is built.
-    std::unique_ptr<IInt8Calibrator> calibrator;
-    Int8EntropyCalibrator2 *entropycalibrator = new Int8EntropyCalibrator2();
-    if(entropycalibrator->checkCalibrationTable()){
-        std::cout << "Using Entropy Calibrator 2." << std::endl;
-        calibrator.reset(entropycalibrator);
-        builder->setInt8Mode(true);
-        builder->setInt8Calibrator(calibrator.get());
-    }else{
-        // set up the network for paired-fp16 format if available
-        if(useFp16) {
-            builder->setHalf2Mode(true);
+    nvonnxparser::IParser *parser = nvonnxparser::createParser(*network, gLogger);
+    std::ifstream onnx_file("/home/d/CLionProjects/vgate-control-camera-client/model/retina.onnx", std::ios::binary | std::ios::ate);
+    std::streamsize file_size = onnx_file.tellg();
+    onnx_file.seekg(0, std::ios::beg);
+    std::vector<char> onnx_buf(file_size);
+    onnx_file.read(onnx_buf.data(), onnx_buf.size());
+    if (!parser->parse(onnx_buf.data(), onnx_buf.size())) {
+        int nerror = parser->getNbErrors();
+        for (int i = 0; i < nerror; ++i) {
+            nvonnxparser::IParserError const *error = parser->getError(i);
+            std::cerr << "ERROR: "
+                      << error->file() << ":" << error->line()
+                      << " In function " << error->func() << ":\n"
+                      << "[" << static_cast<int>(error->code()) << "] " << error->desc()
+                      << std::endl;
         }
-        std::cout << "Can not open CalibrationTable, Use fp32 infer mode." << std::endl;
     }
-#endif // USE_TENSORRT_INT8
-
+    // Build the engine
+    builder->setMaxBatchSize(1);
+    builder->setMaxWorkspaceSize(1 << 20);
     ICudaEngine* engine = builder->buildCudaEngine(*network);
+
     assert(engine);
-
-#ifdef USE_TENSORRT_INT8
-    // Once the engine is built. Its safe to destroy the calibrator.
-    calibrator.reset();//entropycalibrator will be released here
-#endif // USE_TENSORRT_INT8
-
-    // we don't need the network any more, and we can destroy the parser
     network->destroy();
     parser->destroy();
-
-    // serialize the engine, then close everything down
     trtModelStream = engine->serialize();
     engine->destroy();
     builder->destroy();
-    //shutdownProtobufLibrary();
 }
 

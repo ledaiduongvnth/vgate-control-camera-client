@@ -22,15 +22,17 @@ TrtRetinaFaceNet::TrtRetinaFaceNet(string netWorkName) : TrtNetBase(netWorkName)
     workSpaceSize = 1 << 24;
     maxBatchSize = 8;
 
-    outputs = {"face_rpn_cls_prob_reshape_stride32",
-               "face_rpn_bbox_pred_stride32",
-               "face_rpn_landmark_pred_stride32",
-               "face_rpn_cls_prob_reshape_stride16",
-               "face_rpn_bbox_pred_stride16",
-               "face_rpn_landmark_pred_stride16",
-               "face_rpn_cls_prob_reshape_stride8",
-               "face_rpn_bbox_pred_stride8",
-               "face_rpn_landmark_pred_stride8"};
+    outputs = {
+            "face_rpn_bbox_pred_stride32_Y",
+            "face_rpn_landmark_pred_stride32_Y",
+            "face_rpn_cls_prob_reshape_stride32_Reshape_Y",
+            "face_rpn_bbox_pred_stride16_Y",
+            "face_rpn_landmark_pred_stride16_Y",
+            "face_rpn_cls_prob_reshape_stride16_Reshape_Y",
+            "face_rpn_bbox_pred_stride8_Y",
+            "face_rpn_landmark_pred_stride8_Y",
+            "face_rpn_cls_prob_reshape_stride8_Reshape_Y"
+    };
 
     for(size_t i = 0; i < outputs.size(); i++) {
         outputBuffers.push_back(NULL);

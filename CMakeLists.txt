@@ -16,6 +16,11 @@ if(USE_ARM64)
         SET(CMAKE_CXX_COMPILER "aarch64-linux-gnu-g++")
 endif()
 
+if(USE_NPP)
+    add_definitions(-DUSE_NPP)
+    MESSAGE(STATUS "Build Option: -DUSE_NPP")
+endif()
+
 if(USE_ARM64)
     add_definitions (-std=c++11 -O2 -fomit-frame-pointer -g -Wall)
     MESSAGE (STATUS "Build Option: -std=c++11 -O2 -fomit-frame-pointer -g -Wall")
@@ -73,7 +78,7 @@ target_link_libraries(
         camera_client
         -L/usr/local/cuda/lib64
         -L/usr/local/TensorRT/lib
-        -lnvinfer -lnvcaffe_parser -ljsoncpp -lX11
+        -lnvinfer -lnvonnxparser -ljsoncpp -lX11
         -lcuda -lcudart -lcublas -lcudnn -lcurand
         -lboost_thread -lboost_system -lnppig
         -lnppicc -lnppc -lnppidei -lnppist

@@ -66,7 +66,7 @@ private:
 
 private:
 
-    std::string inputBlobName = "data";
+    std::string inputBlobName = "data_input";
 
     int inputIndex;
     vector<int> outputIndexs;

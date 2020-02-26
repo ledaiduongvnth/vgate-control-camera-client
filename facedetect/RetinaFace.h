@@ -66,10 +66,8 @@ public:
     RetinaFace(string &model, string network = "net3", float nms = 0.4);
     ~RetinaFace();
 
-    void detectBatchImages(vector<cv::Mat> imgs, float threshold=0.5);
     tuple<vector<FaceDetectInfo>, float> detect(const Mat &img, float threshold=0.5, float scales=1.0);
 private:
-    vector<FaceDetectInfo> postProcess(int inputW, int inputH, float threshold);
     anchor_box bbox_pred(anchor_box anchor, cv::Vec4f regress);
     vector<anchor_box> bbox_pred(vector<anchor_box> anchors, vector<cv::Vec4f> regress);
     vector<FacePts> landmark_pred(vector<anchor_box> anchors, vector<FacePts> facePts);

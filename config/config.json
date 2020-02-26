@@ -1,6 +1,6 @@
 {
-  "multiple-camera-host": "172.16.10.12:50052",
-  "camera_source": "rtsp://root:abcd1234@172.16.10.151/axis-media/media.amp",
+  "multiple-camera-host": "172.16.10.107:50052",
+  "camera_source": "/home/d/CLionProjects/retinaface/original_20200211-173858.avi",
   "model_path": "../model",
   "files-store-host": "http://10.61.189.142:5001/get-images",
   "registration_set_id": 1,
