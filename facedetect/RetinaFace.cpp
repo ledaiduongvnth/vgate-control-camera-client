@@ -275,11 +275,7 @@ RetinaFace::RetinaFace(string &model, string network, float nms)
     //加载网络
 #ifdef USE_TENSORRT
     trtNet = new TrtRetinaFaceNet("retina");
-    trtNet->buildTrtContext(model + "/mnet-deconv-0517.prototxt", model + "/mnet-deconv-0517.table.int8");
-
-    TrtRetinaFaceNet *acfc = new TrtRetinaFaceNet("retinaww");
-    acfc->buildTrtContext(model + "/mnet-deconv-0517.prototxt", model + "/mnet-deconv-0517.table.int8");
-
+    trtNet->buildTrtContext(model);
     int maxbatchsize = trtNet->getMaxBatchSize();
     int channels = trtNet->getChannel();
     int inputW = trtNet->getNetWidth();

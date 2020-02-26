@@ -139,7 +139,7 @@ public:
     *
     *   @note					        
     */
-    void buildTrtContext(const std::string &deployfile, const std::string &modelfile, bool bUseCPUBuf = false);
+    void buildTrtContext(const std::string &modelfile, bool bUseCPUBuf = false);
 	
    /**
     *	@brief  destroyTrtContext	     销毁tensorRT上下文环境
@@ -174,7 +174,7 @@ private:
     *
     *   @note					        
     */
-    void caffeToTRTModel(const std::string &deployFile, const std::string &modelFile,
+    void caffeToTRTModel(const std::string &modelFile,
                          nvcaffeparser1::IPluginFactory *pluginFactory);
 						 
    /**

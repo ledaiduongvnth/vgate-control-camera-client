@@ -3,9 +3,9 @@ cmake_minimum_required(VERSION 3.2)
 PROJECT (camera_client)
 
 option (USE_ARM64    "Set switch to build at ARM 64 platform mode"   OFF)
-set(USE_TENSORRT ON)
 add_definitions(-DUSE_TENSORRT)
-set(USE_NPP ON)
+add_definitions(-DUSE_NPP)
+
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0")
 
@@ -14,20 +14,12 @@ if(USE_ARM64)
         SET(CMAKE_SYSTEM_NAME Linux)
         SET(CMAKE_C_COMPILER "aarch64-linux-gnu-gcc")
         SET(CMAKE_CXX_COMPILER "aarch64-linux-gnu-g++")
+        set(CMAKE_CXX_FLAGS  "-lpthread")
+        set(CMAKE_CXX_FLAGS  "-O3")
 endif()
 
-if(USE_NPP)
-    add_definitions(-DUSE_NPP)
-    MESSAGE(STATUS "Build Option: -DUSE_NPP")
-endif()
-
-if(USE_ARM64)
-    add_definitions (-std=c++11 -O2 -fomit-frame-pointer -g -Wall)
-    MESSAGE (STATUS "Build Option: -std=c++11 -O2 -fomit-frame-pointer -g -Wall")
-else()
-    add_definitions (-std=c++11 -O2 -fomit-frame-pointer -g -Wall)
-    MESSAGE (STATUS "Build Option: -std=c++11 -O2 -fomit-frame-pointer -g -Wall")
-endif()
+execute_process ( COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/proto/gen.sh
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/proto )
 
 find_package(OpenCV REQUIRED)
 find_package(CUDA REQUIRED)

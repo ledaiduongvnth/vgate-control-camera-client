@@ -197,51 +197,12 @@ bool TrtNetBase::parseNet(const string& deployfile)
     return true;
 }
 
-void TrtNetBase::buildTrtContext(const std::string& deployfile, const std::string& modelfile, bool bUseCPUBuf)
+void TrtNetBase::buildTrtContext(const std::string& modelfile, bool bUseCPUBuf)
 {
-//    if (!parseNet(deployfile)) {
-//        printf("parse net failed, exit!\n");
-//        exit(0);
-//    }
-    string cacheFile = netWorkName + ".cache";
-    ifstream trtModelFile(cacheFile);
-    if (false) {
-        // get cache file length
-        size_t size = 0;
-        size_t i = 0;
-
-        printf("Using cached tensorRT model.\n");
-
-        // Get the length
-        trtModelFile.seekg(0, ios::end);
-        size = trtModelFile.tellg();
-        trtModelFile.seekg(0, ios::beg);
-
-        char * buff = new char [size];
-        while (trtModelFile.get(buff[i])) {
-            i++;
-        }
-
-        //IPluginFactory pluginFactory;
-        trtModelFile.close();
-        runtime = createInferRuntime(*pLogger);
-        engine = runtime->deserializeCudaEngine((void *)buff, size, NULL);
-        //pluginFactory.destroyPlugin();
-        delete buff;
-    }
-    else {
-        //IPluginFactory pluginFactory;
-        caffeToTRTModel(deployfile, modelfile, NULL);
-        //pluginFactory.destroyPlugin();
-        printf("Create tensorRT model cache.\n");
-        ofstream trtModelFile(cacheFile);
-        trtModelFile.write((char *)trtModelStream->data(), trtModelStream->size());
-        trtModelFile.close();
-        runtime = createInferRuntime(*pLogger);
-        engine = runtime->deserializeCudaEngine(trtModelStream->data(), trtModelStream->size(), NULL);
-        trtModelStream->destroy();
-        //pluginFactory.destroyPlugin();
-    }
+    caffeToTRTModel(modelfile, NULL);
+    runtime = createInferRuntime(*pLogger);
+    engine = runtime->deserializeCudaEngine(trtModelStream->data(), trtModelStream->size(), NULL);
+    trtModelStream->destroy();
     context = engine->createExecutionContext();
     context->setProfiler(profiler);
     allocateMemory(bUseCPUBuf);
@@ -255,7 +216,7 @@ void TrtNetBase::destroyTrtContext(bool bUseCPUBuf)
     runtime->destroy();
 }
 
-void TrtNetBase::caffeToTRTModel(const std::string& deployFile, const std::string& modelFile,
+void TrtNetBase::caffeToTRTModel(const std::string& modelFile,
                        nvcaffeparser1::IPluginFactory* pluginFactory)
 {
     // create API root class - must span the lifetime of the engine usage
@@ -272,7 +233,7 @@ void TrtNetBase::caffeToTRTModel(const std::string& deployFile, const std::strin
     Logger gLogger;
 
     nvonnxparser::IParser *parser = nvonnxparser::createParser(*network, gLogger);
-    std::ifstream onnx_file("/home/d/CLionProjects/vgate-control-camera-client/model/retina.onnx", std::ios::binary | std::ios::ate);
+    std::ifstream onnx_file(modelFile, std::ios::binary | std::ios::ate);
     std::streamsize file_size = onnx_file.tellg();
     onnx_file.seekg(0, std::ios::beg);
     std::vector<char> onnx_buf(file_size);
