@@ -490,41 +490,30 @@ std::vector<FaceDetectInfo> RetinaFace::nms(std::vector<FaceDetectInfo>& bboxes,
 }
 
 
-std::tuple< vector<FaceDetectInfo>, float>  RetinaFace::detect(const Mat &img, float threshold, float scales)
+void  RetinaFace::detect(const Mat &img, float threshold, vector<FaceDetectInfo> &faceInfo, int model_size)
 {
-
-    double t1 = (double) getTickCount();
-    vector<FaceDetectInfo> faceInfo;
+    faceInfo.clear();
     if(img.empty()) {
-        return std::make_tuple(faceInfo, 0.0);
+        return ;
     }
-    int inputW = 640;
-    int inputH = 640;
-
-    float scale = 1.0;
-    float sw = 1.0 * img.cols / inputW;
-    float sh = 1.0 * img.rows / inputH;
-    scale = sw > sh ? sw : sh;
-    scale = scale > 1.0 ? scale : 1.0;
-    std::cout << "1:" << ((double) getTickCount() - t1) * 1000.0 / cv::getTickFrequency() << " ms \n";
-    t1 = (double) getTickCount();
+    double t1 = (double) getTickCount();
 
 #ifdef USE_NPP
     cudaMemcpy(_gpu_data8u.data, img.data, img.cols * img.rows * 3, cudaMemcpyHostToDevice);
     _gpu_data8u.width = img.cols;
     _gpu_data8u.height = img.rows;
     //注：输入图片大小不一样，使用统一buffer会引入脏数据，所以每次置０
-    cudaMemset(_resize_gpu_data8u.data, 0, inputW * inputH * 3);
+    cudaMemset(_resize_gpu_data8u.data, 0, model_size * model_size * 3);
     cv::Rect roi = cv::Rect(0, 0, _gpu_data8u.width, _gpu_data8u.height);
     imageROIResize8U3C(_gpu_data8u.data, _gpu_data8u.width, _gpu_data8u.height,
-                        roi, _resize_gpu_data8u.data, inputW, inputH);
-    _resize_gpu_data8u.width = inputW;
-    _resize_gpu_data8u.height = inputH;
+                        roi, _resize_gpu_data8u.data, model_size, model_size);
+    _resize_gpu_data8u.width = model_size;
+    _resize_gpu_data8u.height = model_size;
 
-    convertBGR2RGBfloat(_resize_gpu_data8u.data, _resize_gpu_data32f.data, inputW, inputH, NULL);
+    convertBGR2RGBfloat(_resize_gpu_data8u.data, _resize_gpu_data32f.data, model_size, model_size, NULL);
 
     float *inputData = (float*)trtNet->getBuffer(0);
-    imageSplit(_resize_gpu_data32f.data, inputData, inputW, inputH, NULL);
+    imageSplit(_resize_gpu_data32f.data, inputData, model_size, model_size, NULL);
 #else
     cv::Mat resize;
     if(scale > 1) {
@@ -612,7 +601,7 @@ std::tuple< vector<FaceDetectInfo>, float>  RetinaFace::detect(const Mat &img, f
                 float dh = bbox_delta[j + count * (3 + num * 4)];
                 regress = cv::Vec4f(dx, dy, dw, dh);
                 anchor_box rect = bbox_pred(_anchors[key][j + count * num], regress);
-                clip_boxes(rect, inputW, inputH);
+                clip_boxes(rect, model_size, model_size);
 
                 FacePts pts;
                 for(size_t k = 0; k < 5; k++) {
@@ -631,5 +620,4 @@ std::tuple< vector<FaceDetectInfo>, float>  RetinaFace::detect(const Mat &img, f
     }
     faceInfo = nms(faceInfo, nms_threshold);
     std::cout << "4:" << ((double) getTickCount() - t1) * 1000.0 / cv::getTickFrequency() << " ms \n";
-    return std::make_tuple(faceInfo, scale);
 }

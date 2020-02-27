@@ -42,48 +42,48 @@ public:
             vector<LabeledFaceIn> facesOut;
             vector<TrackingBox> tmp_det;
             int max_age = 2;
-            int min_hits = 4;
-            SORTtracker tracker(max_age, min_hits, 0.05);
+            int min_hits = 3;
+            SORTtracker tracker(max_age, min_hits, 0.1);
             bool success, first_detections = true;
             int new_left, new_top, is_send = 0;
             float scale;
             while (cap.read(origin_image)) {
                 display_image = origin_image.clone();
-                tmp_det.clear();
                 JSReq jsReq;
-
-                double t1 = (double) getTickCount();
-                tie(faceInfo, scale) = rf->detect(origin_image.clone(), 0.4);
-                t1 = (double) getTickCount() - t1;
-                std::cout << "total time :" << t1 * 1000.0 / cv::getTickFrequency() << " ms \n";
-                printf("number faces:%zu\n", faceInfo.size());
-
-
-
-                /* if there is any face in the image */
                 is_send = is_send + 1;
-                if (is_send == 4) {
-                    is_send = 0;
-                }
-                facesOut = this->work_queue.pop();
-                for (auto &t : faceInfo) {
-                    TrackingBox trackingBox;
-                    trackingBox.box.x = t.rect.x1 * scale;
-                    trackingBox.box.y = t.rect.y1 * scale;
-                    trackingBox.box.width = (t.rect.x2 - t.rect.x1) * scale;
-                    trackingBox.box.height = (t.rect.y2 - t.rect.y1) * scale;
-                    for (size_t j = 0; j < 5; j++) {
-                        trackingBox.landmarks.push_back(t.pts.y[j] * scale);
-                    }
-                    for (size_t j = 0; j < 5; j++) {
-                        trackingBox.landmarks.push_back(t.pts.x[j] * scale);
-                    }
-                    tmp_det.push_back(trackingBox);
-                }
                 if (first_detections) {
                     tracker.init(tmp_det);
                     first_detections = false;
+                    float sw = 1.0 * origin_image.cols / 640;
+                    float sh = 1.0 * origin_image.rows / 640;
+                    scale = sw > sh ? sw : sh;
+                    scale = scale > 1.0 ? scale : 1.0;
                 }
+                if (is_send == 2) {
+                    is_send = 0;
+                }
+                if (is_send == 0){
+                    tmp_det.clear();
+                    double t1 = (double) getTickCount();
+                    rf->detect(origin_image.clone(), 0.8, faceInfo, 640);
+                    t1 = (double) getTickCount() - t1;
+                    std::cout << "total time :" << t1 * 1000.0 / cv::getTickFrequency() << " ms \n";
+                    for (auto &t : faceInfo) {
+                        TrackingBox trackingBox;
+                        trackingBox.box.x = t.rect.x1 * scale;
+                        trackingBox.box.y = t.rect.y1 * scale;
+                        trackingBox.box.width = (t.rect.x2 - t.rect.x1) * scale;
+                        trackingBox.box.height = (t.rect.y2 - t.rect.y1) * scale;
+                        for (size_t j = 0; j < 5; j++) {
+                            trackingBox.landmarks.push_back(t.pts.y[j] * scale);
+                        }
+                        for (size_t j = 0; j < 5; j++) {
+                            trackingBox.landmarks.push_back(t.pts.x[j] * scale);
+                        }
+                        tmp_det.push_back(trackingBox);
+                    }
+                }
+                facesOut = this->work_queue.pop();
                 tracker.step(tmp_det, origin_image.size());
                 if (!faceInfo.empty()) {
                     for (auto it = tracker.trackers.begin(); it != tracker.trackers.end();) {

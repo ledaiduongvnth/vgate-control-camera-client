@@ -66,7 +66,7 @@ public:
     RetinaFace(string &model, string network = "net3", float nms = 0.4);
     ~RetinaFace();
 
-    tuple<vector<FaceDetectInfo>, float> detect(const Mat &img, float threshold=0.5, float scales=1.0);
+    void detect(const Mat &img, float threshold, vector<FaceDetectInfo> &faceInfo, int model_size);
 private:
     anchor_box bbox_pred(anchor_box anchor, cv::Vec4f regress);
     vector<anchor_box> bbox_pred(vector<anchor_box> anchors, vector<cv::Vec4f> regress);
