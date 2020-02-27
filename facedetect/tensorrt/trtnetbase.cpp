@@ -216,22 +216,11 @@ void TrtNetBase::destroyTrtContext(bool bUseCPUBuf)
     runtime->destroy();
 }
 
-void TrtNetBase::caffeToTRTModel(const std::string& modelFile,
-                       nvcaffeparser1::IPluginFactory* pluginFactory)
-{
+void TrtNetBase::caffeToTRTModel(const std::string& modelFile, nvcaffeparser1::IPluginFactory* pluginFactory){
     // create API root class - must span the lifetime of the engine usage
     IBuilder* builder = createInferBuilder(*pLogger);
     INetworkDefinition* network = builder->createNetwork();
-
-    bool useFp16 = builder->platformHasFastFp16();
-    // if user specify
-    if ( useFp32 ) {
-        useFp16 = 0;
-    }
-
-    DataType modelDataType = useFp16 ? DataType::kHALF : DataType::kFLOAT;
     Logger gLogger;
-
     nvonnxparser::IParser *parser = nvonnxparser::createParser(*network, gLogger);
     std::ifstream onnx_file(modelFile, std::ios::binary | std::ios::ate);
     std::streamsize file_size = onnx_file.tellg();

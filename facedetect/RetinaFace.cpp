@@ -492,14 +492,12 @@ std::vector<FaceDetectInfo> RetinaFace::nms(std::vector<FaceDetectInfo>& bboxes,
 
 std::tuple< vector<FaceDetectInfo>, float>  RetinaFace::detect(const Mat &img, float threshold, float scales)
 {
-    vector<FaceDetectInfo> faceInfo;
 
+    double t1 = (double) getTickCount();
+    vector<FaceDetectInfo> faceInfo;
     if(img.empty()) {
         return std::make_tuple(faceInfo, 0.0);
     }
-
-    //double pre = (double)getTickCount();
-
     int inputW = 640;
     int inputH = 640;
 
@@ -508,6 +506,8 @@ std::tuple< vector<FaceDetectInfo>, float>  RetinaFace::detect(const Mat &img, f
     float sh = 1.0 * img.rows / inputH;
     scale = sw > sh ? sw : sh;
     scale = scale > 1.0 ? scale : 1.0;
+    std::cout << "1:" << ((double) getTickCount() - t1) * 1000.0 / cv::getTickFrequency() << " ms \n";
+    t1 = (double) getTickCount();
 
 #ifdef USE_NPP
     cudaMemcpy(_gpu_data8u.data, img.data, img.cols * img.rows * 3, cudaMemcpyHostToDevice);
@@ -542,12 +542,6 @@ std::tuple< vector<FaceDetectInfo>, float>  RetinaFace::detect(const Mat &img, f
         cv::copyMakeBorder(img, resize, 0, inputH - img.rows, 0, inputW - img.cols, cv::BORDER_CONSTANT,cv::Scalar(0));
     }
 
-    printf("%d\n", resize.rows);
-    printf("%d\n", resize.cols);
-
-//    imshow("test", resize);
-//    waitKey(0);
-
     //to float
     resize.convertTo(resize, CV_32FC3);
 
@@ -571,18 +565,11 @@ std::tuple< vector<FaceDetectInfo>, float>  RetinaFace::detect(const Mat &img, f
     float *inputData = (float*)trtNet->getBuffer(0);
     cudaMemcpy(inputData, cpuBuffers, inputW * inputH * 3 * sizeof(float), cudaMemcpyHostToDevice);
 #endif
-
-    //pre = (double)getTickCount() - pre;
-    //std::cout << "pre compute time :" << pre*1000.0 / cv::getTickFrequency() << " ms \n";
-
-    //LOG(INFO) << "Start net_->Forward()";
-    //double t1 = (double)getTickCount();
+    std::cout << "2:" << ((double) getTickCount() - t1) * 1000.0 / cv::getTickFrequency() << " ms \n";
+    t1 = (double) getTickCount();
     trtNet->doInference(1);
-    //t1 = (double)getTickCount() - t1;
-    //std::cout << "doInference compute time :" << t1*1000.0 / cv::getTickFrequency() << " ms \n";
-    //LOG(INFO) << "Done net_->Forward()";
-
-    //double post = (double)getTickCount();
+    std::cout << "3:" << ((double) getTickCount() - t1) * 1000.0 / cv::getTickFrequency() << " ms \n";
+    t1 = (double) getTickCount();
     string name_bbox = "face_rpn_bbox_pred_";
     string name_score ="face_rpn_cls_prob_reshape_";
     string name_landmark ="face_rpn_landmark_pred_";
@@ -624,10 +611,7 @@ std::tuple< vector<FaceDetectInfo>, float>  RetinaFace::detect(const Mat &img, f
                 float dw = bbox_delta[j + count * (2 + num * 4)];
                 float dh = bbox_delta[j + count * (3 + num * 4)];
                 regress = cv::Vec4f(dx, dy, dw, dh);
-
-                //回归人脸框
                 anchor_box rect = bbox_pred(_anchors[key][j + count * num], regress);
-                //越界处理
                 clip_boxes(rect, inputW, inputH);
 
                 FacePts pts;
@@ -635,7 +619,6 @@ std::tuple< vector<FaceDetectInfo>, float>  RetinaFace::detect(const Mat &img, f
                     pts.x[k] = landmark_delta[j + count * (num * 10 + k * 2)];
                     pts.y[k] = landmark_delta[j + count * (num * 10 + k * 2 + 1)];
                 }
-                //回归人脸关键点
                 FacePts landmarks = landmark_pred(_anchors[key][j + count * num], pts);
 
                 FaceDetectInfo tmp;
@@ -646,7 +629,7 @@ std::tuple< vector<FaceDetectInfo>, float>  RetinaFace::detect(const Mat &img, f
             }
         }
     }
-    //排序nms
     faceInfo = nms(faceInfo, nms_threshold);
+    std::cout << "4:" << ((double) getTickCount() - t1) * 1000.0 / cv::getTickFrequency() << " ms \n";
     return std::make_tuple(faceInfo, scale);
 }
