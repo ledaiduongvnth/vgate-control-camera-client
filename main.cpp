@@ -37,7 +37,7 @@ public:
         std::shared_ptr<ClientReaderWriter<JSReq, JSResp> > stream(stub_->recognize_face_js(&context));
         std::thread writer([stream, rf, camera_source, screen, this]() {
             cv::VideoCapture cap(camera_source);
-            cap.set(CV_CAP_PROP_BUFFERSIZE, 3);
+            cap.set(cv::CAP_PROP_BUFFERSIZE, 3);
             cv::Mat origin_image, display_image, cropedImage;
             vector<FaceDetectInfo> faceInfo;
             vector<LabeledFaceIn> facesOut;
