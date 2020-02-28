@@ -37,6 +37,7 @@ public:
         std::shared_ptr<ClientReaderWriter<JSReq, JSResp> > stream(stub_->recognize_face_js(&context));
         std::thread writer([stream, rf, camera_source, screen, this]() {
             cv::VideoCapture cap(camera_source);
+            cap.set(CV_CAP_PROP_BUFFERSIZE, 3);
             cv::Mat origin_image, display_image, cropedImage;
             vector<FaceDetectInfo> faceInfo;
             vector<LabeledFaceIn> facesOut;
@@ -47,7 +48,16 @@ public:
             bool success, first_detections = true;
             int new_left, new_top, is_send = 0;
             float scale;
+            double delay = 0, timer = 0;
             while (cap.read(origin_image)) {
+                delay = ((double)getTickCount() - timer)* 1000.0 / cv::getTickFrequency();
+                printf("delay: %f\n", delay);
+                if (delay < 15){
+                    printf("ignore frame\n");
+                    timer = (int) getTickCount();
+                    continue;
+                }
+
                 display_image = origin_image.clone();
                 JSReq jsReq;
                 is_send = is_send + 1;
@@ -138,6 +148,7 @@ public:
 
                 imshow("camera_client", display_image);
                 waitKey(1);
+                timer = (double) getTickCount();
             }
             stream->WritesDone();
         });
