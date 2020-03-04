@@ -496,7 +496,6 @@ void  RetinaFace::detect(const Mat &img, float threshold, vector<FaceDetectInfo>
     if(img.empty()) {
         return ;
     }
-    double t1 = (double) getTickCount();
 
 #ifdef USE_NPP
     cudaMemcpy(_gpu_data8u.data, img.data, img.cols * img.rows * 3, cudaMemcpyHostToDevice);
@@ -554,11 +553,7 @@ void  RetinaFace::detect(const Mat &img, float threshold, vector<FaceDetectInfo>
     float *inputData = (float*)trtNet->getBuffer(0);
     cudaMemcpy(inputData, cpuBuffers, inputW * inputH * 3 * sizeof(float), cudaMemcpyHostToDevice);
 #endif
-    std::cout << "2:" << ((double) getTickCount() - t1) * 1000.0 / cv::getTickFrequency() << " ms \n";
-    t1 = (double) getTickCount();
     trtNet->doInference(1);
-    std::cout << "3:" << ((double) getTickCount() - t1) * 1000.0 / cv::getTickFrequency() << " ms \n";
-    t1 = (double) getTickCount();
     string name_bbox = "face_rpn_bbox_pred_";
     string name_score ="face_rpn_cls_prob_reshape_";
     string name_landmark ="face_rpn_landmark_pred_";
@@ -619,5 +614,4 @@ void  RetinaFace::detect(const Mat &img, float threshold, vector<FaceDetectInfo>
         }
     }
     faceInfo = nms(faceInfo, nms_threshold);
-    std::cout << "4:" << ((double) getTickCount() - t1) * 1000.0 / cv::getTickFrequency() << " ms \n";
 }
