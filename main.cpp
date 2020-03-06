@@ -66,7 +66,6 @@ public:
         while (cap.read(origin_image)) {
             delay = ((double) getTickCount() - timer) * 1000.0 / cv::getTickFrequency();
             if (delay < 10) {
-                    printf("IGNORE A frame\n");
                 timer = (double) getTickCount();
                 continue;
             }
@@ -207,8 +206,8 @@ int main(int argc, char **argv) {
     Json::Reader reader;
     Json::Value configs;
     reader.parse(file_input, configs);
-    string multiple_camera_host = configs["multiple-camera-host"].asString();
-    string camera_source = configs["camera_source"].asString();
+    string multiple_camera_host = configs["multiple-camera-host"].asString() + ":50052";
+    string camera_source = "rtsp://admin:123456a@@" + configs["camera_source"].asString() + ":554/Streaming/Channels/101";
     string model_path = configs["model_path"].asString();
     CameraClient cameraClient(camera_source, multiple_camera_host, model_path);
     std::thread t1 = cameraClient.ReceiveResponsesThread();

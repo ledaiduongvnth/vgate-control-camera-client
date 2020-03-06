@@ -1,6 +1,7 @@
 {
-  "multiple-camera-host": "172.16.10.107:50052",
-  "camera_source": "rtsp://admin:123456a@@172.16.10.108:554/Streaming/Channels/101",
+  "strLane": 1,
+  "multiple-camera-host": "172.16.10.107",
+  "camera_source": "172.16.10.108",
   "model_path": "../model/retina.onnx",
   "files-store-host": "http://10.61.189.142:5001/get-images",
   "registration_set_id": 1,
