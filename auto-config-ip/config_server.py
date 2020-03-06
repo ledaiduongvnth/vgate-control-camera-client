@@ -59,7 +59,7 @@ def config():
 
         camera_client_config_data[1] = '  "strLane": ' + str(strLane) + ',\n'
         camera_client_config_data[2] = '  "multiple-camera-host": ' + strIPSrv + ',\n'
-        camera_client_config_data[2] = '  "camera_source": ' + strIPSrv + ',\n'
+        camera_client_config_data[3] = '  "camera_source": ' + strIPSrv + ',\n'
 
 
         with open(camera_cliet_config_file, 'w') as file:
