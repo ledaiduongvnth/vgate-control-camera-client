@@ -11,6 +11,7 @@
 #include "base64.h"
 #include "image_proc.h"
 #include "queue.h"
+#include "drawavatar2lanes.h"
 #include "SORTtracker.h"
 #include <jsoncpp/json/value.h>
 #include "jsoncpp/json/json.h"
@@ -34,13 +35,15 @@ public:
     string camera_source;
     string multiple_camera_host;
     Screen *screen;
+    int numberLanes;
 
-    CameraClient(string camera_source, string multiple_camera_host, string model_path) {
+    CameraClient(string camera_source, string multiple_camera_host, string model_path, int numberLanes) {
         this->camera_source = camera_source;
         this->multiple_camera_host = multiple_camera_host;
         this->rf = new RetinaFace(model_path, "net3");
         Display *d = XOpenDisplay(NULL);
         this->screen = DefaultScreenOfDisplay(d);
+        this->numberLanes = numberLanes;
         CreateConnectionStream();
     }
 
@@ -66,6 +69,7 @@ public:
         while (cap.read(origin_image)) {
             delay = ((double) getTickCount() - timer) * 1000.0 / cv::getTickFrequency();
             if (delay < 10) {
+                printf("ignore frame\n");
                 timer = (double) getTickCount();
                 continue;
             }
@@ -73,6 +77,7 @@ public:
             JSReq jsReq;
             is_send = is_send + 1;
             if (first_detections) {
+                printf("make first detection\n");
                 tracker.init(tmp_det);
                 first_detections = false;
                 float sw = 1.0 * origin_image.cols / 640;
@@ -84,6 +89,7 @@ public:
                 is_send = 0;
             }
             if (is_send == 0) {
+                printf("detect faces in a frame\n");
                 tmp_det.clear();
                 rf->detect(origin_image.clone(), 0.7, faceInfo, 640);
                 for (auto &t : faceInfo) {
@@ -99,11 +105,14 @@ public:
                         trackingBox.landmarks.push_back(t.pts.x[j] * scale);
                     }
                     tmp_det.push_back(trackingBox);
+                    printf("end detect faces in a frame\n");
                 }
             }
+            printf("get response from queue\n");
             facesOut = this->work_queue.pop();
             tracker.step(tmp_det, origin_image.size());
             if (!faceInfo.empty()) {
+                printf("draw text and make requests\n");
                 for (auto it = tracker.trackers.begin(); it != tracker.trackers.end();) {
                     Rect_<float> pBox = (*it).box;
                     if (pBox.x > 0 && pBox.y > 0 && pBox.x + pBox.width < origin_image.size().width &&
@@ -131,6 +140,7 @@ public:
                         std::vector<uchar> buf;
                         success = cv::imencode(".jpg", cropedImage, buf);
                         if (success) {
+                            printf("make request\n");
                             auto *enc_msg = reinterpret_cast<unsigned char *>(buf.data());
                             std::string encoded = base64_encode(enc_msg, buf.size());
                             face->set_track_id(it->source_track_id);
@@ -145,14 +155,17 @@ public:
                         }
                     }
                     it++;
+                    printf("end draw text and make requests\n");
                 }
                 if (is_send == 0) {
+                    printf("send request\n");
                     stream->Write(jsReq);
                 }
             }
+            resize(display_image, display_image, cv::Size(screen->width, screen->height));
             namedWindow("camera_client", WND_PROP_FULLSCREEN);
             setWindowProperty("camera_client", WND_PROP_FULLSCREEN, WINDOW_FULLSCREEN);
-            resize(display_image, display_image, cv::Size(screen->width, screen->height));
+            printf("display image\n");
             imshow("camera_client", display_image);
             waitKey(1);
             timer = (double) getTickCount();
@@ -172,6 +185,7 @@ public:
                 this->CreateConnectionStream();
             }
             if (!jSResp.faces().empty()) {
+                printf("receiving a response\n");
                 for (int i = 0; i < jSResp.faces().size(); ++i) {
                     labeledFace = jSResp.faces(i);
                     labeledFaceIn.track_id = labeledFace.track_id();
@@ -207,6 +221,7 @@ int main(int argc, char **argv) {
     Json::Value configs;
     reader.parse(file_input, configs);
     string multiple_camera_host = configs["multiple_camera_host"].asString() + ":50052";
+    int numberLanes = configs["strLane"].asInt();
     string camera_source;
     if (configs["use_gstreamer"].asBool()){
         camera_source = "rtspsrc location=rtsp://" + configs["camera_source"].asString() +
@@ -215,7 +230,7 @@ int main(int argc, char **argv) {
         camera_source = "rtsp://admin:123456a@@" + configs["camera_source"].asString() + ":554/Streaming/Channels/101";
     }
     string model_path = configs["model_path"].asString();
-    CameraClient cameraClient(camera_source, multiple_camera_host, model_path);
+    CameraClient cameraClient(camera_source, multiple_camera_host, model_path, numberLanes);
     std::thread t1 = cameraClient.ReceiveResponsesThread();
     std::thread t2 = cameraClient.SendRequestsThread();
     t1.join();
