@@ -206,8 +206,14 @@ int main(int argc, char **argv) {
     Json::Reader reader;
     Json::Value configs;
     reader.parse(file_input, configs);
-    string multiple_camera_host = configs["multiple-camera-host"].asString() + ":50052";
-    string camera_source = "rtsp://admin:123456a@@" + configs["camera_source"].asString() + ":554/Streaming/Channels/101";
+    string multiple_camera_host = configs["multiple_camera_host"].asString() + ":50052";
+    string camera_source;
+    if (configs["use_gstreamer"].asBool()){
+        camera_source = "rtspsrc location=rtsp://" + configs["camera_source"].asString() +
+                        "/101 user-id=admin user-pw=123456a@ latency=0 ! rtph264depay ! h264parse ! avdec_h264 ! videoconvert ! appsink";
+    } else{
+        camera_source = "rtsp://admin:123456a@@" + configs["camera_source"].asString() + ":554/Streaming/Channels/101";
+    }
     string model_path = configs["model_path"].asString();
     CameraClient cameraClient(camera_source, multiple_camera_host, model_path);
     std::thread t1 = cameraClient.ReceiveResponsesThread();

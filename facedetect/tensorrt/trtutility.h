@@ -21,7 +21,7 @@ class Logger : public ILogger
     void log(Severity severity, const char* msg) override
     {
 		//log输出等级
-        if (severity!=Severity::kINFO) {
+        if (severity == Severity::kERROR || severity == Severity::kINTERNAL_ERROR || severity == Severity::kWARNING){
             printf("%s.\n", msg);
         }
     }
