@@ -9,6 +9,7 @@
 // by Cong Ma, 2016
 // 
 
+#include <ctime>
 #include "Hungarian.h"
 
 
@@ -76,8 +77,10 @@ void HungarianAlgorithm::assignmentoptimal(int *assignment, double *cost, double
 
     for (row = 0; row < nOfElements; row++) {
         value = distMatrixIn[row];
-        if (value < 0)
-            cerr << "All matrix elements have to be non-negative." << endl;
+        if (value < 0){
+            std::time_t t = std::time(0);
+            std::cout << "All matrix elements have to be non-negative at:" << std::ctime(&t) << "\n";
+        }
         distMatrix[row] = value;
     }
 
