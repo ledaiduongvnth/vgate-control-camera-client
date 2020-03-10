@@ -62,15 +62,20 @@ public:
         vector<TrackingBox> tmp_det;
         int max_age = 2, min_hits = 3;
         SORTtracker tracker(max_age, min_hits, 0.1);
-        bool success, send_success = false, first_detections = true;
+        bool success, send_success = false, first_detections = true, capSuccess;
         int new_left, new_top, is_send = 0;
         float scale;
         double delay = 0, timer = 0;
-        while (cap.read(origin_image)) {
+        while (1) {
+            timer = (double) getTickCount();
+            capSuccess = cap.read(origin_image);
             delay = ((double) getTickCount() - timer) * 1000.0 / cv::getTickFrequency();
+            if (!capSuccess){
+                printf("cap is not success\n");
+                continue;
+            }
             if (delay < 10) {
                 printf("ignore frame\n");
-                timer = (double) getTickCount();
                 continue;
             }
             display_image = origin_image.clone();
@@ -168,7 +173,6 @@ public:
             printf("display image\n");
             imshow("camera_client", display_image);
             waitKey(1);
-            timer = (double) getTickCount();
         }
     }
 
@@ -223,7 +227,6 @@ int main(int argc, char **argv) {
     string multiple_camera_host = configs["multiple_camera_host"].asString() + ":50052";
     int numberLanes = configs["strLane"].asInt();
     string camera_source;
-    "rtsp://root:abcd1234@172.16.10.151/axis-media/media.amp";
     if (configs["hikvision"].asBool()){
         if (configs["use_gstreamer"].asBool()){
             camera_source = "rtspsrc location=rtsp://" + configs["camera_source"].asString() +
