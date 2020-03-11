@@ -16,7 +16,7 @@
 #include <jsoncpp/json/value.h>
 #include "jsoncpp/json/json.h"
 #include "X11/Xlib.h"
-
+#include <unistd.h>
 
 using grpc::Channel;
 using grpc::ClientContext;
@@ -72,6 +72,8 @@ public:
             delay = ((double) getTickCount() - timer) * 1000.0 / cv::getTickFrequency();
             if (!capSuccess){
                 printf("cap is not success\n");
+                usleep(1000);
+                cap = cv::VideoCapture(camera_source);
                 continue;
             }
             if (delay < 10) {
@@ -242,7 +244,6 @@ int main(int argc, char **argv) {
             camera_source = "rtsp://root:abcd1234@" + configs["camera_source"].asString() + ":554/axis-media/media.amp";
         }
     }
-
     string model_path = configs["model_path"].asString();
     CameraClient cameraClient(camera_source, multiple_camera_host, model_path, numberLanes);
     std::thread t1 = cameraClient.ReceiveResponsesThread();

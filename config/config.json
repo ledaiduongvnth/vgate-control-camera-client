@@ -1,9 +1,9 @@
 {
   "strLane": 1,
   "multiple_camera_host": "172.16.10.107",
-  "camera_source": "172.16.10.233",
+  "camera_source": "172.16.10.108",
   "use_gstreamer": false,
-  "hikvision": false,
+  "hikvision": true,
   "model_path": "../model/retina.onnx",
   "files_store_host": "http://10.61.189.142:5001/get-images",
   "registration_set_id": 1,
