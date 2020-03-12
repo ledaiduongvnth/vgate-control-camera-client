@@ -51,7 +51,7 @@ def config():
         with open('/etc/network/interfaces.d/eth0', 'w') as file:
             file.write(ip_config_data)
 
-        camera_cliet_config_file = "/home/d/PycharmProjects/multiple-camera-server/config/config.json"
+        camera_cliet_config_file = "../config/config.json"
 
         with open(camera_cliet_config_file, 'r') as file:
             # read a list of lines into data

@@ -41,6 +41,10 @@ public:
 
     void DrawBoxes(cv::Mat& frame);
 
+    void CaculateScale(int avatarWindowHeight, int avatarWindowWidth,cv::Size avatarShape){
+
+    }
+
 };
 
 
