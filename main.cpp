@@ -18,6 +18,7 @@
 #include "X11/Xlib.h"
 #include <unistd.h>
 
+
 using grpc::Channel;
 using grpc::ClientContext;
 using grpc::ClientReader;
@@ -28,6 +29,7 @@ using multiple_camera_server::JSReq;
 using multiple_camera_server::JSResp;
 using multiple_camera_server::LabeledFace;
 using multiple_camera_server::UnlabeledFace;
+
 
 class CameraClient {
 public:
@@ -48,10 +50,17 @@ public:
     }
 
     void CreateConnectionStream() {
-
+        this->enable = false;
+        if (this->context != nullptr){
+            this->context->TryCancel();
+            printf("delete context\n");
+            delete(this->context);
+        }
+        this->context = new ClientContext;
         this->channel = grpc::CreateChannel(this->multiple_camera_host, grpc::InsecureChannelCredentials());
-        this->stub_ = FaceProcessing::NewStub(channel);
-        this->stream = this->stub_->recognize_face_js(new ClientContext);
+        this->stub_ = FaceProcessing::NewStub(this->channel);
+        this->stream = this->stub_->recognize_face_js(this->context);
+        this->enable = true;
     }
 
     void SendRequests() {
@@ -72,7 +81,7 @@ public:
             delay = ((double) getTickCount() - timer) * 1000.0 / cv::getTickFrequency();
             if (!capSuccess){
                 printf("cap is not success\n");
-                usleep(1000);
+                usleep(1000000);
                 cap = cv::VideoCapture(camera_source);
                 continue;
             }
@@ -164,7 +173,7 @@ public:
                     it++;
                     printf("end draw text and make requests\n");
                 }
-                if (is_send == 0) {
+                if (is_send == 0 && this->enable) {
                     printf("send request\n");
                     stream->Write(jsReq);
                 }
@@ -188,9 +197,10 @@ public:
             receive_success = stream->Read(&jSResp);
             if (!receive_success){
                 printf("CLIENT RECONNECT TO SERVER ...\n");
+                usleep(1000000);
                 this->CreateConnectionStream();
             }
-            if (!jSResp.faces().empty()) {
+            if (!jSResp.faces().empty() && receive_success) {
                 printf("receiving a response\n");
                 for (int i = 0; i < jSResp.faces().size(); ++i) {
                     labeledFace = jSResp.faces(i);
@@ -216,6 +226,8 @@ private:
     shared_ptr<Channel> channel;
     std::unique_ptr<FaceProcessing::Stub> stub_{};
     shared_ptr<ClientReaderWriter<JSReq, JSResp>> stream;
+    ClientContext *context;
+    bool enable;
     RetinaFace *rf;
     WorkQueue work_queue;
 
