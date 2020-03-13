@@ -62,7 +62,7 @@ public:
         vector<TrackingBox> tmp_det;
         int max_age = 2, min_hits = 3;
         SORTtracker tracker(max_age, min_hits, 0.1);
-        bool success, send_success = false, first_detections = true, capSuccess;
+        bool success, send_success, first_detections = true, capSuccess;
         int new_left, new_top, is_send = 0;
         float scale;
         double delay = 0, timer = 0;
