@@ -72,7 +72,7 @@ public:
             delay = ((double) getTickCount() - timer) * 1000.0 / cv::getTickFrequency();
             if (!capSuccess){
                 printf("cap is not success\n");
-                usleep(1000);
+                usleep(1000000);
                 cap = cv::VideoCapture(camera_source);
                 continue;
             }
@@ -166,7 +166,10 @@ public:
                 }
                 if (is_send == 0) {
                     printf("send request\n");
-                    stream->Write(jsReq);
+                    send_success = stream->Write(jsReq);
+                    if (!send_success){
+                        throw std::exception();
+                    }
                 }
             }
             resize(display_image, display_image, cv::Size(screen->width, screen->height));
@@ -187,10 +190,9 @@ public:
         while (true) {
             receive_success = stream->Read(&jSResp);
             if (!receive_success){
-                printf("CLIENT RECONNECT TO SERVER ...\n");
-                this->CreateConnectionStream();
+                throw std::exception();
             }
-            if (!jSResp.faces().empty()) {
+            if (!jSResp.faces().empty() && receive_success) {
                 printf("receiving a response\n");
                 for (int i = 0; i < jSResp.faces().size(); ++i) {
                     labeledFace = jSResp.faces(i);
@@ -246,8 +248,12 @@ int main(int argc, char **argv) {
     }
     string model_path = configs["model_path"].asString();
     CameraClient cameraClient(camera_source, multiple_camera_host, model_path, numberLanes);
-    std::thread t1 = cameraClient.ReceiveResponsesThread();
-    std::thread t2 = cameraClient.SendRequestsThread();
-    t1.join();
-    t2.join();
+    try {
+        std::thread t1 = cameraClient.ReceiveResponsesThread();
+        std::thread t2 = cameraClient.SendRequestsThread();
+        t1.join();
+        t2.join();
+    } catch (const std::exception&){
+        return 2;
+    }
 }
