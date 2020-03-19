@@ -134,10 +134,10 @@ public:
                         }
                         // end attach detection results to the trackers
                         // put text and draw rectangle
-                        cv::putText(display_image, it->name, cv::Point(pBox.x, pBox.y), cv::FONT_ITALIC, 5.0,
-                                    CV_RGB(0, 255, 0), 5);
+                        cv::putText(display_image, it->name, cv::Point(pBox.x, pBox.y), cv::FONT_HERSHEY_SIMPLEX, 3.0,
+                                    CV_RGB(0, 255, 0), 3);
                         cv::Rect rect = cv::Rect(pBox.x, pBox.y, pBox.width, pBox.height);
-                        cv::rectangle(display_image, rect, Scalar(0, 0, 255), 5);
+                        DrawRectangle(display_image, rect, 3, 3, CV_RGB(255, 255, 127));
                         // end put text and draw rectangle
                         // get face image and landmarks to make request
                         tie(cropedImage, new_left, new_top) = CropFaceImageWithMargin(origin_image, pBox.x, pBox.y,
