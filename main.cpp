@@ -36,19 +36,29 @@ public:
     string multiple_camera_host;
     Screen *screen;
     int numberLanes;
+    int detectionFrequency;
+    int maxAge;
+    int minHits;
+    float iouThreash;
+    int fontScale;
 
-    CameraClient(string camera_source, string multiple_camera_host, string model_path, int numberLanes) {
+    CameraClient(string camera_source, string multiple_camera_host, string model_path, int numberLanes, int detectionFrequency,
+            int maxAge, int minHits, float iouThreash, int fontScale) {
         this->camera_source = camera_source;
         this->multiple_camera_host = multiple_camera_host;
         this->rf = new RetinaFace(model_path, "net3");
         Display *d = XOpenDisplay(NULL);
         this->screen = DefaultScreenOfDisplay(d);
         this->numberLanes = numberLanes;
+        this->detectionFrequency = detectionFrequency;
+        this->maxAge = maxAge;
+        this->minHits = minHits;
+        this->iouThreash = iouThreash;
+        this->fontScale = fontScale;
         CreateConnectionStream();
     }
 
     void CreateConnectionStream() {
-
         this->channel = grpc::CreateChannel(this->multiple_camera_host, grpc::InsecureChannelCredentials());
         this->stub_ = FaceProcessing::NewStub(channel);
         this->stream = this->stub_->recognize_face_js(new ClientContext);
@@ -60,8 +70,7 @@ public:
         vector<FaceDetectInfo> faceInfo;
         vector<LabeledFaceIn> facesOut;
         vector<TrackingBox> tmp_det;
-        int max_age = 2, min_hits = 3;
-        SORTtracker tracker(max_age, min_hits, 0.1);
+        SORTtracker tracker(this->maxAge, this->minHits, this->iouThreash);
         bool success, send_success, first_detections = true, capSuccess;
         int new_left, new_top, is_send = 0;
         float scale;
@@ -92,7 +101,7 @@ public:
                 scale = sw > sh ? sw : sh;
                 scale = scale > 1.0 ? scale : 1.0;
             }
-            if (is_send == 2) {
+            if (is_send == this->detectionFrequency) {
                 is_send = 0;
             }
             if (is_send == 0) {
@@ -134,8 +143,8 @@ public:
                         }
                         // end attach detection results to the trackers
                         // put text and draw rectangle
-                        cv::putText(display_image, it->name, cv::Point(pBox.x, pBox.y), cv::FONT_HERSHEY_SIMPLEX, 3.0,
-                                    CV_RGB(0, 255, 0), 3);
+                        cv::putText(display_image, it->name, cv::Point(pBox.x - 10*int(it->name.length()*this->fontScale/2), pBox.y),
+                                cv::FONT_HERSHEY_SIMPLEX, this->fontScale, CV_RGB(0, 255, 0), 2);
                         cv::Rect rect = cv::Rect(pBox.x, pBox.y, pBox.width, pBox.height);
                         DrawRectangle(display_image, rect, 3, 3, CV_RGB(255, 255, 127));
                         // end put text and draw rectangle
@@ -230,6 +239,12 @@ int main(int argc, char **argv) {
     reader.parse(file_input, configs);
     string multiple_camera_host = configs["multiple_camera_host"].asString() + ":50052";
     int numberLanes = configs["strLane"].asInt();
+    int detectionFrequency = configs["detection_frequency"].asInt();
+    int maxAge = configs["max_age"].asInt();
+    int minHits = configs["min_hits"].asInt();
+    float iouThreash = configs["iou_threash"].asInt();
+    int fontScale = configs["font_scale"].asInt();
+
     string camera_source;
     if (configs["hikvision"].asBool()){
         if (configs["use_gstreamer"].asBool()){
@@ -247,7 +262,7 @@ int main(int argc, char **argv) {
         }
     }
     string model_path = configs["model_path"].asString();
-    CameraClient cameraClient(camera_source, multiple_camera_host, model_path, numberLanes);
+    CameraClient cameraClient(camera_source, multiple_camera_host, model_path, numberLanes, detectionFrequency, maxAge, minHits, iouThreash, fontScale);
     try {
         std::thread t1 = cameraClient.ReceiveResponsesThread();
         std::thread t2 = cameraClient.SendRequestsThread();
