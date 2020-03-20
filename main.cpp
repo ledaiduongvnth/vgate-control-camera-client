@@ -148,26 +148,27 @@ public:
                         cv::Rect rect = cv::Rect(pBox.x, pBox.y, pBox.width, pBox.height);
                         DrawRectangle(display_image, rect, 3, 3, CV_RGB(255, 255, 127));
                         // end put text and draw rectangle
-                        // get face image and landmarks to make request
-                        tie(cropedImage, new_left, new_top) = CropFaceImageWithMargin(origin_image, pBox.x, pBox.y,
-                                                                                      pBox.x + pBox.width,
-                                                                                      pBox.y + pBox.height, 1.3);
-                        UnlabeledFace *face = jsReq.add_faces();
-                        std::vector<uchar> buf;
-                        success = cv::imencode(".jpg", cropedImage, buf);
-                        if (success) {
-                            printf("make request\n");
-                            auto *enc_msg = reinterpret_cast<unsigned char *>(buf.data());
-                            std::string encoded = base64_encode(enc_msg, buf.size());
-                            face->set_track_id(it->source_track_id);
-                            face->set_image_bytes(encoded);
-                            for (size_t j = 0; j < 5; j++) {
-                                face->add_landmarks(it->landmarks[j] - (float) new_top);
+                        if (it->name == ""){
+                            // get face image and landmarks to make request
+                            tie(cropedImage, new_left, new_top) = CropFaceImageWithMargin(origin_image,
+                                    pBox.x, pBox.y,pBox.x + pBox.width,pBox.y + pBox.height, 1.3);
+                            UnlabeledFace *face = jsReq.add_faces();
+                            std::vector<uchar> buf;
+                            success = cv::imencode(".jpg", cropedImage, buf);
+                            if (success) {
+                                printf("make request\n");
+                                auto *enc_msg = reinterpret_cast<unsigned char *>(buf.data());
+                                std::string encoded = base64_encode(enc_msg, buf.size());
+                                face->set_track_id(it->source_track_id);
+                                face->set_image_bytes(encoded);
+                                for (size_t j = 0; j < 5; j++) {
+                                    face->add_landmarks(it->landmarks[j] - (float) new_top);
+                                }
+                                for (size_t j = 5; j < 10; j++) {
+                                    face->add_landmarks(it->landmarks[j] - (float) new_left);
+                                }
+                                face->add_landmarks(0);
                             }
-                            for (size_t j = 5; j < 10; j++) {
-                                face->add_landmarks(it->landmarks[j] - (float) new_left);
-                            }
-                            face->add_landmarks(0);
                         }
                     }
                     it++;
