@@ -80,20 +80,20 @@ public:
             capSuccess = cap.read(origin_image);
             delay = ((double) getTickCount() - timer) * 1000.0 / cv::getTickFrequency();
             if (!capSuccess){
-                printf("cap is not success\n");
                 usleep(1000000);
                 cap = cv::VideoCapture(camera_source);
                 continue;
             }
             if (delay < 10) {
-                printf("ignore frame\n");
                 continue;
             }
             display_image = origin_image.clone();
             JSReq jsReq;
             is_send = is_send + 1;
+            if (is_send == this->detectionFrequency) {
+                is_send = 0;
+            }
             if (first_detections) {
-                printf("make first detection\n");
                 tracker.init(tmp_det);
                 first_detections = false;
                 float sw = 1.0 * origin_image.cols / 640;
@@ -101,11 +101,7 @@ public:
                 scale = sw > sh ? sw : sh;
                 scale = scale > 1.0 ? scale : 1.0;
             }
-            if (is_send == this->detectionFrequency) {
-                is_send = 0;
-            }
             if (is_send == 0) {
-                printf("detect faces in a frame\n");
                 tmp_det.clear();
                 rf->detect(origin_image.clone(), 0.7, faceInfo, 640);
                 for (auto &t : faceInfo) {
@@ -121,14 +117,11 @@ public:
                         trackingBox.landmarks.push_back(t.pts.x[j] * scale);
                     }
                     tmp_det.push_back(trackingBox);
-                    printf("end detect faces in a frame\n");
                 }
             }
-            printf("get response from queue\n");
             facesOut = this->work_queue.pop();
             tracker.step(tmp_det, origin_image.size());
             if (!faceInfo.empty()) {
-                printf("draw text and make requests\n");
                 for (auto it = tracker.trackers.begin(); it != tracker.trackers.end();) {
                     Rect_<float> pBox = (*it).box;
                     if (pBox.x > 0 && pBox.y > 0 && pBox.x + pBox.width < origin_image.size().width &&
@@ -156,7 +149,6 @@ public:
                             std::vector<uchar> buf;
                             success = cv::imencode(".jpg", cropedImage, buf);
                             if (success) {
-                                printf("make request\n");
                                 auto *enc_msg = reinterpret_cast<unsigned char *>(buf.data());
                                 std::string encoded = base64_encode(enc_msg, buf.size());
                                 face->set_track_id(it->source_track_id);
@@ -172,10 +164,8 @@ public:
                         }
                     }
                     it++;
-                    printf("end draw text and make requests\n");
                 }
                 if (is_send == 0) {
-                    printf("send request\n");
                     send_success = stream->Write(jsReq);
                     if (!send_success){
                         throw std::exception();
@@ -185,7 +175,6 @@ public:
             resize(display_image, display_image, cv::Size(screen->width, screen->height));
             namedWindow("camera_client", WND_PROP_FULLSCREEN);
             setWindowProperty("camera_client", WND_PROP_FULLSCREEN, WINDOW_FULLSCREEN);
-            printf("display image\n");
             imshow("camera_client", display_image);
             waitKey(1);
         }
@@ -203,7 +192,6 @@ public:
                 throw std::exception();
             }
             if (!jSResp.faces().empty() && receive_success) {
-                printf("receiving a response\n");
                 for (int i = 0; i < jSResp.faces().size(); ++i) {
                     labeledFace = jSResp.faces(i);
                     labeledFaceIn.track_id = labeledFace.track_id();
@@ -243,7 +231,7 @@ int main(int argc, char **argv) {
     int detectionFrequency = configs["detection_frequency"].asInt();
     int maxAge = configs["max_age"].asInt();
     int minHits = configs["min_hits"].asInt();
-    float iouThreash = configs["iou_threash"].asInt();
+    float iouThreash = configs["iou_threash"].asFloat();
     int fontScale = configs["font_scale"].asInt();
 
     string camera_source;

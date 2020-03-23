@@ -160,6 +160,7 @@ void SORTtracker::step(vector<TrackingBox> detections, const Size &img_size) {
             continue;
         //if low IOU: mark trajectory and detection as unmatched
         if (1 - iouMatrix[i][assignment[i]] < iouThreshold) {
+            printf("unmatch:%f\n", 1 - iouMatrix[i][assignment[i]]);
             unmatchedTrajectories.insert(i);
             unmatchedDetections.insert(assignment[i]);
         } else //collect matched pairs
