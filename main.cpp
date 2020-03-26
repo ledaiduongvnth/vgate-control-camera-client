@@ -43,9 +43,10 @@ public:
     float iouThreash;
     float faceDetectThreash;
     int fontScale;
+    int delayToIgnore;
 
     CameraClient(string camera_source, string multiple_camera_host, string model_path, int numberLanes, int detectionFrequency,
-            int recognitionFrequency, int maxAge, int minHits, float iouThreash,float faceDetectThreash, int fontScale) {
+            int recognitionFrequency, int maxAge, int minHits, float iouThreash,float faceDetectThreash, int fontScale, int delayToIgnore) {
         this->camera_source = camera_source;
         this->multiple_camera_host = multiple_camera_host;
         this->rf = new RetinaFace(model_path, "net3");
@@ -59,6 +60,7 @@ public:
         this->minHits = minHits;
         this->iouThreash = iouThreash;
         this->fontScale = fontScale;
+        this->delayToIgnore = delayToIgnore;
         CreateConnectionStream();
     }
 
@@ -88,7 +90,7 @@ public:
                 cap = cv::VideoCapture(camera_source);
                 continue;
             }
-            if (delay < 10) {
+            if (delay < this->delayToIgnore) {
                 continue;
             }
             display_image = origin_image.clone();
@@ -243,6 +245,8 @@ int main(int argc, char **argv) {
     float faceDetectThreash = configs["face_detect_threash"].asFloat();
     float iouThreash = configs["iou_threash"].asFloat();
     int fontScale = configs["font_scale"].asInt();
+    int delayToIgnore = configs["delay_to_ignore"].asInt();
+
 
     string camera_source;
     if (configs["hikvision"].asBool()){
@@ -262,7 +266,7 @@ int main(int argc, char **argv) {
     }
     string model_path = configs["model_path"].asString();
     CameraClient cameraClient(camera_source, multiple_camera_host, model_path, numberLanes, detectionFrequency, recognitionFrequency,
-            maxAge, minHits, iouThreash, faceDetectThreash, fontScale);
+            maxAge, minHits, iouThreash, faceDetectThreash, fontScale, delayToIgnore);
     try {
         std::thread t1 = cameraClient.ReceiveResponsesThread();
         std::thread t2 = cameraClient.SendRequestsThread();
