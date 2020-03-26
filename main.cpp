@@ -37,13 +37,15 @@ public:
     Screen *screen;
     int numberLanes;
     int detectionFrequency;
+    int recognitionFrequency;
     int maxAge;
     int minHits;
     float iouThreash;
+    float faceDetectThreash;
     int fontScale;
 
     CameraClient(string camera_source, string multiple_camera_host, string model_path, int numberLanes, int detectionFrequency,
-            int maxAge, int minHits, float iouThreash, int fontScale) {
+            int recognitionFrequency, int maxAge, int minHits, float iouThreash,float faceDetectThreash, int fontScale) {
         this->camera_source = camera_source;
         this->multiple_camera_host = multiple_camera_host;
         this->rf = new RetinaFace(model_path, "net3");
@@ -51,6 +53,8 @@ public:
         this->screen = DefaultScreenOfDisplay(d);
         this->numberLanes = numberLanes;
         this->detectionFrequency = detectionFrequency;
+        this->recognitionFrequency = recognitionFrequency;
+        this->faceDetectThreash = faceDetectThreash;
         this->maxAge = maxAge;
         this->minHits = minHits;
         this->iouThreash = iouThreash;
@@ -72,7 +76,7 @@ public:
         vector<TrackingBox> tmp_det;
         SORTtracker tracker(this->maxAge, this->minHits, this->iouThreash);
         bool success, send_success, first_detections = true, capSuccess;
-        int new_left, new_top, is_send = 0;
+        int new_left, new_top, detectionCount = 0, recognitionCount = 0;
         float scale;
         double delay = 0, timer = 0;
         while (1) {
@@ -89,9 +93,9 @@ public:
             }
             display_image = origin_image.clone();
             JSReq jsReq;
-            is_send = is_send + 1;
-            if (is_send == this->detectionFrequency) {
-                is_send = 0;
+            detectionCount = detectionCount + 1;
+            if (detectionCount == this->detectionFrequency) {
+                detectionCount = 0;
             }
             if (first_detections) {
                 tracker.init(tmp_det);
@@ -101,9 +105,9 @@ public:
                 scale = sw > sh ? sw : sh;
                 scale = scale > 1.0 ? scale : 1.0;
             }
-            if (is_send == 0) {
+            if (detectionCount == 0) {
                 tmp_det.clear();
-                rf->detect(origin_image.clone(), 0.7, faceInfo, 640);
+                rf->detect(origin_image.clone(), this->faceDetectThreash, faceInfo, 640);
                 for (auto &t : faceInfo) {
                     TrackingBox trackingBox;
                     trackingBox.box.x = t.rect.x1 * scale;
@@ -165,7 +169,11 @@ public:
                     }
                     it++;
                 }
-                if (is_send == 0) {
+                recognitionCount = recognitionCount + 1;
+                if (recognitionCount == this->recognitionFrequency) {
+                    recognitionCount = 0;
+                }
+                if (recognitionCount == 0) {
                     send_success = stream->Write(jsReq);
                     if (!send_success){
                         throw std::exception();
@@ -229,8 +237,10 @@ int main(int argc, char **argv) {
     string multiple_camera_host = configs["multiple_camera_host"].asString() + ":50052";
     int numberLanes = configs["strLane"].asInt();
     int detectionFrequency = configs["detection_frequency"].asInt();
+    int recognitionFrequency = configs["recognition_frequency"].asInt();
     int maxAge = configs["max_age"].asInt();
     int minHits = configs["min_hits"].asInt();
+    float faceDetectThreash = configs["face_detect_threash"].asFloat();
     float iouThreash = configs["iou_threash"].asFloat();
     int fontScale = configs["font_scale"].asInt();
 
@@ -251,7 +261,8 @@ int main(int argc, char **argv) {
         }
     }
     string model_path = configs["model_path"].asString();
-    CameraClient cameraClient(camera_source, multiple_camera_host, model_path, numberLanes, detectionFrequency, maxAge, minHits, iouThreash, fontScale);
+    CameraClient cameraClient(camera_source, multiple_camera_host, model_path, numberLanes, detectionFrequency, recognitionFrequency,
+            maxAge, minHits, iouThreash, faceDetectThreash, fontScale);
     try {
         std::thread t1 = cameraClient.ReceiveResponsesThread();
         std::thread t2 = cameraClient.SendRequestsThread();
