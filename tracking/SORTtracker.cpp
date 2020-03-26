@@ -1,23 +1,23 @@
 ///////////////////////////////////////////////////////////////////////////////
 //  SORT: A Simple, Online and Realtime Tracker
-//  
+//
 //  This is a C++ reimplementation of the open source tracker in
 //  https://github.com/abewley/sort
 //  Based on the work of Alex Bewley, alex@dynamicdetection.com, 2016
 //
 //  Cong Ma, mcximing@sina.cn, 2016
 //  Rewritten by Beloborodov Dmitri (BeloborodovDS), 2017
-//  
+//
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
 //  (at your option) any later version.
-//  
+//
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU General Public License for more details.
-//  
+//
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ///////////////////////////////////////////////////////////////////////////////
@@ -79,6 +79,7 @@ void SORTtracker::init(vector<TrackingBox> detections) {
     for (unsigned int i = 0; i < detections.size(); i++) {
         KalmanTracker trk = KalmanTracker(detections[i].box, min_hits);
         trk.landmarks = detections[i].landmarks;
+        trk.box = detections[i].box;
         trackers.push_back(trk);
     }
 }
@@ -92,7 +93,7 @@ void SORTtracker::step(vector<TrackingBox> detections, const Size &img_size) {
         Rect_<float> pBox = (*it).predict();
         if (pBox.x > 0 && pBox.y > 0 && pBox.x + pBox.width < img_size.width &&
             pBox.y + pBox.height < img_size.height) {
-            it->box = pBox;
+//            it->box = pBox;
             predictedBoxes.push_back(pBox);
             it++;
         } else {
@@ -174,13 +175,14 @@ void SORTtracker::step(vector<TrackingBox> detections, const Size &img_size) {
         detIdx = matchedPairs[i].y;
         trackers[trkIdx].update(detections[detIdx].box);
         trackers[trkIdx].landmarks = detections[detIdx].landmarks;
-
+        trackers[trkIdx].box = detections[detIdx].box;
     }
 
     // create and initialise new trackers for unmatched detections
     for (set<int>::iterator umd = unmatchedDetections.begin(); umd != unmatchedDetections.end(); umd++) {
         KalmanTracker tracker = KalmanTracker(detections[*umd].box, min_hits);
         tracker.landmarks = detections[*umd].landmarks;
+        tracker.box = detections[*umd].box;
         trackers.push_back(tracker);
     }
 
