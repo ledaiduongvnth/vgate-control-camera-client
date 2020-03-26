@@ -120,7 +120,7 @@ public:
                 }
             }
             facesOut = this->work_queue.pop();
-            tracker.step(tmp_det, origin_image.size());
+            tracker.step(tmp_det, origin_image.size(), stream);
             if (!faceInfo.empty()) {
                 for (auto it = tracker.trackers.begin(); it != tracker.trackers.end();) {
                     Rect_<float> pBox = (*it).box;
@@ -144,7 +144,10 @@ public:
                         if (it->name == ""){
                             // get face image and landmarks to make request
                             tie(cropedImage, new_left, new_top) = CropFaceImageWithMargin(origin_image,
-                                    pBox.x, pBox.y,pBox.x + pBox.width,pBox.y + pBox.height, 1.3);
+                                    pBox.x, pBox.y,pBox.x + pBox.width,pBox.y + pBox.height, 1.4);
+                            it->new_top = new_top;
+                            it->new_left = new_left;
+                            it->faceImage = cropedImage.clone();
                             UnlabeledFace *face = jsReq.add_faces();
                             std::vector<uchar> buf;
                             success = cv::imencode(".jpg", cropedImage, buf);
@@ -153,13 +156,13 @@ public:
                                 std::string encoded = base64_encode(enc_msg, buf.size());
                                 face->set_track_id(it->source_track_id);
                                 face->set_image_bytes(encoded);
+                                face->set_is_saving_history(false);
                                 for (size_t j = 0; j < 5; j++) {
                                     face->add_landmarks(it->landmarks[j] - (float) new_top);
                                 }
                                 for (size_t j = 5; j < 10; j++) {
                                     face->add_landmarks(it->landmarks[j] - (float) new_left);
                                 }
-                                face->add_landmarks(0);
                             }
                         }
                     }
@@ -172,9 +175,9 @@ public:
                     }
                 }
             }
-            resize(display_image, display_image, cv::Size(screen->width, screen->height));
-            namedWindow("camera_client", WND_PROP_FULLSCREEN);
-            setWindowProperty("camera_client", WND_PROP_FULLSCREEN, WINDOW_FULLSCREEN);
+//            resize(display_image, display_image, cv::Size(screen->width, screen->height));
+//            namedWindow("camera_client", WND_PROP_FULLSCREEN);
+//            setWindowProperty("camera_client", WND_PROP_FULLSCREEN, WINDOW_FULLSCREEN);
             imshow("camera_client", display_image);
             waitKey(1);
         }
@@ -226,7 +229,7 @@ int main(int argc, char **argv) {
     Json::Reader reader;
     Json::Value configs;
     reader.parse(file_input, configs);
-    string multiple_camera_host = configs["multiple_camera_host"].asString() + ":50052";
+    string multiple_camera_host = configs["multiple_camera_host"].asString();
     int numberLanes = configs["strLane"].asInt();
     int detectionFrequency = configs["detection_frequency"].asInt();
     int maxAge = configs["max_age"].asInt();

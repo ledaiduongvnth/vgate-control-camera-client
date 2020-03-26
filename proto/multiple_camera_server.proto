@@ -3,28 +3,26 @@ syntax = "proto3";
 package multiple_camera_server;
 
 service FaceProcessing {
-    rpc register_images(RegistrationReq) returns (RegistrationResp) {}
+    rpc calculate_feature_vector (ImageReq) returns (RecognizedImageResp) {}
     rpc recognize_face_js (stream JSReq) returns (stream JSResp) {}
     rpc check_connection (CheckConnectionReq) returns (CheckConnectionResp) {}
 }
 
 message CheckConnectionReq{}
 
-message CheckConnectionResp{
+message CheckConnectionResp {
     string connection_response = 1;
 }
 
-message RegistrationReq {
+message ImageReq {
     repeated bytes image_bytes = 1;
 }
 
-message RegistrationResp {
-    repeated FaceInfo face_infos = 1;
-}
-
-message FaceInfo {
-    repeated int32 bbox = 1;
-    bytes feature_vector = 2;
+message RecognizedImageResp {
+    repeated bytes feature_vectors = 1;
+    repeated int64 similar_registration_info_ids = 2;
+    repeated float percentage_list = 3;
+    repeated int32 error_image_ids = 4;
 }
 
 message JSReq {
@@ -39,6 +37,7 @@ message UnlabeledFace {
     string track_id = 1;
     bytes image_bytes = 2;
     repeated int32 landmarks = 3;
+    bool is_saving_history = 4;
 }
 
 message LabeledFace {

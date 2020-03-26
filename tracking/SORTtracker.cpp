@@ -84,7 +84,7 @@ void SORTtracker::init(vector<TrackingBox> detections) {
     }
 }
 
-void SORTtracker::step(vector<TrackingBox> detections, const Size &img_size) {
+void SORTtracker::step(vector<TrackingBox> detections, const Size &img_size, shared_ptr<ClientReaderWriter<JSReq, JSResp>> stream) {
     frame_count++;
 
     //for each Kalman tracker: try to predict next box; if failed, erase tracker
@@ -97,6 +97,10 @@ void SORTtracker::step(vector<TrackingBox> detections, const Size &img_size) {
             predictedBoxes.push_back(pBox);
             it++;
         } else {
+            bool is_save;
+            (frame_count - it->init_frame_count > 20) ? (is_save = true) : (is_save = false);
+            it->save(stream, is_save);
+            printf("track:%s, save:%d\n", it->source_track_id.c_str(), is_save);
             it = trackers.erase(it);
         }
     }
@@ -182,6 +186,7 @@ void SORTtracker::step(vector<TrackingBox> detections, const Size &img_size) {
     // create and initialise new trackers for unmatched detections
     for (set<int>::iterator umd = unmatchedDetections.begin(); umd != unmatchedDetections.end(); umd++) {
         KalmanTracker tracker = KalmanTracker(detections[*umd].box, min_hits);
+        tracker.init_frame_count = frame_count;
         tracker.landmarks = detections[*umd].landmarks;
         trackers.push_back(tracker);
     }
@@ -199,43 +204,17 @@ void SORTtracker::step(vector<TrackingBox> detections, const Size &img_size) {
             res.age = (*it).m_time_since_update;
         }
 
-
-        // create names vector
-        vector<string> names;
-        for (auto &it : trackers) {
-            names.push_back(it.name);
-        }
-
-        //create vector of duplicate names
-        std::map<std::string, int> countMap;
-        // Iterate over the vector and store the frequency of each element in map
-        for (auto & name : names)
-        {
-            auto result = countMap.insert(std::pair<std::string, int>(name, 1));
-            if (result.second == false)
-                result.first->second++;
-        }
-        vector<string> duplicateNames;
-        for (auto & elem : countMap)
-        {
-            if (elem.second > 1)
-            {
-                duplicateNames.push_back(elem.first);
-            }
-        }
-
-        // filter duplicated names
-        if(std::find(duplicateNames.begin(), duplicateNames.end(), it->name) != duplicateNames.end()) {
-            it->name = "";
-        }
-
         // remove dead tracker (if time since update > max_age)
-        if ((*it).m_time_since_update > max_age)
+        if ((*it).m_time_since_update > max_age){
+            bool is_save;
+            (frame_count - it->init_frame_count > 10) ? (is_save = true) : (is_save = false);
+            it->save(stream, is_save);
+            printf("track:%s, save:%d\n", it->source_track_id.c_str(), is_save);
             it = trackers.erase(it);
-        else
+        }
+        else{
             it++;
+        }
     }
-
-    return;
 }
 

@@ -6,6 +6,16 @@
 
 #include "opencv2/video/tracking.hpp"
 #include "opencv2/highgui/highgui.hpp"
+#include "multiple_camera_server.grpc.pb.h"
+#include "base64.h"
+
+
+using multiple_camera_server::JSReq;
+using multiple_camera_server::JSResp;
+using grpc::ClientReaderWriter;
+
+
+using multiple_camera_server::UnlabeledFace;
 
 using namespace std;
 using namespace cv;
@@ -55,6 +65,8 @@ public:
 
     void update(StateType stateMat);
 
+    void save(shared_ptr<ClientReaderWriter<JSReq, JSResp>> stream, bool is_save);
+
     StateType get_state();
 
     StateType get_rect_xysr(float cx, float cy, float s, float r);
@@ -71,8 +83,12 @@ public:
     bool m_is_tracking;
     string source_track_id;
     string name;
+    cv::Mat faceImage;
     Rect_<float> box;
     vector<float> landmarks;
+    float new_left;
+    float new_top;
+    int init_frame_count;
 
 private:
     void init_kf(StateType stateMat);
