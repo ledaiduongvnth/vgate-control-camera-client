@@ -71,7 +71,6 @@ public:
     }
 
     void SendRequests() {
-        cv::VideoCapture cap(camera_source);
         cv::Mat origin_image, display_image, cropedImage;
         vector<FaceDetectInfo> faceInfo;
         vector<LabeledFaceIn> facesOut;
@@ -82,15 +81,8 @@ public:
         float scale;
         double delay = 0, timer = 0;
         while (1) {
-            timer = (double) getTickCount();
-            capSuccess = cap.read(origin_image);
-            delay = ((double) getTickCount() - timer) * 1000.0 / cv::getTickFrequency();
-            if (!capSuccess){
-                usleep(1000000);
-                cap = cv::VideoCapture(camera_source);
-                continue;
-            }
-            if (delay < this->delayToIgnore) {
+            capSuccess = this->imagesQueue.wtpop(origin_image);
+            if(!capSuccess){
                 continue;
             }
             display_image = origin_image.clone();
@@ -125,7 +117,7 @@ public:
                     tmp_det.push_back(trackingBox);
                 }
             }
-            facesOut = this->work_queue.pop();
+            this->facesQueue.pop(facesOut);
             tracker.step(tmp_det, origin_image.size());
             if (!faceInfo.empty()) {
                 for (auto it = tracker.trackers.begin(); it != tracker.trackers.end();) {
@@ -210,9 +202,25 @@ public:
                     labeledFaceIn.confidence = labeledFace.confidence();
                     faces.emplace_back(labeledFaceIn);
                 }
-                this->work_queue.push_work(faces);
+                this->facesQueue.push(faces);
             }
         }
+    }
+    void ReadImages(){
+        cv::VideoCapture cap(camera_source);
+        cv::Mat origin_image;
+        while (1){
+            bool capSuccess = cap.read(origin_image);
+            if (!capSuccess){
+                usleep(1000000);
+                cap = cv::VideoCapture(camera_source);
+                continue;
+            }
+            this->imagesQueue.push(origin_image);
+        }
+    }
+    std::thread ReadImagesThread() {
+        return std::thread([this] {ReadImages();});
     }
 
     std::thread SendRequestsThread() {
@@ -227,8 +235,8 @@ private:
     std::unique_ptr<FaceProcessing::Stub> stub_{};
     shared_ptr<ClientReaderWriter<JSReq, JSResp>> stream;
     RetinaFace *rf;
-    WorkQueue work_queue;
-
+    CConcurrentQueue<std::vector<LabeledFaceIn>> facesQueue;
+    CConcurrentQueue<cv::Mat> imagesQueue;
 };
 
 int main(int argc, char **argv) {
@@ -268,8 +276,10 @@ int main(int argc, char **argv) {
     CameraClient cameraClient(camera_source, multiple_camera_host, model_path, numberLanes, detectionFrequency, recognitionFrequency,
             maxAge, minHits, iouThreash, faceDetectThreash, fontScale, delayToIgnore);
     try {
+        std::thread t0 = cameraClient.ReadImagesThread();
         std::thread t1 = cameraClient.ReceiveResponsesThread();
         std::thread t2 = cameraClient.SendRequestsThread();
+        t0.join();
         t1.join();
         t2.join();
     } catch (const std::exception&){
