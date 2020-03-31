@@ -33,6 +33,7 @@ public:
         m_forceExit.store ( false );
         std::unique_lock<std::mutex> lk ( m_mutex );
         m_queue.push ( data );
+        printf("%d\n", m_queue.size());
         while(m_queue.size() > 2){
             m_queue.pop();
             printf("pop\n");
