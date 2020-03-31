@@ -272,12 +272,9 @@ int main(int argc, char **argv) {
         }
     }
     string model_path = configs["model_path"].asString();
-    printf("a\n");
     Screen *screen = DefaultScreenOfDisplay(XOpenDisplay(NULL));
-    printf("b\n");
     CameraClient cameraClient(camera_source, multiple_camera_host, model_path, numberLanes, detectionFrequency, recognitionFrequency,
                               maxAge, minHits, iouThreash, faceDetectThreash, fontScale, delayToIgnore, cv::Size(screen->width, screen->height));
-    printf("c\n");
     try {
         std::thread t0 = cameraClient.ReadImagesThread();
         std::thread t1 = cameraClient.ReceiveResponsesThread();
