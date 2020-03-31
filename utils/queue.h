@@ -32,11 +32,10 @@ public:
     {
         m_forceExit.store ( false );
         std::unique_lock<std::mutex> lk ( m_mutex );
-        m_queue.push ( data );
-        lk.unlock ();
-        while (size() > 3){
-            m_queue.pop();
+        if(m_queue.size() < 2){
+            m_queue.push ( data );
         }
+        lk.unlock ();
         m_cv.notify_one ();
     }
     /// <summary> Check queue empty. </summary>
