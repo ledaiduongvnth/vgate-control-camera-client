@@ -34,7 +34,7 @@ public:
 
     string camera_source;
     string multiple_camera_host;
-    Screen *screen;
+    cv::Size screenSize;
     int numberLanes;
     int detectionFrequency;
     int recognitionFrequency;
@@ -46,12 +46,11 @@ public:
     int delayToIgnore;
 
     CameraClient(string camera_source, string multiple_camera_host, string model_path, int numberLanes, int detectionFrequency,
-            int recognitionFrequency, int maxAge, int minHits, float iouThreash,float faceDetectThreash, int fontScale, int delayToIgnore) {
+                 int recognitionFrequency, int maxAge, int minHits, float iouThreash,float faceDetectThreash, int fontScale, int delayToIgnore, cv::Size screenSize) {
         this->camera_source = camera_source;
         this->multiple_camera_host = multiple_camera_host;
         this->rf = new RetinaFace(model_path, "net3");
-        Display *d = XOpenDisplay(NULL);
-        this->screen = DefaultScreenOfDisplay(d);
+        this->screenSize = screenSize;
         this->numberLanes = numberLanes;
         this->detectionFrequency = detectionFrequency;
         this->recognitionFrequency = recognitionFrequency;
@@ -174,7 +173,7 @@ public:
                     }
                 }
             }
-            resize(display_image, display_image, cv::Size(screen->width, screen->height));
+            resize(display_image, display_image, screenSize);
             namedWindow("camera_client", WND_PROP_FULLSCREEN);
             setWindowProperty("camera_client", WND_PROP_FULLSCREEN, WINDOW_FULLSCREEN);
             imshow("camera_client", display_image);
@@ -273,8 +272,12 @@ int main(int argc, char **argv) {
         }
     }
     string model_path = configs["model_path"].asString();
+    printf("a\n");
+    Screen *screen = DefaultScreenOfDisplay(XOpenDisplay(NULL));
+    printf("b\n");
     CameraClient cameraClient(camera_source, multiple_camera_host, model_path, numberLanes, detectionFrequency, recognitionFrequency,
-            maxAge, minHits, iouThreash, faceDetectThreash, fontScale, delayToIgnore);
+                              maxAge, minHits, iouThreash, faceDetectThreash, fontScale, delayToIgnore, cv::Size(screen->width, screen->height));
+    printf("c\n");
     try {
         std::thread t0 = cameraClient.ReadImagesThread();
         std::thread t1 = cameraClient.ReceiveResponsesThread();
