@@ -20,7 +20,7 @@ void DrawRectangle(cv::Mat img, cv::Rect rect, int r, int thickness, cv::Scalar 
     int x2 = rect.x + rect.width;
     int y1 = rect.y;
     int y2 = rect.y + rect.height;
-    int d = std::min(abs(x1 - x2), abs(y1 - y2)) / 5;
+    int d = std::min(abs(x1 - x2), abs(y1 - y2)) / 10;
 
 
     cv::line(img, cv::Point(x1 + r, y1), cv::Point(x1 + r + d, y1), color, thickness);

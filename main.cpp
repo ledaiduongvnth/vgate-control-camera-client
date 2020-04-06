@@ -18,6 +18,7 @@
 #include "X11/Xlib.h"
 #include <unistd.h>
 
+
 using grpc::Channel;
 using grpc::ClientContext;
 using grpc::ClientReader;
@@ -80,7 +81,7 @@ public:
         float scale;
         double delay = 0, timer = 0;
         while (1) {
-            capSuccess = this->imagesQueue.wtpop(origin_image);
+            capSuccess = this->imagesQueue.pop(origin_image);
             if(!capSuccess){
                 continue;
             }
@@ -133,11 +134,19 @@ public:
                         }
                         // end attach detection results to the trackers
                         // put text and draw rectangle
-                        std::string displayName = (it->name.empty()) ? "unknown" : it->name;
-                        cv::putText(display_image, displayName, cv::Point(pBox.x - 10*int(it->name.length()*this->fontScale/2), pBox.y),
-                                cv::FONT_HERSHEY_SIMPLEX, this->fontScale, CV_RGB(0, 255, 0), 2);
+                        std::string displayName;
+                        cv::Scalar color;
+                        if (it->name.empty()){
+                            displayName = "unknown";
+                            color = CV_RGB(255, 0, 0);
+                        } else{
+                            displayName = it->name;
+                            color = CV_RGB(255, 200, 0);
+                        }
+                        cv::putText(display_image, displayName, cv::Point(pBox.x - 10*int(displayName.length()*this->fontScale/2), pBox.y),
+                                cv::FONT_HERSHEY_SIMPLEX, this->fontScale, color, 2);
                         cv::Rect rect = cv::Rect(pBox.x, pBox.y, pBox.width, pBox.height);
-                        DrawRectangle(display_image, rect, 3, 3, CV_RGB(255, 255, 127));
+                        DrawRectangle(display_image, rect, 3, 3, color);
                         // end put text and draw rectangle
                         if (it->name.empty()){
                             // get face image and landmarks to make request
@@ -212,8 +221,10 @@ public:
         while (1){
             bool capSuccess = cap.read(origin_image);
             if (!capSuccess){
-                usleep(1000000);
                 cap = cv::VideoCapture(camera_source);
+                auto time = std::time(nullptr);
+                printf("cap not success ");
+                std::cout << "at: " << std::put_time(std::gmtime(&time), "%c") << '\n';
                 continue;
             }
             this->imagesQueue.push(origin_image);
