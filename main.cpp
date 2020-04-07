@@ -11,7 +11,6 @@
 #include "base64.h"
 #include "image_proc.h"
 #include "queue.h"
-#include "drawavatar2lanes.h"
 #include "SORTtracker.h"
 #include <jsoncpp/json/value.h>
 #include "jsoncpp/json/json.h"
@@ -29,6 +28,9 @@ using multiple_camera_server::JSReq;
 using multiple_camera_server::JSResp;
 using multiple_camera_server::LabeledFace;
 using multiple_camera_server::UnlabeledFace;
+
+
+
 
 class CameraClient {
 public:
@@ -141,10 +143,9 @@ public:
                             color = CV_RGB(255, 0, 0);
                         } else{
                             displayName = it->name;
-                            color = CV_RGB(255, 200, 0);
+                            color = CV_RGB(0, 255, 0);
                         }
-                        cv::putText(display_image, displayName, cv::Point(pBox.x - 10*int(displayName.length()*this->fontScale/2), pBox.y),
-                                cv::FONT_HERSHEY_SIMPLEX, this->fontScale, color, 2);
+                        WriteText(display_image, displayName, cv::Point(pBox.x, pBox.y), pBox.width);
                         cv::Rect rect = cv::Rect(pBox.x, pBox.y, pBox.width, pBox.height);
                         DrawRectangle(display_image, rect, 3, 3, color);
                         // end put text and draw rectangle
