@@ -7,11 +7,13 @@
 
 #include <string>
 #include <opencv2/opencv.hpp>
+#include <codecvt>
+#include "DrawText.h"
 
-
-std::tuple<cv::Mat, int, int> CropFaceImageWithMargin(cv::Mat srcImg, int x1, int y1, int x2, int y2, float expanded_face_scale){
-    int new_width = (int)((float)(x2 - x1) / 2 * expanded_face_scale);
-    int new_height = (int)((float)(y2 - y1) / 2 * expanded_face_scale);
+std::tuple<cv::Mat, int, int>
+CropFaceImageWithMargin(cv::Mat srcImg, int x1, int y1, int x2, int y2, float expanded_face_scale) {
+    int new_width = (int) ((float) (x2 - x1) / 2 * expanded_face_scale);
+    int new_height = (int) ((float) (y2 - y1) / 2 * expanded_face_scale);
     int x_center = (x1 + x2) / 2;
     int y_center = (y1 + y2) / 2;
     int new_top = y_center - new_height > 0 ? (y_center - new_height) : 0;
@@ -47,21 +49,29 @@ void DrawRectangle(cv::Mat img, cv::Rect rect, int r, int thickness, cv::Scalar 
 }
 
 
-void WriteText(cv::Mat& im, std::string label, cv::Point p, int boxWidth){
+void WriteText(cv::Mat &im, std::string label, cv::Point p, int boxWidth, DrawText &drawer) {
     cv::Mat overlay = im.clone();
     cv::Mat output = im.clone();
     int fontface = cv::FONT_HERSHEY_COMPLEX;
     double scale = 2;
     int thickness = 2;
     int baseline = 0;
-    cv::Size text = cv::getTextSize(label, fontface, scale, thickness, &baseline);
-    p.y = p.y - text.height/2;
-    p.x = p.x - text.width/2 + boxWidth/2;
-    cv::rectangle(overlay, p + cv::Point(0, baseline), p + cv::Point(text.width, -text.height), cv::Scalar(0), cv::FILLED);
+//    cv::Size text = cv::getTextSize(label, fontface, scale, thickness, &baseline);
+    int text_height = drawer.pixel_width;
+    int text_width = drawer.pixel_width * label.size()/2;
+
+    p.y = p.y - text_height/2;
+    p.x = p.x - text_width/2 + boxWidth/2;
+    cv::rectangle(overlay, p + cv::Point(0, baseline), p + cv::Point(text_width, -text_height), cv::Scalar(0), cv::FILLED);
     float alpha = 0.5;
     cv::addWeighted(overlay, alpha, output, 1-alpha, 0, output);
     im = output;
-    cv::putText(im, label, p, fontface, scale, CV_RGB(255,255,255), thickness, 8);
+
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+    std::wstring ws(label.size(), L' ');
+    ws.resize(std::mbstowcs(&ws[0], label.c_str(), label.size()));
+    drawer.PrintText(im, ws, p.x, p.y, Scalar(255, 255, 255));
+//    cv::putText(im, label, p, fontface, scale, CV_RGB(255, 255, 255), thickness, 8);
 }
 
 #endif //CAMERA_CLIENT_IMAGE_PROC_H
