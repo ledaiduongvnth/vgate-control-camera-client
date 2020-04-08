@@ -1,0 +1,8 @@
+//
+// Created by d on 08/04/2020.
+//
+
+#ifndef CAMERA_CLIENT_FREE_TYPE_H
+#define CAMERA_CLIENT_FREE_TYPE_H
+
+#endif //CAMERA_CLIENT_FREE_TYPE_H

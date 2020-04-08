@@ -16,6 +16,14 @@
 #include "jsoncpp/json/json.h"
 #include "X11/Xlib.h"
 #include <unistd.h>
+#include "ft2build.h"
+#include FT_FREETYPE_H
+#include <locale>
+#include <codecvt>
+#include <string>
+
+FT_Library ftlibrary;
+FT_Face ftface;
 
 
 using grpc::Channel;
@@ -28,6 +36,69 @@ using multiple_camera_server::JSReq;
 using multiple_camera_server::JSResp;
 using multiple_camera_server::LabeledFace;
 using multiple_camera_server::UnlabeledFace;
+
+int StringToWString(std::wstring &ws, const std::string &s)
+{
+    std::wstring wsTmp(s.begin(), s.end());
+
+    ws = wsTmp;
+
+    return 0;
+}
+
+void my_draw_bitmap(Mat &img, FT_Bitmap *bitmap, int x, int y, Scalar color) {
+    Scalar src_col, dst_col;
+    for (int i = 0; i < bitmap->rows; i++) {
+        for (int j = 0; j < bitmap->width; j++) {
+            unsigned char val = bitmap->buffer[j + i * bitmap->pitch];
+            float mix = (float) val / 255.0;
+            if (val != 0) {
+                src_col = Scalar(img.at<Vec3b>(i + y, j + x));
+                dst_col = mix * color + (1.0 - mix) * src_col;
+                img.at<Vec3b>(i + y, j + x) = Vec3b(dst_col[0], dst_col[1], dst_col[2]);
+            }
+        }
+    }
+}
+
+
+float PrintString(Mat &img, std::wstring str, int x, int y, Scalar color) {
+    FT_Bool use_kerning = 0;
+    FT_UInt previous = 0;
+    use_kerning = FT_HAS_KERNING(ftface);
+    float prev_yadv = 0;
+    float posx = 0;
+    float posy = 0;
+    float dx = 0;
+    for (int k = 0; k < str.length(); k++) {
+        int glyph_index = FT_Get_Char_Index(ftface, str.c_str()[k]);
+        FT_GlyphSlot slot = ftface->glyph;  // a small shortcut
+        if (k > 0) { dx = slot->advance.x / 64; }
+        FT_Load_Glyph(ftface, glyph_index, FT_LOAD_DEFAULT);
+        FT_Render_Glyph(slot, FT_RENDER_MODE_NORMAL);
+        prev_yadv = slot->metrics.vertAdvance / 64;
+        if (use_kerning && previous && glyph_index) {
+            FT_Vector delta;
+            FT_Get_Kerning(ftface, previous, glyph_index, FT_KERNING_DEFAULT, &delta);
+            posx += (delta.x / 64);
+        }
+        posx += (dx);
+        my_draw_bitmap(img, &slot->bitmap, posx + x + slot->bitmap_left, y - slot->bitmap_top + posy, color);
+        previous = glyph_index;
+    }
+    return prev_yadv;
+}
+
+
+void PrintText(Mat &img, std::wstring str, int x, int y, Scalar color) {
+    float posy = 0;
+    for (int pos = str.find_first_of(L'\n'); pos != wstring::npos; pos = str.find_first_of(L'\n')) {
+        std::wstring substr = str.substr(0, pos);
+        str.erase(0, pos + 1);
+        posy += PrintString(img, substr, x, y + posy, color);
+    }
+    PrintString(img, str, x, y + posy, color);
+}
 
 
 
@@ -73,10 +144,25 @@ public:
     }
 
     void SendRequests() {
+
+        FT_Init_FreeType( &ftlibrary );
+        FT_New_Face( ftlibrary,"/mnt/hdd/CLionProjects/vgate-control-camera-client/tracking/arial.ttf",0,&ftface );
+        FT_Set_Pixel_Sizes(ftface,24,0);
+        FT_Select_Charmap(ftface, FT_ENCODING_UNICODE);
+
+
+//        Mat img = imread("/home/d/Pictures/67452337-51c8-4c95-9938-9cfd8a009b65.jpeg");
+//        std::wstring str = L"Xin chào các bạn";
+//        PrintText(img, str, 100, 50, Scalar(0, 0, 0));
+//        cv::imshow("win", img);
+//        cv::waitKey(0);
+
         cv::Mat origin_image, display_image, cropedImage;
         vector<FaceDetectInfo> faceInfo;
         vector<LabeledFaceIn> facesOut;
         vector<TrackingBox> tmp_det;
+        std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+
         SORTtracker tracker(this->maxAge, this->minHits, this->iouThreash);
         bool success, send_success, first_detections = true, capSuccess;
         int new_left, new_top, detectionCount = 0, recognitionCount = 0;
@@ -139,13 +225,17 @@ public:
                         std::string displayName;
                         cv::Scalar color;
                         if (it->name.empty()){
-                            displayName = "unknown";
+                            displayName = "không biết thằng này";
                             color = CV_RGB(255, 0, 0);
                         } else{
                             displayName = it->name;
                             color = CV_RGB(0, 255, 0);
                         }
-                        WriteText(display_image, displayName, cv::Point(pBox.x, pBox.y), pBox.width);
+                        std::wstring ws(displayName.size(), L' '); // Overestimate number of code points.
+                        ws.resize(std::mbstowcs(&ws[0], displayName.c_str(), displayName.size())); // Shrink to fit.
+
+                        PrintText(display_image, ws, pBox.x, pBox.y, Scalar(255, 255, 255));
+//                        WriteText(display_image, displayName, cv::Point(pBox.x, pBox.y), pBox.width);
                         cv::Rect rect = cv::Rect(pBox.x, pBox.y, pBox.width, pBox.height);
                         DrawRectangle(display_image, rect, 3, 3, color);
                         // end put text and draw rectangle
@@ -252,6 +342,7 @@ private:
 };
 
 int main(int argc, char **argv) {
+
     std::ifstream file_input("../config/config.json");
     Json::Reader reader;
     Json::Value configs;
