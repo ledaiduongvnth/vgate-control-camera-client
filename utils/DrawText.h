@@ -16,17 +16,16 @@ public:
     DrawText(int pixel_width){
         this->pixel_width = pixel_width;
         FT_Init_FreeType( &library );
-        FT_New_Face( library,"../utils/arial.ttf",0,&face );
+        FT_New_Face( library,"../utils/Roboto.ttf",0,&face );
         FT_Set_Pixel_Sizes(face, this->pixel_width,0);
         FT_Select_Charmap(face, FT_ENCODING_UNICODE);
     }
 
     void my_draw_bitmap(Mat &img, FT_Bitmap *bitmap, int x, int y, Scalar color) {
-
         Scalar src_col, dst_col;
         for (int i = 0; i < bitmap->rows; i++) {
             for (int j = 0; j < bitmap->width; j++) {
-                if (/*0 < j + x && j + x < img.rows && */0 < i + y && i + y < img.cols){
+                if (0 < i + y && i + y < img.cols){
                     unsigned char val = bitmap->buffer[j + i * bitmap->pitch];
                     float mix = (float) val / 255.0;
                     if (val != 0) {
@@ -64,6 +63,10 @@ public:
             previous = glyph_index;
         }
         return prev_yadv;
+    }
+
+    int GetWidth(std::wstring str){
+
     }
 
     void PrintText(Mat &img, std::wstring str, int x, int y, Scalar color) {
