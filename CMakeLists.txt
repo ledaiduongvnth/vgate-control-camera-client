@@ -48,6 +48,15 @@ include_directories (
         utils
         tracking
         ${FREETYPE_INCLUDE_DIRS}
+        /usr/local/include/jetson-utils
+        /usr/include/gstreamer-1.0
+        /usr/include/glib-2.0
+        /usr/include/libxml2
+        /usr/lib/aarch64-linux-gnu/gstreamer-1.0/include
+        /usr/lib/x86_64-linux-gnu/gstreamer-1.0/include
+        /usr/lib/aarch64-linux-gnu/glib-2.0/include
+        /usr/lib/x86_64-linux-gnu/glib-2.0/include
+        /usr/include/gstreamer-1.0
 )
 
 AUX_SOURCE_DIRECTORY(facedetect DIR_SRCS)
@@ -75,7 +84,7 @@ target_link_libraries(
         -lnvinfer -lnvonnxparser -ljsoncpp -lX11
         -lcuda -lcudart -lcublas -lcudnn -lcurand
         -lboost_thread -lboost_system -lnppig
-        -lnppicc -lnppc -lnppidei -lnppist
+        -lnppicc -lnppc -lnppidei -lnppist -ljetson-utils
         ${GRPC_CPP_LIB}
         ${Protobuf_LIBRARIES}
         ${OpenCV_LIBS}
