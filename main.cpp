@@ -99,7 +99,7 @@ public:
         static cudaFont* font = NULL;
         if( !font )
         {
-            font = cudaFont::Create(adaptFontSize(5));
+            font = cudaFont::Create(adaptFontSize(10));
 
             if( !font )
             {
@@ -170,13 +170,13 @@ public:
                         std::string displayName;
                         cv::Scalar color;
                         if (it->name.empty()){
-                            displayName = "vô danh";
+                            displayName = "unknown";
                             color = CV_RGB(255, 0, 0);
                         } else{
                             displayName = it->name;
                             color = CV_RGB(0, 255, 0);
                         }
-                        const int2  position   = make_int2(pBox.x+5, pBox.y+3);
+                        const int2  position   = make_int2(pBox.x, pBox.y);
                         labels.emplace_back(std::pair<std::string, int2>(displayName, position));
 //                        WriteText(display_image, displayName, cv::Point(pBox.x, pBox.y), pBox.width, drawer);
 //                        cv::Rect rect = cv::Rect(pBox.x, pBox.y, pBox.width, pBox.height);
@@ -236,12 +236,12 @@ public:
 //
 //            }
 
-            font->OverlayText((float4*)cudaImage, 1280, 720, labels, make_float4(255,255,255,255));
+            font->OverlayText((float4*)cudaImage, 1920, 1080, labels, make_float4(255,255,255,255));
 //            cudaDeviceSynchronize();
 //            float *displayImage = nullptr;
-//            CUDA(cudaResizeRGBA((float4*)cudaImage, 1280, 720, (float4*)cudaImage, 1920, 1080));
+//            CUDA(cudaResizeRGBA((float4*)cudaImage, 1920, 1080, (float4*)cudaImage, 1920, 1080));
 //            cudaDeviceSynchronize();
-            display->RenderOnce(cudaImage, 1280, 720);
+            display->RenderOnce(cudaImage, 1920, 1080);
         }
     }
 
@@ -271,7 +271,7 @@ public:
         }
     }
     void ReadImages(){
-        gstCamera* camera = gstCamera::Create(1280, 720, "rtspsrc location=rtsp://172.16.10.108/101 user-id=admin user-pw=123456a@ latency=0 ! rtph264depay !  h264parse ! nvv4l2decoder ! nvvidconv ! video/x-raw, format=BGRx, width=1280, height=720");
+        gstCamera* camera = gstCamera::Create(1920, 1080, "rtspsrc location=rtsp://172.16.10.108/101 user-id=admin user-pw=123456a@ latency=0 ! rtph264depay !  h264parse ! nvv4l2decoder ! nvvidconv ! video/x-raw, format=BGRx, width=1920, height=1080");
         if( !camera )
         {
             printf("failed to initialize camera device\n");
@@ -299,11 +299,11 @@ public:
                 printf("failed to convert from NV12 to RGBA\n");
             }
             cudaDeviceSynchronize();
-            origin_image = cv::Mat(720, 1280, CV_8UC3, (void *) cpu);
+            origin_image = cv::Mat(1080, 1920, CV_8UC3, (void *) cpu);
             delay = ((double) cv::getTickCount() - timer) * 1000.0 / cv::getTickFrequency();
             printf("%f\n", delay);
             if (!capSuccess){
-                camera = gstCamera::Create(1280, 720, "rtspsrc location=rtsp://172.16.10.108/101 user-id=admin user-pw=123456a@ latency=0 ! rtph264depay !  h264parse ! nvv4l2decoder ! nvvidconv ! video/x-raw, format=BGRx, width=1280, height=720");
+                camera = gstCamera::Create(1920, 1080, "rtspsrc location=rtsp://172.16.10.108/101 user-id=admin user-pw=123456a@ latency=0 ! rtph264depay !  h264parse ! nvv4l2decoder ! nvvidconv ! video/x-raw, format=BGRx, width=1920, height=1080   ");
                 if( !camera )
                 {
                     printf("failed to initialize camera device\n");
