@@ -16,8 +16,13 @@
 #include "jsoncpp/json/json.h"
 #include "X11/Xlib.h"
 #include <unistd.h>
+#include <cudaFont.h>
 #include "DrawText.h"
 #include "gstCamera.h"
+#include "glDisplay.h"
+#include "cudaResize.h"
+
+
 
 
 using grpc::Channel;
@@ -81,13 +86,36 @@ public:
         std::vector<TrackingBox> tmp_det;
         SORTtracker tracker(this->maxAge, this->minHits, this->iouThreash);
         DrawText drawer(30) ;
-        bool success, send_success, first_detections = true, capSuccess;
+        bool success, send_success, first_detections = true, capSuccess1, capSuccess2;
         int new_left, new_top, detectionCount = 0, recognitionCount = 0;
         float scale;
         double delay = 0, timer = 0;
+        float* cudaImage;
+        glDisplay* display = glDisplay::Create();
+        if( !display ){
+            printf("failed to create openGL display\n");
+            throw std::exception();
+        }
+        static cudaFont* font = NULL;
+        if( !font )
+        {
+            font = cudaFont::Create(adaptFontSize(5));
+
+            if( !font )
+            {
+                printf("failed to create openGL display\n");
+                throw std::exception();
+            }
+        }
+        std::vector< std::pair< std::string, int2 > > labels;
         while (1) {
-            capSuccess = this->imagesQueue.pop(origin_image);
-            if(!capSuccess){
+            labels.clear();
+            capSuccess1 = this->imagesQueue.pop(origin_image);
+            if(!capSuccess1){
+                continue;
+            }
+            capSuccess2 = this->imagesQueue2.pop(cudaImage);
+            if(!capSuccess2){
                 continue;
             }
             display_image = origin_image.clone();
@@ -148,14 +176,16 @@ public:
                             displayName = it->name;
                             color = CV_RGB(0, 255, 0);
                         }
-                        WriteText(display_image, displayName, cv::Point(pBox.x, pBox.y), pBox.width, drawer);
-                        cv::Rect rect = cv::Rect(pBox.x, pBox.y, pBox.width, pBox.height);
-                        DrawRectangle(display_image, rect, 3, 3, color);
+                        const int2  position   = make_int2(pBox.x+5, pBox.y+3);
+                        labels.emplace_back(std::pair<std::string, int2>(displayName, position));
+//                        WriteText(display_image, displayName, cv::Point(pBox.x, pBox.y), pBox.width, drawer);
+//                        cv::Rect rect = cv::Rect(pBox.x, pBox.y, pBox.width, pBox.height);
+//                        DrawRectangle(display_image, rect, 3, 3, color);
                         // end put text and draw rectangle
                         if (it->name.empty()){
                             // get face image and landmarks to make request
                             std::tie(cropedImage, new_left, new_top) = CropFaceImageWithMargin(origin_image,
-                                    pBox.x, pBox.y,pBox.x + pBox.width,pBox.y + pBox.height, 1.3);
+                                                                                               pBox.x, pBox.y,pBox.x + pBox.width,pBox.y + pBox.height, 1.3);
                             UnlabeledFace *face = jsReq.add_faces();
                             std::vector<uchar> buf;
                             success = cv::imencode(".jpg", cropedImage, buf);
@@ -188,11 +218,30 @@ public:
                     }
                 }
             }
-            resize(display_image, display_image, screenSize);
-            namedWindow("camera_client", WND_PROP_FULLSCREEN);
-            setWindowProperty("camera_client", WND_PROP_FULLSCREEN, WINDOW_FULLSCREEN);
-            imshow("camera_client", display_image);
-            waitKey(1);
+
+//            if( CUDA_FAILED(cudaDetectionOverlay((float4*)input, (float4*)output, width, height, detections, numDetections, (float4*)mClassColors[1])) ){
+//                printf("failed to send grpc\n");
+//                throw std::exception();
+//            }
+//
+//            std::vector< std::pair< std::string, int2 > > labels;
+//
+//            for( uint32_t n=0; n < numDetections; n++ )
+//            {
+//                const char* className  = GetClassDesc(detections[n].ClassID);
+//                const float confidence = detections[n].Confidence * 100.0f;
+//                const int2  position   = make_int2(detections[n].Left+5, detections[n].Top+3);
+//
+//                labels.push_back(std::pair<std::string, int2>(className, position));
+//
+//            }
+
+            font->OverlayText((float4*)cudaImage, 1280, 720, labels, make_float4(255,255,255,255));
+//            cudaDeviceSynchronize();
+//            float *displayImage = nullptr;
+//            CUDA(cudaResizeRGBA((float4*)cudaImage, 1280, 720, (float4*)cudaImage, 1920, 1080));
+//            cudaDeviceSynchronize();
+            display->RenderOnce(cudaImage, 1280, 720);
         }
     }
 
@@ -222,7 +271,7 @@ public:
         }
     }
     void ReadImages(){
-        gstCamera* camera = gstCamera::Create(1920, 1080, "rtspsrc location=rtsp://172.16.10.108/101 user-id=admin user-pw=123456a@ latency=0 ! rtph264depay !  h264parse ! nvv4l2decoder ! nvvidconv ! video/x-raw, format=BGRx, width=1920, height=1080");
+        gstCamera* camera = gstCamera::Create(1280, 720, "rtspsrc location=rtsp://172.16.10.108/101 user-id=admin user-pw=123456a@ latency=0 ! rtph264depay !  h264parse ! nvv4l2decoder ! nvvidconv ! video/x-raw, format=BGRx, width=1280, height=720");
         if( !camera )
         {
             printf("failed to initialize camera device\n");
@@ -245,16 +294,16 @@ public:
             if (!capSuccess){
                 printf("failed to capture frame\n");
             }
-            capSuccess = camera->ConvertRGBA(gpu, &imgRGBA, false);
+            capSuccess = camera->ConvertRGBA(gpu, &imgRGBA, true);
             if (!capSuccess) {
                 printf("failed to convert from NV12 to RGBA\n");
             }
             cudaDeviceSynchronize();
-            origin_image = cv::Mat(1080, 1920, CV_8UC3, (void *) cpu);
+            origin_image = cv::Mat(720, 1280, CV_8UC3, (void *) cpu);
             delay = ((double) cv::getTickCount() - timer) * 1000.0 / cv::getTickFrequency();
             printf("%f\n", delay);
             if (!capSuccess){
-                camera = gstCamera::Create(1920, 1080, "rtspsrc location=rtsp://172.16.10.108/101 user-id=admin user-pw=123456a@ latency=0 ! rtph264depay !  h264parse ! nvv4l2decoder ! nvvidconv ! video/x-raw, format=BGRx, width=1920, height=1080");
+                camera = gstCamera::Create(1280, 720, "rtspsrc location=rtsp://172.16.10.108/101 user-id=admin user-pw=123456a@ latency=0 ! rtph264depay !  h264parse ! nvv4l2decoder ! nvvidconv ! video/x-raw, format=BGRx, width=1280, height=720");
                 if( !camera )
                 {
                     printf("failed to initialize camera device\n");
@@ -271,6 +320,7 @@ public:
                 continue;
             }
             this->imagesQueue.push(origin_image);
+            this->imagesQueue2.push(imgRGBA);
         }
     }
     std::thread ReadImagesThread() {
@@ -291,6 +341,8 @@ private:
     RetinaFace *rf;
     CConcurrentQueue<std::vector<LabeledFaceIn>> facesQueue;
     CConcurrentQueue<cv::Mat> imagesQueue;
+    CConcurrentQueue<float*> imagesQueue2;
+
 };
 
 int main(int argc, char **argv) {
