@@ -99,8 +99,7 @@ public:
         static cudaFont* font = NULL;
         if( !font )
         {
-            font = cudaFont::Create(adaptFontSize(10));
-
+            font = cudaFont::Create(adaptFontSize(this->fontScale));
             if( !font )
             {
                 printf("failed to create openGL display\n");
@@ -108,8 +107,10 @@ public:
             }
         }
         std::vector< std::pair< std::string, int2 > > labels;
+        std::vector< std::pair< std::string, int2 > > unknowns;
         while (1) {
             labels.clear();
+            unknowns.clear();
             capSuccess1 = this->imagesQueue.pop(origin_image);
             if(!capSuccess1){
                 continue;
@@ -171,21 +172,17 @@ public:
                         cv::Scalar color;
                         if (it->name.empty()){
                             displayName = "unknown";
-                            color = CV_RGB(255, 0, 0);
+                            const int2  position = make_int2(pBox.x, pBox.y);
+                            unknowns.emplace_back(std::pair<std::string, int2>(displayName, position));
                         } else{
                             displayName = it->name;
-                            color = CV_RGB(0, 255, 0);
+                            const int2  position = make_int2(pBox.x, pBox.y);
+                            labels.emplace_back(std::pair<std::string, int2>(displayName, position));
                         }
-                        const int2  position   = make_int2(pBox.x, pBox.y);
-                        labels.emplace_back(std::pair<std::string, int2>(displayName, position));
-//                        WriteText(display_image, displayName, cv::Point(pBox.x, pBox.y), pBox.width, drawer);
-//                        cv::Rect rect = cv::Rect(pBox.x, pBox.y, pBox.width, pBox.height);
-//                        DrawRectangle(display_image, rect, 3, 3, color);
-                        // end put text and draw rectangle
                         if (it->name.empty()){
                             // get face image and landmarks to make request
                             std::tie(cropedImage, new_left, new_top) = CropFaceImageWithMargin(origin_image,
-                                                                                               pBox.x, pBox.y,pBox.x + pBox.width,pBox.y + pBox.height, 1.3);
+                                    pBox.x, pBox.y,pBox.x + pBox.width,pBox.y + pBox.height, 1.3);
                             UnlabeledFace *face = jsReq.add_faces();
                             std::vector<uchar> buf;
                             success = cv::imencode(".jpg", cropedImage, buf);
@@ -235,13 +232,10 @@ public:
 //                labels.push_back(std::pair<std::string, int2>(className, position));
 //
 //            }
-
+            font->OverlayText((float4*)cudaImage, 1920, 1080, unknowns, make_float4(255,0,0,255));
             font->OverlayText((float4*)cudaImage, 1920, 1080, labels, make_float4(255,255,255,255));
-//            cudaDeviceSynchronize();
-//            float *displayImage = nullptr;
-//            CUDA(cudaResizeRGBA((float4*)cudaImage, 1920, 1080, (float4*)cudaImage, 1920, 1080));
-//            cudaDeviceSynchronize();
             display->RenderOnce(cudaImage, 1920, 1080);
+            display->SetTitle("VIETTEL");
         }
     }
 
@@ -294,11 +288,10 @@ public:
             if (!capSuccess){
                 printf("failed to capture frame\n");
             }
-            capSuccess = camera->ConvertRGBA(gpu, &imgRGBA, true);
+            capSuccess = camera->ConvertRGBA(gpu, &imgRGBA, false);
             if (!capSuccess) {
                 printf("failed to convert from NV12 to RGBA\n");
             }
-            cudaDeviceSynchronize();
             origin_image = cv::Mat(1080, 1920, CV_8UC3, (void *) cpu);
             delay = ((double) cv::getTickCount() - timer) * 1000.0 / cv::getTickFrequency();
             printf("%f\n", delay);

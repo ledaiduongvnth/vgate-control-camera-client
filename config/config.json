@@ -11,7 +11,7 @@
   "min_hits": 3,
   "face_detect_threash": 0.9,
   "iou_threash": 0.4,
-  "font_scale": 2,
+  "font_scale": 20,
   "model_path": "../facedetect/model/retina.onnx",
   "files_store_host": "http://10.61.189.142:5001/get-images",
   "registration_set_id": 1,
