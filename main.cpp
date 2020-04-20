@@ -1,4 +1,4 @@
-#include <RetinaFace.h>
+//#include <RetinaFace.h>
 #include <opencv2/videoio.hpp>
 #include <memory>
 #include <string>
@@ -21,6 +21,10 @@
 #include "gstCamera.h"
 #include "glDisplay.h"
 #include "cudaResize.h"
+#include "superResNet.h"
+#include "fstream"
+
+
 
 
 
@@ -59,7 +63,7 @@ public:
                  int recognitionFrequency, int maxAge, int minHits, float iouThreash,float faceDetectThreash, int fontScale, int delayToIgnore, cv::Size screenSize) {
         this->camera_source = camera_source;
         this->multiple_camera_host = multiple_camera_host;
-        this->rf = new RetinaFace(model_path, "net3");
+//        this->rf = new RetinaFace(model_path, "net3");
         this->screenSize = screenSize;
         this->numberLanes = numberLanes;
         this->detectionFrequency = detectionFrequency;
@@ -80,6 +84,9 @@ public:
     }
 
     void SendRequests() {
+//        detectNet::Detection* detections = NULL;
+        superResNet* net = superResNet::Create();
+        printf("loaded\n");
         cv::Mat origin_image, display_image, cropedImage;
         std::vector<FaceDetectInfo> faceInfo;
         std::vector<LabeledFaceIn> facesOut;
@@ -135,7 +142,9 @@ public:
             }
             if (detectionCount == 0) {
                 tmp_det.clear();
-                rf->detect(origin_image.clone(), this->faceDetectThreash, faceInfo, 640);
+                net->Detect(cudaImage, 1920, 1080);
+
+//                rf->detect(origin_image.clone(), this->faceDetectThreash, faceInfo, 640);
                 for (auto &t : faceInfo) {
                     TrackingBox trackingBox;
                     trackingBox.box.x = t.rect.x1 * scale;
@@ -294,7 +303,7 @@ public:
             }
             origin_image = cv::Mat(1080, 1920, CV_8UC3, (void *) cpu);
             delay = ((double) cv::getTickCount() - timer) * 1000.0 / cv::getTickFrequency();
-            printf("%f\n", delay);
+//            printf("%f\n", delay);
             if (!capSuccess){
                 camera = gstCamera::Create(1920, 1080, "rtspsrc location=rtsp://172.16.10.108/101 user-id=admin user-pw=123456a@ latency=0 ! rtph264depay !  h264parse ! nvv4l2decoder ! nvvidconv ! video/x-raw, format=BGRx, width=1920, height=1080   ");
                 if( !camera )
@@ -331,7 +340,7 @@ private:
     std::shared_ptr<Channel> channel;
     std::unique_ptr<FaceProcessing::Stub> stub_{};
     std::shared_ptr<ClientReaderWriter<JSReq, JSResp>> stream;
-    RetinaFace *rf;
+//    RetinaFace *rf;
     CConcurrentQueue<std::vector<LabeledFaceIn>> facesQueue;
     CConcurrentQueue<cv::Mat> imagesQueue;
     CConcurrentQueue<float*> imagesQueue2;

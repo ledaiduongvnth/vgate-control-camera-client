@@ -21,24 +21,24 @@ public:
         FT_Select_Charmap(face, FT_ENCODING_UNICODE);
     }
 
-    void my_draw_bitmap(Mat &img, FT_Bitmap *bitmap, int x, int y, Scalar color) {
-        Scalar src_col, dst_col;
+    void my_draw_bitmap(cv::Mat &img, FT_Bitmap *bitmap, int x, int y, cv::Scalar color) {
+        cv::Scalar src_col, dst_col;
         for (int i = 0; i < bitmap->rows; i++) {
             for (int j = 0; j < bitmap->width; j++) {
                 if (0 < i + y && i + y < img.cols){
                     unsigned char val = bitmap->buffer[j + i * bitmap->pitch];
                     float mix = (float) val / 255.0;
                     if (val != 0) {
-                        src_col = Scalar(img.at<Vec3b>(i + y, j + x));
+                        src_col = cv::Scalar(img.at<cv::Vec3b>(i + y, j + x));
                         dst_col = mix * color + (1.0 - mix) * src_col;
-                        img.at<Vec3b>(i + y, j + x) = Vec3b(dst_col[0], dst_col[1], dst_col[2]);
+                        img.at<cv::Vec3b>(i + y, j + x) = cv::Vec3b(dst_col[0], dst_col[1], dst_col[2]);
                     }
                 }
             }
         }
     }
 
-    float PrintString(Mat &img, std::wstring str, int x, int y, Scalar color) {
+    float PrintString(cv::Mat &img, std::wstring str, int x, int y, cv::Scalar color) {
         FT_Bool use_kerning = 0;
         FT_UInt previous = 0;
         use_kerning = FT_HAS_KERNING(face);
@@ -69,9 +69,9 @@ public:
 
     }
 
-    void PrintText(Mat &img, std::wstring str, int x, int y, Scalar color) {
+    void PrintText(cv::Mat &img, std::wstring str, int x, int y, cv::Scalar color) {
         float posy = 0;
-        for (int pos = str.find_first_of(L'\n'); pos != wstring::npos; pos = str.find_first_of(L'\n')) {
+        for (int pos = str.find_first_of(L'\n'); pos != std::wstring::npos; pos = str.find_first_of(L'\n')) {
             std::wstring substr = str.substr(0, pos);
             str.erase(0, pos + 1);
             posy += PrintString(img, substr, x, y + posy, color);

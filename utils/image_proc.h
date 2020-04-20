@@ -70,7 +70,7 @@ void WriteText(cv::Mat &im, std::string label, cv::Point p, int boxWidth, DrawTe
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
     std::wstring ws(label.size(), L' ');
     ws.resize(std::mbstowcs(&ws[0], label.c_str(), label.size()));
-    drawer.PrintText(im, ws, p.x, p.y, Scalar(255, 255, 255));
+    drawer.PrintText(im, ws, p.x, p.y, cv::Scalar(255, 255, 255));
 //    cv::putText(im, label, p, fontface, scale, CV_RGB(255, 255, 255), thickness, 8);
 }
 

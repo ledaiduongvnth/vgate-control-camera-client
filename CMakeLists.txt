@@ -81,10 +81,10 @@ target_link_libraries(
         camera_client
         -L/usr/local/cuda/lib64
         -L/usr/local/TensorRT/lib
-        -lnvinfer -lnvonnxparser -ljsoncpp -lX11
+        -lnvinfer -lnvonnxparser -ljsoncpp -lX11 -lnvcaffe_parser
         -lcuda -lcudart -lcublas -lcudnn -lcurand
         -lboost_thread -lboost_system -lnppig
-        -lnppicc -lnppc -lnppidei -lnppist -ljetson-utils
+        -lnppicc -lnppc -lnppidei -lnppist -ljetson-utils nvinfer_plugin
         ${GRPC_CPP_LIB}
         ${Protobuf_LIBRARIES}
         ${OpenCV_LIBS}
