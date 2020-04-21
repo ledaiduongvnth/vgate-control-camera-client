@@ -495,7 +495,6 @@ std::vector<FaceDetectInfo> RetinaFace::nms(std::vector<FaceDetectInfo>& bboxes,
 
 void  RetinaFace::detect(std::vector<std::vector<float>> results, float threshold, vector<FaceDetectInfo> &faceInfo, int model_size)
 {
-    faceInfo.clear();
     vector<int> aaa = {20, 40, 80};
 
     for(size_t i = 0; i < _feat_stride_fpn.size(); i++) {

@@ -145,7 +145,9 @@ public:
             }
             if (detectionCount == 0) {
                 tmp_det.clear();
+                faceInfo.clear();
                 net->Detect(cudaImage, 1920, 1080, rf, faceInfo);
+                printf("faceInfo size:%zu\n", faceInfo.size());
                 for (auto &t : faceInfo) {
                     TrackingBox trackingBox;
                     trackingBox.box.x = t.rect.x1 * scale;
@@ -184,11 +186,19 @@ public:
                             displayName = "unknown";
                             const int2  position = make_int2(pBox.x, pBox.y);
                             unknowns.emplace_back(std::pair<std::string, int2>(displayName, position));
+                            color = CV_RGB(255, 0, 0);
+
                         } else{
                             displayName = it->name;
                             const int2  position = make_int2(pBox.x, pBox.y);
                             labels.emplace_back(std::pair<std::string, int2>(displayName, position));
+                            color = CV_RGB(0, 255, 0);
+
                         }
+                        WriteText(display_image, displayName, cv::Point(pBox.x, pBox.y), pBox.width, drawer);
+                        cv::Rect rect = cv::Rect(pBox.x, pBox.y, pBox.width, pBox.height);
+                        DrawRectangle(display_image, rect, 3, 3, color);
+                        // end put text and draw rectangle
                         if (it->name.empty()){
                             // get face image and landmarks to make request
                             std::tie(cropedImage, new_left, new_top) = CropFaceImageWithMargin(origin_image,
@@ -225,27 +235,11 @@ public:
                     }
                 }
             }
-
-//            if( CUDA_FAILED(cudaDetectionOverlay((float4*)input, (float4*)output, width, height, detections, numDetections, (float4*)mClassColors[1])) ){
-//                printf("failed to send grpc\n");
-//                throw std::exception();
-//            }
-//
-//            std::vector< std::pair< std::string, int2 > > labels;
-//
-//            for( uint32_t n=0; n < numDetections; n++ )
-//            {
-//                const char* className  = GetClassDesc(detections[n].ClassID);
-//                const float confidence = detections[n].Confidence * 100.0f;
-//                const int2  position   = make_int2(detections[n].Left+5, detections[n].Top+3);
-//
-//                labels.push_back(std::pair<std::string, int2>(className, position));
-//
-//            }
-            font->OverlayText((float4*)cudaImage, 1920, 1080, unknowns, make_float4(255,0,0,255));
-            font->OverlayText((float4*)cudaImage, 1920, 1080, labels, make_float4(255,255,255,255));
-            display->RenderOnce(cudaImage, 1920, 1080);
-            display->SetTitle("VIETTEL");
+            resize(display_image, display_image, screenSize);
+            namedWindow("camera_client", WND_PROP_FULLSCREEN);
+            setWindowProperty("camera_client", WND_PROP_FULLSCREEN, WINDOW_FULLSCREEN);
+            imshow("camera_client", display_image);
+            waitKey(1);
         }
     }
 
