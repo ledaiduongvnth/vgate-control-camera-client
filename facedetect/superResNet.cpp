@@ -23,6 +23,15 @@
 #include "superResNet.h"
 #include "cudaUtility.h"
 
+void printaaa(std::vector<float> const &input)
+{
+    for (int i = 0; i < input.size(); i++) {
+        std::cout << input.at(i) << ' ';
+    }
+    printf("\n");
+}
+
+
 cudaError_t cudaPreImageNetRGB( float4* input, size_t inputWidth, size_t inputHeight,
                                 float* output, size_t outputWidth, size_t outputHeight,
                                 cudaStream_t stream );
@@ -74,8 +83,9 @@ superResNet* superResNet::Create()
 	return net;
 }
 
-int superResNet::Detect( float* rgba, uint32_t width, uint32_t height)
+int superResNet::Detect( float* rgba, uint32_t width, uint32_t height, RetinaFace* rf, std::vector<FaceDetectInfo> faceInfo)
 {
+
     if( !rgba || width == 0 || height == 0  )
     {
         printf(LOG_TRT "detectNet::Detect( 0x%p, %u, %u ) -> invalid parameters\n", rgba, width, height);
@@ -89,10 +99,8 @@ int superResNet::Detect( float* rgba, uint32_t width, uint32_t height)
     }
 
     void* inferenceBuffers[] = { mInputCUDA, mOutputs[0].CUDA, mOutputs[1].CUDA, mOutputs[2].CUDA, mOutputs[3].CUDA, mOutputs[4].CUDA,
-                                 mOutputs[5].CUDA, mOutputs[6].CUDA, mOutputs[7].CUDA, mOutputs[8].CUDA, mOutputs[9].CUDA};
+                                 mOutputs[5].CUDA, mOutputs[6].CUDA, mOutputs[7].CUDA, mOutputs[8].CUDA};
 
-    printf("mWidth:%u\n", mWidth);
-    printf("mHeight:%u\n", mHeight);
 
     if( !mContext->execute(1, inferenceBuffers) )
     {
@@ -100,13 +108,27 @@ int superResNet::Detect( float* rgba, uint32_t width, uint32_t height)
         return -1;
     }
 
-    // post-processing / clustering
-    int numDetections = 0;
-    float* coord = mOutputs[0].CPU;
-    printf("results:%f\n", *coord);
-
     CUDA(cudaDeviceSynchronize());
+
+//    printf("size57767 :%f\n", *mOutputs[5].CPU);
+//
+//    // post-processing / clustering
+    int numDetections = 0;
+    std::vector<std::vector<float>> results;
+    printf("-------------------\n");
+
+    for (int i = 0; i < 9; i++) {
+        std::vector<float> aaa = std::vector<float>(mOutputs[i].CPU, mOutputs[i].CPU + mOutputs[i].size/4);
+        results.emplace_back(aaa);
+//        printf("size:%u\n", mOutputs[i].size/4);
+//        printaaa(aaa);
+    }
+    rf->detect(results, 0.9, faceInfo, 640);
+    printf("faces :%zu\n", faceInfo.size());
 
     return numDetections;
 }
+
+
+
 

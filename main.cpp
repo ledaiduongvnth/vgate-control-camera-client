@@ -1,4 +1,4 @@
-//#include <RetinaFace.h>
+#include <RetinaFace.h>
 #include <opencv2/videoio.hpp>
 #include <memory>
 #include <string>
@@ -115,6 +115,9 @@ public:
         }
         std::vector< std::pair< std::string, int2 > > labels;
         std::vector< std::pair< std::string, int2 > > unknowns;
+        RetinaFace* rf = new RetinaFace((string &) "model_path", "net3");
+
+
         while (1) {
             labels.clear();
             unknowns.clear();
@@ -142,9 +145,7 @@ public:
             }
             if (detectionCount == 0) {
                 tmp_det.clear();
-                net->Detect(cudaImage, 1920, 1080);
-
-//                rf->detect(origin_image.clone(), this->faceDetectThreash, faceInfo, 640);
+                net->Detect(cudaImage, 1920, 1080, rf, faceInfo);
                 for (auto &t : faceInfo) {
                     TrackingBox trackingBox;
                     trackingBox.box.x = t.rect.x1 * scale;
