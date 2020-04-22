@@ -196,12 +196,12 @@ public:
                             color = CV_RGB(0, 255, 0);
 
                         }
-                        WriteText(display_image, displayName, cv::Point(pBox.x, pBox.y), pBox.width, drawer);
-                        cv::Rect rect = cv::Rect(pBox.x, pBox.y, pBox.width, pBox.height);
-                        DrawRectangle(display_image, rect, 3, 3, color);
-                        for (size_t j = 0; j < 5; j++) {
-                            cv::circle(display_image, Point(it->landmarks[j + 5],it->landmarks[j]),5, Scalar(255,255,255),cv::FILLED, 8,0);
-                        }
+//                        WriteText(display_image, displayName, cv::Point(pBox.x, pBox.y), pBox.width, drawer);
+//                        cv::Rect rect = cv::Rect(pBox.x, pBox.y, pBox.width, pBox.height);
+//                        DrawRectangle(display_image, rect, 3, 3, color);
+//                        for (size_t j = 0; j < 5; j++) {
+//                            cv::circle(display_image, Point(it->landmarks[j + 5],it->landmarks[j]),5, Scalar(255,255,255),cv::FILLED, 8,0);
+//                        }
 
                         // end put text and draw rectangle
                         if (it->name.empty()){
@@ -240,16 +240,16 @@ public:
                     }
                 }
             }
-            resize(display_image, display_image, screenSize);
-            namedWindow("camera_client", WND_PROP_FULLSCREEN);
-            setWindowProperty("camera_client", WND_PROP_FULLSCREEN, WINDOW_FULLSCREEN);
-            imshow("camera_client", display_image);
-            waitKey(1);
+//            resize(display_image, display_image, screenSize);
+//            namedWindow("camera_client", WND_PROP_FULLSCREEN);
+//            setWindowProperty("camera_client", WND_PROP_FULLSCREEN, WINDOW_FULLSCREEN);
+//            imshow("camera_client", display_image);
+//            waitKey(1);
 
-//            font->OverlayText((float4*)cudaImage, 1920, 1920, unknowns, make_float4(255,0,0,255));
-//            font->OverlayText((float4*)cudaImage, 1920, 1920, labels, make_float4(255,255,255,255));
-//            display->RenderOnce(cudaImage, 1920, 1920);
-//            display->SetTitle("VIETTEL");
+            font->OverlayText((float4*)cudaImage, 1920, 1080, unknowns, make_float4(255,0,0,255));
+            font->OverlayText((float4*)cudaImage, 1920, 1080, labels, make_float4(255,255,255,255));
+            display->RenderOnce(cudaImage, 1920, 1080);
+            display->SetTitle("VIETTEL");
         }
     }
 

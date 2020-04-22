@@ -20,6 +20,7 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#include <gstCamera.h>
 #include "superResNet.h"
 #include "cudaUtility.h"
 
@@ -42,7 +43,22 @@ void imagePadding32f4C(void *src, int srcWidth, int srcHeight, void *dst, int ds
 // constructor
 superResNet::superResNet()
 {
-    cudaMemset(cudaInput, 0, 1920 * 1920 * 4);
+    gstCamera* camera = gstCamera::Create(1920, 1080, "rtspsrc location=rtsp://172.16.10.108/101 user-id=admin user-pw=123456a@ latency=0 ! rtph264depay !  h264parse ! nvv4l2decoder ! nvvidconv ! video/x-raw, format=BGRx, width=1920, height=1080");
+    if( !camera )
+    {
+        printf("failed to initialize camera device\n");
+        throw std::exception();
+    }
+    if( !camera->Open() )
+    {
+        printf("failed to open camera for streaming\n");
+        throw std::exception();
+    }
+
+    void *cpu = NULL;
+    void *gpu = NULL;
+    camera->Capture(&cpu, &gpu, 1000);
+    camera->ConvertRGBA(gpu, &cudaInput, false);
 
 }
 
@@ -95,9 +111,9 @@ int superResNet::Detect( float* rgba, uint32_t width, uint32_t height, RetinaFac
         return -1;
     }
 
-    imagePadding32f4C(rgba, 1920, 1080, rgba, 1920, 1920, 0, 0);
+    imagePadding32f4C(rgba, 1920, 1080, cudaInput, 1920, 1920, 0, 0);
 
-    if( CUDA_FAILED(cudaPreImageNetRGB((float4*)rgba, 1920, 1920, mInputCUDA, 640, 640, GetStream())) )
+    if( CUDA_FAILED(cudaPreImageNetRGB((float4*)cudaInput, 1920, 1920, mInputCUDA, 640, 640, GetStream())) )
     {
         printf(LOG_TRT "imageNet::PreProcess() -- cudaPreImageNetNormMeanRGB() failed\n");
         return false;
