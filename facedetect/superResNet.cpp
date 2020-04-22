@@ -36,10 +36,13 @@ cudaError_t cudaPreImageNetRGB( float4* input, size_t inputWidth, size_t inputHe
                                 float* output, size_t outputWidth, size_t outputHeight,
                                 cudaStream_t stream );
 
+void imagePadding32f4C(void *src, int srcWidth, int srcHeight, void *dst, int dstWidth, int dstHeight, int top, int left);
+
 
 // constructor
 superResNet::superResNet()
 {
+    cudaMemset(cudaInput, 0, 1920 * 1920 * 4);
 
 }
 
@@ -92,7 +95,9 @@ int superResNet::Detect( float* rgba, uint32_t width, uint32_t height, RetinaFac
         return -1;
     }
 
-    if( CUDA_FAILED(cudaPreImageNetRGB((float4*)rgba, width, height, mInputCUDA, 640, 360, GetStream())) )
+    imagePadding32f4C(rgba, 1920, 1080, rgba, 1920, 1920, 0, 0);
+
+    if( CUDA_FAILED(cudaPreImageNetRGB((float4*)rgba, 1920, 1920, mInputCUDA, 640, 640, GetStream())) )
     {
         printf(LOG_TRT "imageNet::PreProcess() -- cudaPreImageNetNormMeanRGB() failed\n");
         return false;

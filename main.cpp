@@ -97,7 +97,6 @@ public:
         int new_left, new_top, detectionCount = 0, recognitionCount = 0;
         float scale;
         double delay = 0, timer = 0;
-        float* cudaImage;
         glDisplay* display = glDisplay::Create();
         if( !display ){
             printf("failed to create openGL display\n");
@@ -119,6 +118,7 @@ public:
 
 
         while (1) {
+            float* cudaImage;
             labels.clear();
             unknowns.clear();
             capSuccess1 = this->imagesQueue.pop(origin_image);
@@ -130,6 +130,7 @@ public:
                 continue;
             }
             display_image = origin_image.clone();
+            cv::cvtColor(display_image, display_image, cv::COLOR_RGB2BGR);
             JSReq jsReq;
             detectionCount = detectionCount + 1;
             if (detectionCount == this->detectionFrequency) {
@@ -146,7 +147,7 @@ public:
             if (detectionCount == 0) {
                 tmp_det.clear();
                 faceInfo.clear();
-                net->Detect(cudaImage, 1920, 1080, rf, faceInfo);
+                net->Detect(cudaImage, 1920, 1920, rf, faceInfo);
                 printf("faceInfo size:%zu\n", faceInfo.size());
                 for (auto &t : faceInfo) {
                     TrackingBox trackingBox;
@@ -198,10 +199,14 @@ public:
                         WriteText(display_image, displayName, cv::Point(pBox.x, pBox.y), pBox.width, drawer);
                         cv::Rect rect = cv::Rect(pBox.x, pBox.y, pBox.width, pBox.height);
                         DrawRectangle(display_image, rect, 3, 3, color);
+                        for (size_t j = 0; j < 5; j++) {
+                            cv::circle(display_image, Point(it->landmarks[j + 5],it->landmarks[j]),5, Scalar(255,255,255),cv::FILLED, 8,0);
+                        }
+
                         // end put text and draw rectangle
                         if (it->name.empty()){
                             // get face image and landmarks to make request
-                            std::tie(cropedImage, new_left, new_top) = CropFaceImageWithMargin(origin_image,
+                            std::tie(cropedImage, new_left, new_top) = CropFaceImageWithMargin(display_image.clone(),
                                     pBox.x, pBox.y,pBox.x + pBox.width,pBox.y + pBox.height, 1.3);
                             UnlabeledFace *face = jsReq.add_faces();
                             std::vector<uchar> buf;
@@ -240,6 +245,11 @@ public:
             setWindowProperty("camera_client", WND_PROP_FULLSCREEN, WINDOW_FULLSCREEN);
             imshow("camera_client", display_image);
             waitKey(1);
+
+//            font->OverlayText((float4*)cudaImage, 1920, 1920, unknowns, make_float4(255,0,0,255));
+//            font->OverlayText((float4*)cudaImage, 1920, 1920, labels, make_float4(255,255,255,255));
+//            display->RenderOnce(cudaImage, 1920, 1920);
+//            display->SetTitle("VIETTEL");
         }
     }
 

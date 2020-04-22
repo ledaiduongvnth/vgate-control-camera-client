@@ -45,6 +45,8 @@ public:
 	 */
 	static superResNet* Create();
 
+	void * cudaInput;
+
 	/**
 	 * Destroy
 	 */
