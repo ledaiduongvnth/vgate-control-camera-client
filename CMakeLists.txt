@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.2)
 
 PROJECT (camera_client)
 
-option (USE_ARM64    "Set switch to build at ARM 64 platform mode"   ON)
+option (USE_ARM64    "Set switch to build at ARM 64 platform mode"   OFF)
 add_definitions(-DUSE_TENSORRT)
 add_definitions(-DUSE_NPP)
 
