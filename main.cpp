@@ -16,11 +16,8 @@
 #include "jsoncpp/json/json.h"
 #include "X11/Xlib.h"
 #include <unistd.h>
-#include <cudaFont.h>
 #include "DrawText.h"
 #include "gstCamera.h"
-#include "glDisplay.h"
-#include "cudaResize.h"
 #include "superResNet.h"
 #include "fstream"
 
@@ -94,30 +91,9 @@ public:
         bool success, send_success, first_detections = true, capSuccess1, capSuccess2;
         int new_left, new_top, detectionCount = 0, recognitionCount = 0;
         float scale;
-        glDisplay* display = glDisplay::Create();
-        if( !display ){
-            printf("failed to create openGL display\n");
-            throw std::exception();
-        }
-        static cudaFont* font = NULL;
-        if( !font )
-        {
-            font = cudaFont::Create(adaptFontSize(this->fontScale));
-            if( !font )
-            {
-                printf("failed to create openGL display\n");
-                throw std::exception();
-            }
-        }
-//        std::vector< std::pair< std::string, int2 > > labels;
-//        std::vector< std::pair< std::string, int2 > > unknowns;
         RetinaFace* rf = new RetinaFace((string &) "model_path", "net3");
-
-
         while (1) {
             float* cudaImage;
-//            labels.clear();
-//            unknowns.clear();
             capSuccess1 = this->imagesQueue.pop(origin_image);
             if(!capSuccess1){
                 continue;
@@ -178,14 +154,10 @@ public:
                         cv::Scalar color;
                         if (it->name.empty()){
                             displayName = "unknown";
-                            const int2  position = make_int2(pBox.x, pBox.y + 5);
-//                            unknowns.emplace_back(std::pair<std::string, int2>(displayName, position));
                             color = CV_RGB(255, 0, 0);
 
                         } else{
                             displayName = it->name;
-                            const int2  position = make_int2(pBox.x, pBox.y);
-//                            labels.emplace_back(std::pair<std::string, int2>(displayName, position));
                             color = CV_RGB(0, 255, 0);
 
                         }
@@ -234,13 +206,6 @@ public:
             setWindowProperty("camera_client", WND_PROP_FULLSCREEN, WINDOW_FULLSCREEN);
             imshow("camera_client", display_image);
             waitKey(1);
-
-//            font->OverlayText((float4*)cudaImage, this->cameraWidth, this->cameraHeight, unknowns, make_float4(255,0,0,255),
-//                    make_float4(0,0,0,150), 10);
-//            font->OverlayText((float4*)cudaImage, this->cameraWidth, this->cameraHeight, labels, make_float4(255,255,255,255),
-//                    make_float4(0,0,0,150), 10);
-//            display->RenderOnce(cudaImage, this->cameraWidth, this->cameraHeight);
-//            display->SetTitle("VIETTEL");
         }
     }
 
