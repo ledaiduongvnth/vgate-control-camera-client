@@ -113,87 +113,13 @@ string KalmanTracker::randomString() {
     return str;
 }
 
-
-
-
-
-/*
-// --------------------------------------------------------------------
-// Kalman Filter Demonstrating, a 2-d ball demo
-// --------------------------------------------------------------------
-
-const int winHeight = 600;
-const int winWidth = 800;
-
-Point mousePosition = Point(winWidth >> 1, winHeight >> 1);
-
-// mouse event callback
-void mouseEvent(int event, int x, int y, int flags, void *param)
-{
-	if (event == CV_EVENT_MOUSEMOVE) {
-		mousePosition = Point(x, y);
-	}
+void KalmanTracker::save(shared_ptr<ClientReaderWriter<JSReq, JSResp>> stream, bool is_save) {
+    JSReq jsReq;
+    UnlabeledFace *face = jsReq.add_faces();
+    face->set_track_id(source_track_id);
+    face->set_is_saving_history(is_save);
+    bool send_success = stream->Write(jsReq);
+    if (!send_success){
+        throw std::exception();
+    }
 }
-
-void TestKF();
-
-void main()
-{
-	TestKF();
-}
-
-
-void TestKF()
-{
-	int stateNum = 4;
-	int measureNum = 2;
-	KalmanFilter kf = KalmanFilter(stateNum, measureNum, 0);
-
-	// initialization
-	Mat processNoise(stateNum, 1, CV_32F);
-	Mat measurement = Mat::zeros(measureNum, 1, CV_32F);
-
-	kf.transitionMatrix = *(Mat_<float>(stateNum, stateNum) <<
-		1, 0, 1, 0,
-		0, 1, 0, 1,
-		0, 0, 1, 0,
-		0, 0, 0, 1);
-
-	setIdentity(kf.measurementMatrix);
-	setIdentity(kf.processNoiseCov, Scalar::all(1e-2));
-	setIdentity(kf.measurementNoiseCov, Scalar::all(1e-1));
-	setIdentity(kf.errorCovPost, Scalar::all(1));
-
-	randn(kf.statePost, Scalar::all(0), Scalar::all(winHeight));
-
-	namedWindow("Kalman");
-	setMouseCallback("Kalman", mouseEvent);
-	Mat img(winHeight, winWidth, CV_8UC3);
-
-	while (1)
-	{
-		// predict
-		Mat prediction = kf.predict();
-		Point predictPt = Point(prediction.at<float>(0, 0), prediction.at<float>(1, 0));
-
-		// generate measurement
-		Point statePt = mousePosition;
-		measurement.at<float>(0, 0) = statePt.x;
-		measurement.at<float>(1, 0) = statePt.y;
-
-		// update
-		kf.correct(measurement);
-
-		// visualization
-		img.setTo(Scalar(255, 255, 255));
-		circle(img, predictPt, 8, CV_RGB(0, 255, 0), -1); // predicted point as green
-		circle(img, statePt, 8, CV_RGB(255, 0, 0), -1); // current position as red
-
-		imshow("Kalman", img);
-		char code = (char)waitKey(100);
-		if (code == 27 || code == 'q' || code == 'Q')
-			break;
-	}
-	destroyWindow("Kalman");
-}
-*/

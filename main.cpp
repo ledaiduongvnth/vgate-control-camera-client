@@ -169,6 +169,11 @@ public:
                             // get face image and landmarks to make request
                             std::tie(cropedImage, new_left, new_top) = CropFaceImageWithMargin(display_image.clone(),
                                     pBox.x, pBox.y,pBox.x + pBox.width,pBox.y + pBox.height, 1.3);
+                            tie(cropedImage, new_left, new_top) = CropFaceImageWithMargin(origin_image,
+                                    pBox.x, pBox.y,pBox.x + pBox.width,pBox.y + pBox.height, 1.4);
+                            it->new_top = new_top;
+                            it->new_left = new_left;
+                            it->faceImage = cropedImage.clone();
                             UnlabeledFace *face = jsReq.add_faces();
                             std::vector<uchar> buf;
                             success = cv::imencode(".jpg", cropedImage, buf);
@@ -177,13 +182,13 @@ public:
                                 std::string encoded = base64_encode(enc_msg, buf.size());
                                 face->set_track_id(it->source_track_id);
                                 face->set_image_bytes(encoded);
+                                face->set_is_saving_history(false);
                                 for (size_t j = 0; j < 5; j++) {
                                     face->add_landmarks(it->landmarks[j] - (float) new_top);
                                 }
                                 for (size_t j = 5; j < 10; j++) {
                                     face->add_landmarks(it->landmarks[j] - (float) new_left);
                                 }
-                                face->add_landmarks(0);
                             }
                         }
                     }
