@@ -84,9 +84,7 @@ public:
     }
 
     void SendRequests() {
-//        detectNet::Detection* detections = NULL;
         superResNet* net = superResNet::Create();
-        printf("loaded\n");
         cv::Mat origin_image, display_image, cropedImage;
         std::vector<FaceDetectInfo> faceInfo;
         std::vector<LabeledFaceIn> facesOut;
@@ -105,7 +103,7 @@ public:
         static cudaFont* font = NULL;
         if( !font )
         {
-            font = cudaFont::Create(adaptFontSize(this->fontScale));
+            font = cudaFont::Create(adaptFontSize(32));
             if( !font )
             {
                 printf("failed to create openGL display\n");
@@ -148,7 +146,6 @@ public:
                 tmp_det.clear();
                 faceInfo.clear();
                 net->Detect(cudaImage, 1920, 1920, rf, faceInfo);
-                printf("faceInfo size:%zu\n", faceInfo.size());
                 for (auto &t : faceInfo) {
                     TrackingBox trackingBox;
                     trackingBox.box.x = t.rect.x1 * scale;
@@ -171,7 +168,6 @@ public:
                     Rect_<float> pBox = (*it).box;
                     if (pBox.x > 0 && pBox.y > 0 && pBox.x + pBox.width < origin_image.size().width &&
                         pBox.y + pBox.height < origin_image.size().height) {
-                        // attach detection results to the trackers
                         if (!facesOut.empty()) {
                             for (auto &k : facesOut) {
                                 if (k.track_id == it->source_track_id) {
@@ -179,8 +175,6 @@ public:
                                 }
                             }
                         }
-                        // end attach detection results to the trackers
-                        // put text and draw rectangle
                         std::string displayName;
                         cv::Scalar color;
                         if (it->name.empty()){
@@ -246,8 +240,10 @@ public:
 //            imshow("camera_client", display_image);
 //            waitKey(1);
 
-            font->OverlayText((float4*)cudaImage, 1920, 1080, unknowns, make_float4(255,0,0,255));
-            font->OverlayText((float4*)cudaImage, 1920, 1080, labels, make_float4(255,255,255,255));
+            font->OverlayText((float4*)cudaImage, 1920, 1080, unknowns, make_float4(255,0,0,255),
+                    make_float4(0,0,0,255), 10);
+            font->OverlayText((float4*)cudaImage, 1920, 1080, labels, make_float4(255,255,255,255),
+                    make_float4(0,0,0,255), 10);
             display->RenderOnce(cudaImage, 1920, 1080);
             display->SetTitle("VIETTEL");
         }
@@ -290,14 +286,12 @@ public:
             printf("failed to open camera for streaming\n");
             throw std::exception();
         }
-        double delay = 0, timer = 0;
         bool capSuccess;
         cv::Mat origin_image;
         while (1){
             float *imgRGBA = NULL;
             void *cpu = NULL;
             void *gpu = NULL;
-            timer = (double) cv::getTickCount();
             capSuccess = camera->Capture(&cpu, &gpu, 1000);
             if (!capSuccess){
                 printf("failed to capture frame\n");
@@ -307,8 +301,6 @@ public:
                 printf("failed to convert from NV12 to RGBA\n");
             }
             origin_image = cv::Mat(1080, 1920, CV_8UC3, (void *) cpu);
-            delay = ((double) cv::getTickCount() - timer) * 1000.0 / cv::getTickFrequency();
-//            printf("%f\n", delay);
             if (!capSuccess){
                 camera = gstCamera::Create(1920, 1080, "rtspsrc location=rtsp://172.16.10.108/101 user-id=admin user-pw=123456a@ latency=0 ! rtph264depay !  h264parse ! nvv4l2decoder ! nvvidconv ! video/x-raw, format=BGRx, width=1920, height=1080   ");
                 if( !camera )

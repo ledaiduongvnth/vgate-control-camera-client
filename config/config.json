@@ -10,7 +10,7 @@
   "max_age": 2,
   "min_hits": 3,
   "face_detect_threash": 0.9,
-  "iou_threash": 0.4,
+  "iou_threash": 0.3,
   "font_scale": 40,
   "model_path": "../facedetect/model/retina.onnx",
   "files_store_host": "http://10.61.189.142:5001/get-images",

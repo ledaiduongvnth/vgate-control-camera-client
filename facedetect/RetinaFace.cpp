@@ -2,15 +2,8 @@
 #include <cuda_runtime_api.h>
 #include <tuple>
 
-
-void imageROIResize8U3C(void *src, int srcWidth, int srcHeight, cv::Rect imgROI, void *dst, int dstWidth, int dstHeight);
-void convertBGR2RGBfloat(void *src, void *dst, int width, int height, cudaStream_t stream);
-void imageSplit(const void *src, float *dst, int width, int height, cudaStream_t stream);
-
-//processing
 anchor_win  _whctrs(anchor_box anchor)
 {
-    //Return width, height, x center, and y center for an anchor (window).
     anchor_win win;
     win.w = anchor.x2 - anchor.x1 + 1;
     win.h = anchor.y2 - anchor.y1 + 1;
@@ -22,8 +15,6 @@ anchor_win  _whctrs(anchor_box anchor)
 
 anchor_box _mkanchors(anchor_win win)
 {
-    //Given a vector of widths (ws) and heights (hs) around a center
-    //(x_ctr, y_ctr), output a set of anchors (windows).
     anchor_box anchor;
     anchor.x1 = win.x_ctr - 0.5 * (win.w - 1);
     anchor.y1 = win.y_ctr - 0.5 * (win.h - 1);
@@ -54,7 +45,6 @@ vector<anchor_box> _ratio_enum(anchor_box anchor, vector<float> ratios)
 
 vector<anchor_box> _scale_enum(anchor_box anchor, vector<int> scales)
 {
-    //Enumerate a set of anchors for each scale wrt an anchor.
     vector<anchor_box> anchors;
     for(size_t i = 0; i < scales.size(); i++) {
         anchor_win win = _whctrs(anchor);
@@ -72,9 +62,6 @@ vector<anchor_box> _scale_enum(anchor_box anchor, vector<int> scales)
 vector<anchor_box> generate_anchors(int base_size = 16, vector<float> ratios = {0.5, 1, 2},
                       vector<int> scales = {8, 64}, int stride = 16, bool dense_anchor = false)
 {
-    //Generate anchor (reference) windows by enumerating aspect ratios X
-    //scales wrt a reference (0, 0, 15, 15) window.
-
     anchor_box base_anchor;
     base_anchor.x1 = 0;
     base_anchor.y1 = 0;
@@ -107,9 +94,6 @@ vector<anchor_box> generate_anchors(int base_size = 16, vector<float> ratios = {
 
 vector<vector<anchor_box>> generate_anchors_fpn(bool dense_anchor = false, vector<anchor_cfg> cfg = {})
 {
-    //Generate anchor (reference) windows by enumerating aspect ratios X
-    //scales wrt a reference (0, 0, 15, 15) window.
-
     vector<vector<anchor_box>> anchors;
     for(size_t i = 0; i < cfg.size(); i++) {
         //stride从小到大[32 16 8]
@@ -128,13 +112,6 @@ vector<vector<anchor_box>> generate_anchors_fpn(bool dense_anchor = false, vecto
 
 vector<anchor_box> anchors_plane(int height, int width, int stride, vector<anchor_box> base_anchors)
 {
-    /*
-    height: height of plane
-    width:  width of plane
-    stride: stride ot the original image
-    anchors_base: a base set of anchors
-    */
-
     vector<anchor_box> all_anchors;
     for(size_t k = 0; k < base_anchors.size(); k++) {
         for(int ih = 0; ih < height; ih++) {
@@ -171,10 +148,6 @@ void clip_boxes(vector<anchor_box> &boxes, int width, int height)
         if(boxes[i].y2 > height - 1) {
             boxes[i].y2 = height -1;
         }
-//        boxes[i].x1 = std::max<float>(std::min<float>(boxes[i].x1, width - 1), 0);
-//        boxes[i].y1 = std::max<float>(std::min<float>(boxes[i].y1, height - 1), 0);
-//        boxes[i].x2 = std::max<float>(std::min<float>(boxes[i].x2, width - 1), 0);
-//        boxes[i].y2 = std::max<float>(std::min<float>(boxes[i].y2, height - 1), 0);
     }
 }
 
@@ -193,21 +166,12 @@ void clip_boxes(anchor_box &box, int width, int height)
     if(box.y2 > height - 1) {
         box.y2 = height -1;
     }
-//    boxes[i].x1 = std::max<float>(std::min<float>(boxes[i].x1, width - 1), 0);
-//    boxes[i].y1 = std::max<float>(std::min<float>(boxes[i].y1, height - 1), 0);
-//    boxes[i].x2 = std::max<float>(std::min<float>(boxes[i].x2, width - 1), 0);
-//    boxes[i].y2 = std::max<float>(std::min<float>(boxes[i].y2, height - 1), 0);
-
 }
 
-//######################################################################
-//retinaface
-//######################################################################
 
 RetinaFace::RetinaFace(string &model, string network, float nms)
     : network(network), nms_threshold(nms)
 {
-    //主干网络选择
     int fmc = 3;
 
     if (network=="ssh" || network=="vgg") {
@@ -243,7 +207,6 @@ RetinaFace::RetinaFace(string &model, string network, float nms)
         std::cout << "network setting error" << network << std::endl;
     }
 
-    //anchor配置
     if(fmc == 3) {
         _feat_stride_fpn = {32, 16, 8};
         anchor_cfg tmp;
@@ -272,22 +235,6 @@ RetinaFace::RetinaFace(string &model, string network, float nms)
         std::cout << "please reconfig anchor_cfg" << network << std::endl;
     }
 
-//    //加载网络
-//#ifdef USE_TENSORRT
-//    trtNet = new TrtRetinaFaceNet("retina");
-//    trtNet->buildTrtContext(model);
-//    int maxbatchsize = trtNet->getMaxBatchSize();
-//    int channels = trtNet->getChannel();
-//    int inputW = trtNet->getNetWidth();
-//    int inputH = trtNet->getNetHeight();
-//    //
-//    int inputsize = maxbatchsize * channels * inputW * inputH * sizeof(float);
-//    cpuBuffers = (float*)malloc(inputsize);
-//    memset(cpuBuffers, 0, inputsize);
-
-//    vector<int> outputW = trtNet->getOutputWidth();
-//    vector<int> outputH = trtNet->getOutputHeight();
-
     vector<int> outputW = {20, 40, 80};
     vector<int> outputH = {20, 40, 80};
 
@@ -298,62 +245,16 @@ RetinaFace::RetinaFace(string &model, string network, float nms)
         string key = "stride" + std::to_string(_feat_stride_fpn[i]);
         _anchors_fpn[key] = anchors_fpn[i];
         _num_anchors[key] = anchors_fpn[i].size();
-        //有三组不同输出宽高
         _anchors[key] = anchors_plane(outputH[i], outputW[i], stride, _anchors_fpn[key]);
     }
-//#else
-//
-//#ifdef CPU_ONLY
-//    Caffe::set_mode(Caffe::CPU);
-//#else
-//    Caffe::set_mode(Caffe::GPU);
-//#endif
-//    /* Load the network. */
-//    Net_.reset(new Net<float>((model + "/mnet-deconv-0517.prototxt"), TEST));
-//    Net_->CopyTrainedLayersFrom((model + "/mnet-deconv-0517.caffemodel"));
-//
-//    bool dense_anchor = false;
-//    vector<vector<anchor_box>> anchors_fpn = generate_anchors_fpn(dense_anchor, cfg);
-//    for(size_t i = 0; i < anchors_fpn.size(); i++) {
-//        string key = "stride" + std::to_string(_feat_stride_fpn[i]);
-//        _anchors_fpn[key] = anchors_fpn[i];
-//        _num_anchors[key] = anchors_fpn[i].size();
-//    }
-// #endif
-//
-//#ifdef USE_NPP
-//    //最大图片尺寸如果比这个大会出错
-//    int maxSize = 4096 * 3072 * 3;
-//    int maxResize = 2000 * 2000 * 3;
-//    if (cudaMalloc(&_gpu_data8u.data, maxSize) != cudaSuccess) {
-//        throw;
-//    }
-//    if (cudaMalloc(&_resize_gpu_data8u.data, maxResize) != cudaSuccess) {
-//        throw;
-//    }
-//    if (cudaMalloc(&_resize_gpu_data32f.data, maxResize * sizeof(float)) != cudaSuccess) {
-//        throw;
-//    }
-//#endif
 }
 
 RetinaFace::~RetinaFace()
 {
-//#ifdef USE_TENSORRT
-//    delete trtNet;
-//    free(cpuBuffers);
-//#endif
 }
 
 vector<anchor_box> RetinaFace::bbox_pred(vector<anchor_box> anchors, vector<cv::Vec4f> regress)
 {
-    //"""
-    //  Transform the set of class-agnostic boxes into class-specific boxes
-    //  by applying the predicted offsets (box_deltas)
-    //  :param boxes: !important [N 4]
-    //  :param box_deltas: [N, 4 * num_classes]
-    //  :return: [N 4 * num_classes]
-    //  """
 
     vector<anchor_box> rects(anchors.size());
     for(size_t i = 0; i < anchors.size(); i++) {
@@ -450,7 +351,6 @@ std::vector<FaceDetectInfo> RetinaFace::nms(std::vector<FaceDetectInfo>& bboxes,
     while (!all_merged) {
         while (select_idx < num_bbox && mask_merged[select_idx] == 1)
             select_idx++;
-        //如果全部执行完则返回
         if (select_idx == num_bbox) {
             all_merged = true;
             continue;

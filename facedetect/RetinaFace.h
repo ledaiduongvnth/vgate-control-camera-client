@@ -5,12 +5,9 @@
 #include <vector>
 #include <map>
 #include <opencv2/opencv.hpp>
-//#include <caffe/caffe.hpp>
-//#include "tensorrt/trtretinafacenet.h"
 
 using namespace cv;
 using namespace std;
-//using namespace caffe;
 
 struct anchor_win
 {
@@ -75,46 +72,23 @@ private:
     static bool CompareBBox(const FaceDetectInfo &a, const FaceDetectInfo &b);
     std::vector<FaceDetectInfo> nms(std::vector<FaceDetectInfo> &bboxes, float threshold);
 private:
-//    boost::shared_ptr<Net<float> > Net_;
-    
-//    TrtRetinaFaceNet *trtNet;
-    float *cpuBuffers;
+
 
     float pixel_means[3] = {0.0, 0.0, 0.0};
     float pixel_stds[3] = {1.0, 1.0, 1.0};
     float pixel_scale = 1.0;
 
-    int ctx_id;
     string network;
-    float decay4;
     float nms_threshold;
-    bool vote;
-    bool nocrop;
-
     vector<float> _ratio;
     vector<anchor_cfg> cfg;
 
     vector<int> _feat_stride_fpn;
-    //每一层fpn的anchor形状
     map<string, vector<anchor_box>> _anchors_fpn;
-    //每一层所有点的anchor
     map<string, vector<anchor_box>> _anchors;
-    //每一层fpn有几种形状的anchor
-    //也就是ratio个数乘以scales个数
+
     map<string, int> _num_anchors;
 
-#ifdef USE_NPP
-    typedef struct GPUImg {
-    void *data;
-    int width;
-    int height;
-    int channel;
-    } GPUImg;
-
-    GPUImg _gpu_data8u;
-    GPUImg _resize_gpu_data8u;
-    GPUImg _resize_gpu_data32f;
-#endif
 };
 
 #endif // RETINAFACE_H
