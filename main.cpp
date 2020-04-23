@@ -8,7 +8,6 @@
 #include <grpcpp/create_channel.h>
 #include <grpcpp/security/credentials.h>
 #include "multiple_camera_server.grpc.pb.h"
-#include "base64.h"
 #include "image_proc.h"
 #include "queue.h"
 #include "SORTtracker.h"
@@ -20,6 +19,7 @@
 #include "gstCamera.h"
 #include "superResNet.h"
 #include "fstream"
+#include "base64.h"
 
 
 using grpc::Channel;
@@ -137,7 +137,7 @@ public:
                 }
             }
             this->facesQueue.pop(facesOut);
-            tracker.step(tmp_det, origin_image.size());
+            tracker.step(tmp_det, origin_image.size(), stream);
             if (!faceInfo.empty()) {
                 for (auto it = tracker.trackers.begin(); it != tracker.trackers.end();) {
                     Rect_<float> pBox = (*it).box;
@@ -166,7 +166,6 @@ public:
                         DrawRectangle(display_image, rect, 3, 3, color);
 
                         if (it->name.empty()){
-                            // get face image and landmarks to make request
                             std::tie(cropedImage, new_left, new_top) = CropFaceImageWithMargin(display_image.clone(),
                                     pBox.x, pBox.y,pBox.x + pBox.width,pBox.y + pBox.height, 1.3);
                             tie(cropedImage, new_left, new_top) = CropFaceImageWithMargin(origin_image,
@@ -179,7 +178,7 @@ public:
                             success = cv::imencode(".jpg", cropedImage, buf);
                             if (success) {
                                 auto *enc_msg = reinterpret_cast<unsigned char *>(buf.data());
-                                std::string encoded = base64_encode(enc_msg, buf.size());
+                                std::string encoded = Base64Encode(enc_msg, buf.size());
                                 face->set_track_id(it->source_track_id);
                                 face->set_image_bytes(encoded);
                                 face->set_is_saving_history(false);
@@ -313,7 +312,7 @@ int main(int argc, char **argv) {
     Json::Reader reader;
     Json::Value configs;
     reader.parse(file_input, configs);
-    std::string multiple_camera_host = configs["multiple_camera_host"].asString() + ":50052";
+    std::string multiple_camera_host = configs["multiple_camera_host"].asString() + ":50051";
     int numberLanes = configs["strLane"].asInt();
     int detectionFrequency = configs["detection_frequency"].asInt();
     int recognitionFrequency = configs["recognition_frequency"].asInt();

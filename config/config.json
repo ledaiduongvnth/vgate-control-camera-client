@@ -1,6 +1,6 @@
 {
   "strLane": 1,
-  "multiple_camera_host": "172.16.10.107",
+  "multiple_camera_host": "172.16.10.12",
   "camera_source": "172.16.10.108",
   "camera_width": 1280,
   "camera_height": 720,

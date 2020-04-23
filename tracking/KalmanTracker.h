@@ -7,8 +7,6 @@
 #include "opencv2/video/tracking.hpp"
 #include "opencv2/highgui/highgui.hpp"
 #include "multiple_camera_server.grpc.pb.h"
-#include "base64.h"
-
 
 using multiple_camera_server::JSReq;
 using multiple_camera_server::JSResp;
