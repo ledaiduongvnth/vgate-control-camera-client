@@ -25,10 +25,6 @@
 #include "fstream"
 
 
-
-
-
-
 using grpc::Channel;
 using grpc::ClientContext;
 using grpc::ClientReader;
@@ -58,12 +54,14 @@ public:
     float faceDetectThreash;
     int fontScale;
     int delayToIgnore;
+    int cameraWidth;
+    int cameraHeight;
 
     CameraClient(std::string camera_source, std::string multiple_camera_host, std::string model_path, int numberLanes, int detectionFrequency,
-                 int recognitionFrequency, int maxAge, int minHits, float iouThreash,float faceDetectThreash, int fontScale, int delayToIgnore, cv::Size screenSize) {
+                 int recognitionFrequency, int maxAge, int minHits, float iouThreash,float faceDetectThreash, int fontScale, int delayToIgnore,
+                 cv::Size screenSize,int cameraWidth,int cameraHeight) {
         this->camera_source = camera_source;
         this->multiple_camera_host = multiple_camera_host;
-//        this->rf = new RetinaFace(model_path, "net3");
         this->screenSize = screenSize;
         this->numberLanes = numberLanes;
         this->detectionFrequency = detectionFrequency;
@@ -74,6 +72,8 @@ public:
         this->iouThreash = iouThreash;
         this->fontScale = fontScale;
         this->delayToIgnore = delayToIgnore;
+        this->cameraWidth = cameraWidth;
+        this->cameraHeight = cameraHeight;
         CreateConnectionStream();
     }
 
@@ -94,7 +94,6 @@ public:
         bool success, send_success, first_detections = true, capSuccess1, capSuccess2;
         int new_left, new_top, detectionCount = 0, recognitionCount = 0;
         float scale;
-        double delay = 0, timer = 0;
         glDisplay* display = glDisplay::Create();
         if( !display ){
             printf("failed to create openGL display\n");
@@ -103,22 +102,22 @@ public:
         static cudaFont* font = NULL;
         if( !font )
         {
-            font = cudaFont::Create(adaptFontSize(32));
+            font = cudaFont::Create(adaptFontSize(this->fontScale));
             if( !font )
             {
                 printf("failed to create openGL display\n");
                 throw std::exception();
             }
         }
-        std::vector< std::pair< std::string, int2 > > labels;
-        std::vector< std::pair< std::string, int2 > > unknowns;
+//        std::vector< std::pair< std::string, int2 > > labels;
+//        std::vector< std::pair< std::string, int2 > > unknowns;
         RetinaFace* rf = new RetinaFace((string &) "model_path", "net3");
 
 
         while (1) {
             float* cudaImage;
-            labels.clear();
-            unknowns.clear();
+//            labels.clear();
+//            unknowns.clear();
             capSuccess1 = this->imagesQueue.pop(origin_image);
             if(!capSuccess1){
                 continue;
@@ -145,7 +144,7 @@ public:
             if (detectionCount == 0) {
                 tmp_det.clear();
                 faceInfo.clear();
-                net->Detect(cudaImage, 1920, 1920, rf, faceInfo);
+                net->Detect(cudaImage, this->cameraWidth, this->cameraHeight, rf, faceInfo, this->faceDetectThreash);
                 for (auto &t : faceInfo) {
                     TrackingBox trackingBox;
                     trackingBox.box.x = t.rect.x1 * scale;
@@ -179,25 +178,21 @@ public:
                         cv::Scalar color;
                         if (it->name.empty()){
                             displayName = "unknown";
-                            const int2  position = make_int2(pBox.x, pBox.y);
-                            unknowns.emplace_back(std::pair<std::string, int2>(displayName, position));
+                            const int2  position = make_int2(pBox.x, pBox.y + 5);
+//                            unknowns.emplace_back(std::pair<std::string, int2>(displayName, position));
                             color = CV_RGB(255, 0, 0);
 
                         } else{
                             displayName = it->name;
                             const int2  position = make_int2(pBox.x, pBox.y);
-                            labels.emplace_back(std::pair<std::string, int2>(displayName, position));
+//                            labels.emplace_back(std::pair<std::string, int2>(displayName, position));
                             color = CV_RGB(0, 255, 0);
 
                         }
-//                        WriteText(display_image, displayName, cv::Point(pBox.x, pBox.y), pBox.width, drawer);
-//                        cv::Rect rect = cv::Rect(pBox.x, pBox.y, pBox.width, pBox.height);
-//                        DrawRectangle(display_image, rect, 3, 3, color);
-//                        for (size_t j = 0; j < 5; j++) {
-//                            cv::circle(display_image, Point(it->landmarks[j + 5],it->landmarks[j]),5, Scalar(255,255,255),cv::FILLED, 8,0);
-//                        }
+                        WriteText(display_image, displayName, cv::Point(pBox.x, pBox.y), pBox.width, drawer);
+                        cv::Rect rect = cv::Rect(pBox.x, pBox.y, pBox.width, pBox.height);
+                        DrawRectangle(display_image, rect, 3, 3, color);
 
-                        // end put text and draw rectangle
                         if (it->name.empty()){
                             // get face image and landmarks to make request
                             std::tie(cropedImage, new_left, new_top) = CropFaceImageWithMargin(display_image.clone(),
@@ -234,18 +229,18 @@ public:
                     }
                 }
             }
-//            resize(display_image, display_image, screenSize);
-//            namedWindow("camera_client", WND_PROP_FULLSCREEN);
-//            setWindowProperty("camera_client", WND_PROP_FULLSCREEN, WINDOW_FULLSCREEN);
-//            imshow("camera_client", display_image);
-//            waitKey(1);
+            resize(display_image, display_image, screenSize);
+            namedWindow("camera_client", WND_PROP_FULLSCREEN);
+            setWindowProperty("camera_client", WND_PROP_FULLSCREEN, WINDOW_FULLSCREEN);
+            imshow("camera_client", display_image);
+            waitKey(1);
 
-            font->OverlayText((float4*)cudaImage, 1920, 1080, unknowns, make_float4(255,0,0,255),
-                    make_float4(0,0,0,255), 10);
-            font->OverlayText((float4*)cudaImage, 1920, 1080, labels, make_float4(255,255,255,255),
-                    make_float4(0,0,0,255), 10);
-            display->RenderOnce(cudaImage, 1920, 1080);
-            display->SetTitle("VIETTEL");
+//            font->OverlayText((float4*)cudaImage, this->cameraWidth, this->cameraHeight, unknowns, make_float4(255,0,0,255),
+//                    make_float4(0,0,0,150), 10);
+//            font->OverlayText((float4*)cudaImage, this->cameraWidth, this->cameraHeight, labels, make_float4(255,255,255,255),
+//                    make_float4(0,0,0,150), 10);
+//            display->RenderOnce(cudaImage, this->cameraWidth, this->cameraHeight);
+//            display->SetTitle("VIETTEL");
         }
     }
 
@@ -275,7 +270,7 @@ public:
         }
     }
     void ReadImages(){
-        gstCamera* camera = gstCamera::Create(1920, 1080, "rtspsrc location=rtsp://172.16.10.108/101 user-id=admin user-pw=123456a@ latency=0 ! rtph264depay !  h264parse ! nvv4l2decoder ! nvvidconv ! video/x-raw, format=BGRx, width=1920, height=1080");
+        gstCamera* camera = gstCamera::Create(this->cameraWidth, this->cameraHeight, "rtspsrc location=rtsp://172.16.10.108/101 user-id=admin user-pw=123456a@ latency=0 ! rtph264depay !  h264parse ! nvv4l2decoder ! nvvidconv ! video/x-raw, format=BGRx");
         if( !camera )
         {
             printf("failed to initialize camera device\n");
@@ -300,9 +295,9 @@ public:
             if (!capSuccess) {
                 printf("failed to convert from NV12 to RGBA\n");
             }
-            origin_image = cv::Mat(1080, 1920, CV_8UC3, (void *) cpu);
+            origin_image = cv::Mat(this->cameraHeight, this->cameraWidth, CV_8UC3, (void *) cpu);
             if (!capSuccess){
-                camera = gstCamera::Create(1920, 1080, "rtspsrc location=rtsp://172.16.10.108/101 user-id=admin user-pw=123456a@ latency=0 ! rtph264depay !  h264parse ! nvv4l2decoder ! nvvidconv ! video/x-raw, format=BGRx, width=1920, height=1080   ");
+                camera = gstCamera::Create(this->cameraWidth, this->cameraHeight, "rtspsrc location=rtsp://172.16.10.108/101 user-id=admin user-pw=123456a@ latency=0 ! rtph264depay !  h264parse ! nvv4l2decoder ! nvvidconv ! video/x-raw, format=BGRx");
                 if( !camera )
                 {
                     printf("failed to initialize camera device\n");
@@ -337,7 +332,6 @@ private:
     std::shared_ptr<Channel> channel;
     std::unique_ptr<FaceProcessing::Stub> stub_{};
     std::shared_ptr<ClientReaderWriter<JSReq, JSResp>> stream;
-//    RetinaFace *rf;
     CConcurrentQueue<std::vector<LabeledFaceIn>> facesQueue;
     CConcurrentQueue<cv::Mat> imagesQueue;
     CConcurrentQueue<float*> imagesQueue2;
@@ -359,7 +353,8 @@ int main(int argc, char **argv) {
     float iouThreash = configs["iou_threash"].asFloat();
     int fontScale = configs["font_scale"].asInt();
     int delayToIgnore = configs["delay_to_ignore"].asInt();
-
+    int cameraWidth = configs["camera_width"].asInt();
+    int cameraHeight = configs["camera_height"].asInt();
 
     std::string camera_source;
     if (configs["hikvision"].asBool()){
@@ -380,7 +375,8 @@ int main(int argc, char **argv) {
     std::string model_path = configs["model_path"].asString();
     Screen *screen = DefaultScreenOfDisplay(XOpenDisplay(NULL));
     CameraClient cameraClient(camera_source, multiple_camera_host, model_path, numberLanes, detectionFrequency, recognitionFrequency,
-                              maxAge, minHits, iouThreash, faceDetectThreash, fontScale, delayToIgnore, cv::Size(screen->width, screen->height));
+                              maxAge, minHits, iouThreash, faceDetectThreash, fontScale, delayToIgnore, cv::Size(screen->width, screen->height),
+                              cameraWidth, cameraHeight);
     try {
         std::thread t0 = cameraClient.ReadImagesThread();
         std::thread t1 = cameraClient.ReceiveResponsesThread();

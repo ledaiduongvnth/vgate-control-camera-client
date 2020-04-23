@@ -51,7 +51,7 @@ public:
 	 * Destroy
 	 */
 	~superResNet();
-    int Detect(float* rgba, uint32_t width, uint32_t height, RetinaFace* rf, std::vector<FaceDetectInfo>& faceInfo);
+    int Detect(float* rgba, uint32_t width, uint32_t height, RetinaFace* rf, std::vector<FaceDetectInfo>& faceInfo, float threshold);
 
 
 protected:

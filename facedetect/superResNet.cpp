@@ -94,7 +94,7 @@ superResNet* superResNet::Create()
 	return net;
 }
 
-int superResNet::Detect( float* rgba, uint32_t width, uint32_t height, RetinaFace* rf, std::vector<FaceDetectInfo>& faceInfo)
+int superResNet::Detect( float* rgba, uint32_t width, uint32_t height, RetinaFace* rf, std::vector<FaceDetectInfo>& faceInfo, float threshold)
 {
 
     if( !rgba || width == 0 || height == 0  )
@@ -103,9 +103,9 @@ int superResNet::Detect( float* rgba, uint32_t width, uint32_t height, RetinaFac
         return -1;
     }
 
-    imagePadding32f4C(rgba, 1920, 1080, cudaInput, 1920, 1920, 0, 0);
+    imagePadding32f4C(rgba, width, height, cudaInput, width, width, 0, 0);
 
-    if( CUDA_FAILED(cudaPreImageNetRGB((float4*)cudaInput, 1920, 1920, mInputCUDA, 640, 640, GetStream())) )
+    if( CUDA_FAILED(cudaPreImageNetRGB((float4*)cudaInput, width, width, mInputCUDA, 640, 640, GetStream())) )
     {
         printf(LOG_TRT "imageNet::PreProcess() -- cudaPreImageNetNormMeanRGB() failed\n");
         return false;
@@ -130,7 +130,7 @@ int superResNet::Detect( float* rgba, uint32_t width, uint32_t height, RetinaFac
         std::vector<float> outputi = std::vector<float>(mOutputs[i].CPU, mOutputs[i].CPU + mOutputs[i].size / 4);
         results.emplace_back(outputi);
     }
-    rf->detect(results, 0.7, faceInfo, 640);
+    rf->detect(results, threshold, faceInfo, 640);
 
     return numDetections;
 }
