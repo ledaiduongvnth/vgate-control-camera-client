@@ -1,17 +1,18 @@
 {
-  "camera_ip": "172.16.10.108",
+  "camera_ip": "172.16.10.84",
   "camera_width": 1280,
   "camera_height": 720,
   "camera_type": "hikvision",
   "user_name": "admin",
-  "pass_word": "123456a@",
+  "pass_word": "abcd1234",
   "multiple_camera_host": "172.16.10.12",
   "detection_frequency": 1,
   "recognition_frequency": 4,
   "max_age": 2,
   "min_hits": 3,
-  "face_detect_threash": 0.8,
-  "iou_threash": 0.3,
+  "face_detect_threash": 0.7,
+  "iou_threash": 0.4,
   "font_scale": 32,
-  "registration_set_id": 1
+  "area_id": 3,
+  "direction" : "OUT"
 }

@@ -47,11 +47,12 @@ public:
     int fontScale;
     int cameraWidth;
     int cameraHeight;
-    int registrationSetId;
+    int areaId;
+    std::string direction;
 
-    CameraClient(std::string camera_source, std::string multiple_camera_host, int registrationSetId,
+    CameraClient(std::string camera_source, std::string multiple_camera_host, int areaId,
                  int detectionFrequency, int recognitionFrequency, int maxAge, int minHits, float iouThreash,
-                 float faceDetectThreash, int fontScale, cv::Size screenSize, int cameraWidth, int cameraHeight) {
+                 float faceDetectThreash, int fontScale, cv::Size screenSize, int cameraWidth, int cameraHeight, std::string direction) {
         this->camera_source = camera_source;
         this->multiple_camera_host = multiple_camera_host;
         this->screenSize = screenSize;
@@ -64,7 +65,8 @@ public:
         this->fontScale = fontScale;
         this->cameraWidth = cameraWidth;
         this->cameraHeight = cameraHeight;
-        this->registrationSetId = registrationSetId;
+        this->areaId = areaId;
+        this->direction = direction;
         CreateConnectionStream();
     }
 
@@ -72,8 +74,9 @@ public:
         this->channel = grpc::CreateChannel(this->multiple_camera_host, grpc::InsecureChannelCredentials());
         this->stub_ = FaceProcessing::NewStub(channel);
         ClientContext* context = new ClientContext;
-        context->AddMetadata("registration_set_id", grpc::string(std::to_string(this->registrationSetId)));
-        this->stream = this->stub_->recognize_face_js(new ClientContext);
+        context->AddMetadata("area_id", grpc::string(std::to_string(this->areaId)));
+        context->AddMetadata("direction", grpc::string(this->direction));
+        this->stream = this->stub_->recognize_face_js(context);
     }
 
     void SendRequests() {
@@ -316,13 +319,14 @@ int main(int argc, char **argv) {
     float faceDetectThreash = configs["face_detect_threash"].asFloat();
     float iouThreash = configs["iou_threash"].asFloat();
     int fontScale = configs["font_scale"].asInt();
-    int registrationSetId = configs["registration_set_id"].asInt();
+    int areaId = configs["area_id"].asInt();
+    std::string direction = configs["direction"].asString();
 
     std::string camera_source = MakeCameraSource(cameraIP, cameraType, userName, passWord);
     Screen *screen = DefaultScreenOfDisplay(XOpenDisplay(NULL));
-    CameraClient cameraClient(camera_source, multiple_camera_host, registrationSetId, detectionFrequency,
+    CameraClient cameraClient(camera_source, multiple_camera_host, areaId, detectionFrequency,
                               recognitionFrequency, maxAge, minHits, iouThreash, faceDetectThreash, fontScale,
-                              cv::Size(screen->width, screen->height), cameraWidth, cameraHeight);
+                              cv::Size(screen->width, screen->height), cameraWidth, cameraHeight, direction);
     try {
         std::thread t0 = cameraClient.ReadImagesThread();
         std::thread t1 = cameraClient.ReceiveResponsesThread();
