@@ -71,6 +71,8 @@ public:
     void CreateConnectionStream() {
         this->channel = grpc::CreateChannel(this->multiple_camera_host, grpc::InsecureChannelCredentials());
         this->stub_ = FaceProcessing::NewStub(channel);
+        ClientContext* context = new ClientContext;
+        context->AddMetadata("registration_set_id", grpc::string(std::to_string(this->registrationSetId)));
         this->stream = this->stub_->recognize_face_js(new ClientContext);
     }
 

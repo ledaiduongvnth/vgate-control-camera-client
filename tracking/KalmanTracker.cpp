@@ -120,6 +120,7 @@ void KalmanTracker::save(shared_ptr<ClientReaderWriter<JSReq, JSResp>> stream, b
     face->set_is_saving_history(is_save);
     bool send_success = stream->Write(jsReq);
     if (!send_success){
+        printf("failed to send grpc\n");
         throw std::exception();
     }
 }
