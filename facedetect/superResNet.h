@@ -43,7 +43,7 @@ public:
 	/**
 	 * Load super resolution network
 	 */
-	static superResNet* Create();
+	static superResNet* Create(int cameraWidth, int cameraHeight, std::string camera_source);
 
 	float* cudaInput;
 
@@ -55,7 +55,7 @@ public:
 
 
 protected:
-	superResNet();
+	superResNet(int cameraWidth, int cameraHeight, std::string camera_source);
 };
 
 

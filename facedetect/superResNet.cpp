@@ -33,9 +33,9 @@ void imagePadding32f4C(void *src, int srcWidth, int srcHeight, void *dst, int ds
 
 
 // constructor
-superResNet::superResNet()
+superResNet::superResNet(int cameraWidth, int cameraHeight, std::string camera_source)
 {
-    gstCamera* camera = gstCamera::Create(1920, 1080, "rtspsrc location=rtsp://172.16.10.108/101 user-id=admin user-pw=123456a@ latency=0 ! rtph264depay !  h264parse ! nvv4l2decoder ! nvvidconv ! video/x-raw, format=BGRx, width=1920, height=1080");
+    gstCamera *camera = gstCamera::Create(cameraWidth, cameraHeight, camera_source.c_str());
     if( !camera )
     {
         printf("failed to initialize camera device\n");
@@ -63,9 +63,9 @@ superResNet::~superResNet()
 
 
 // Create
-superResNet* superResNet::Create()
+superResNet* superResNet::Create(int cameraWidth, int cameraHeight, std::string camera_source)
 {
-	superResNet* net = new superResNet();
+	superResNet* net = new superResNet(cameraWidth, cameraHeight, camera_source);
 
 	const char* model_path  = "../facedetect/model/retina.onnx";
 	const char* input_blob  = "data_input";

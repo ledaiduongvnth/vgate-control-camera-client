@@ -77,7 +77,7 @@ public:
     }
 
     void SendRequests() {
-        superResNet *net = superResNet::Create();
+        superResNet *net = superResNet::Create(this->cameraWidth, this->cameraHeight, this->camera_source);
         cv::Mat origin_image, display_image, cropedImage;
         std::vector<FaceDetectInfo> faceInfo;
         std::vector<LabeledFaceIn> facesOut;
