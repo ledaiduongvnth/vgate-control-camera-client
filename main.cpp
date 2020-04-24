@@ -21,7 +21,6 @@
 #include "fstream"
 #include "base64.h"
 
-
 using grpc::Channel;
 using grpc::ClientContext;
 using grpc::ClientReader;
@@ -33,16 +32,12 @@ using multiple_camera_server::JSResp;
 using multiple_camera_server::LabeledFace;
 using multiple_camera_server::UnlabeledFace;
 
-
-
-
 class CameraClient {
 public:
 
     std::string camera_source;
     std::string multiple_camera_host;
     cv::Size screenSize;
-    int numberLanes;
     int detectionFrequency;
     int recognitionFrequency;
     int maxAge;
@@ -50,17 +45,16 @@ public:
     float iouThreash;
     float faceDetectThreash;
     int fontScale;
-    int delayToIgnore;
     int cameraWidth;
     int cameraHeight;
+    int registrationSetId;
 
-    CameraClient(std::string camera_source, std::string multiple_camera_host, std::string model_path, int numberLanes, int detectionFrequency,
-                 int recognitionFrequency, int maxAge, int minHits, float iouThreash,float faceDetectThreash, int fontScale, int delayToIgnore,
-                 cv::Size screenSize,int cameraWidth,int cameraHeight) {
+    CameraClient(std::string camera_source, std::string multiple_camera_host, int registrationSetId,
+                 int detectionFrequency, int recognitionFrequency, int maxAge, int minHits, float iouThreash,
+                 float faceDetectThreash, int fontScale, cv::Size screenSize, int cameraWidth, int cameraHeight) {
         this->camera_source = camera_source;
         this->multiple_camera_host = multiple_camera_host;
         this->screenSize = screenSize;
-        this->numberLanes = numberLanes;
         this->detectionFrequency = detectionFrequency;
         this->recognitionFrequency = recognitionFrequency;
         this->faceDetectThreash = faceDetectThreash;
@@ -68,9 +62,9 @@ public:
         this->minHits = minHits;
         this->iouThreash = iouThreash;
         this->fontScale = fontScale;
-        this->delayToIgnore = delayToIgnore;
         this->cameraWidth = cameraWidth;
         this->cameraHeight = cameraHeight;
+        this->registrationSetId = registrationSetId;
         CreateConnectionStream();
     }
 
@@ -81,25 +75,25 @@ public:
     }
 
     void SendRequests() {
-        superResNet* net = superResNet::Create();
+        superResNet *net = superResNet::Create();
         cv::Mat origin_image, display_image, cropedImage;
         std::vector<FaceDetectInfo> faceInfo;
         std::vector<LabeledFaceIn> facesOut;
         std::vector<TrackingBox> tmp_det;
         SORTtracker tracker(this->maxAge, this->minHits, this->iouThreash);
-        DrawText drawer(30) ;
+        DrawText drawer(this->fontScale);
         bool success, send_success, first_detections = true, capSuccess1, capSuccess2;
         int new_left, new_top, detectionCount = 0, recognitionCount = 0;
         float scale;
-        RetinaFace* rf = new RetinaFace((string &) "model_path", "net3");
+        RetinaFace *rf = new RetinaFace((string &) "model_path", "net3");
         while (1) {
-            float* cudaImage;
+            float *cudaImage;
             capSuccess1 = this->imagesQueue.pop(origin_image);
-            if(!capSuccess1){
+            if (!capSuccess1) {
                 continue;
             }
             capSuccess2 = this->imagesQueue2.pop(cudaImage);
-            if(!capSuccess2){
+            if (!capSuccess2) {
                 continue;
             }
             display_image = origin_image.clone();
@@ -112,8 +106,8 @@ public:
             if (first_detections) {
                 tracker.init(tmp_det);
                 first_detections = false;
-                float sw = 1.0 * origin_image.cols / 640;
-                float sh = 1.0 * origin_image.rows / 640;
+                float sw = 1.0 * display_image.cols / 640;
+                float sh = 1.0 * display_image.rows / 640;
                 scale = sw > sh ? sw : sh;
                 scale = scale > 1.0 ? scale : 1.0;
             }
@@ -137,12 +131,12 @@ public:
                 }
             }
             this->facesQueue.pop(facesOut);
-            tracker.step(tmp_det, origin_image.size(), stream);
+            tracker.step(tmp_det, display_image.size(), stream);
             if (!faceInfo.empty()) {
                 for (auto it = tracker.trackers.begin(); it != tracker.trackers.end();) {
                     Rect_<float> pBox = (*it).box;
-                    if (pBox.x > 0 && pBox.y > 0 && pBox.x + pBox.width < origin_image.size().width &&
-                        pBox.y + pBox.height < origin_image.size().height) {
+                    if (pBox.x > 0 && pBox.y > 0 && pBox.x + pBox.width < display_image.size().width &&
+                        pBox.y + pBox.height < display_image.size().height) {
                         if (!facesOut.empty()) {
                             for (auto &k : facesOut) {
                                 if (k.track_id == it->source_track_id) {
@@ -152,24 +146,19 @@ public:
                         }
                         std::string displayName;
                         cv::Scalar color;
-                        if (it->name.empty()){
+                        if (it->name.empty()) {
                             displayName = "unknown";
                             color = CV_RGB(255, 0, 0);
-
-                        } else{
+                        } else {
                             displayName = it->name;
                             color = CV_RGB(0, 255, 0);
-
                         }
-                        WriteText(display_image, displayName, cv::Point(pBox.x, pBox.y), pBox.width, drawer);
-                        cv::Rect rect = cv::Rect(pBox.x, pBox.y, pBox.width, pBox.height);
-                        DrawRectangle(display_image, rect, 3, 3, color);
-
-                        if (it->name.empty()){
+                        if (it->name.empty()) {
                             std::tie(cropedImage, new_left, new_top) = CropFaceImageWithMargin(display_image.clone(),
-                                    pBox.x, pBox.y,pBox.x + pBox.width,pBox.y + pBox.height, 1.3);
-                            tie(cropedImage, new_left, new_top) = CropFaceImageWithMargin(origin_image,
-                                    pBox.x, pBox.y,pBox.x + pBox.width,pBox.y + pBox.height, 1.4);
+                                                                                               pBox.x, pBox.y,
+                                                                                               pBox.x + pBox.width,
+                                                                                               pBox.y + pBox.height,
+                                                                                               1.4);
                             UnlabeledFace *face = jsReq.add_faces();
                             std::vector<uchar> buf;
                             success = cv::imencode(".jpg", cropedImage, buf);
@@ -187,6 +176,9 @@ public:
                                 }
                             }
                         }
+                        WriteText(display_image, displayName, cv::Point(pBox.x, pBox.y), pBox.width, drawer);
+                        cv::Rect rect = cv::Rect(pBox.x, pBox.y, pBox.width, pBox.height);
+                        DrawRectangle(display_image, rect, 3, 3, color);
                     }
                     it++;
                 }
@@ -196,7 +188,7 @@ public:
                 }
                 if (recognitionCount == 0) {
                     send_success = stream->Write(jsReq);
-                    if (!send_success){
+                    if (!send_success) {
                         printf("failed to send grpc\n");
                         throw std::exception();
                     }
@@ -218,7 +210,7 @@ public:
         bool receive_success;
         while (true) {
             receive_success = stream->Read(&jSResp);
-            if (!receive_success){
+            if (!receive_success) {
                 printf("failed to receive grpc\n");
                 throw std::exception();
             }
@@ -235,26 +227,25 @@ public:
             }
         }
     }
-    void ReadImages(){
-        gstCamera* camera = gstCamera::Create(this->cameraWidth, this->cameraHeight, "rtspsrc location=rtsp://172.16.10.108/101 user-id=admin user-pw=123456a@ latency=0 ! rtph264depay !  h264parse ! nvv4l2decoder ! nvvidconv ! video/x-raw, format=BGRx");
-        if( !camera )
-        {
+
+    void ReadImages() {
+        gstCamera *camera = gstCamera::Create(this->cameraWidth, this->cameraHeight, this->camera_source.c_str());
+        if (!camera) {
             printf("failed to initialize camera device\n");
             throw std::exception();
         }
-        if( !camera->Open() )
-        {
+        if (!camera->Open()) {
             printf("failed to open camera for streaming\n");
             throw std::exception();
         }
         bool capSuccess;
         cv::Mat origin_image;
-        while (1){
+        while (1) {
             float *imgRGBA = NULL;
             void *cpu = NULL;
             void *gpu = NULL;
             capSuccess = camera->Capture(&cpu, &gpu, 1000);
-            if (!capSuccess){
+            if (!capSuccess) {
                 printf("failed to capture frame\n");
             }
             capSuccess = camera->ConvertRGBA(gpu, &imgRGBA, false);
@@ -262,15 +253,13 @@ public:
                 printf("failed to convert from NV12 to RGBA\n");
             }
             origin_image = cv::Mat(this->cameraHeight, this->cameraWidth, CV_8UC3, (void *) cpu);
-            if (!capSuccess){
-                camera = gstCamera::Create(this->cameraWidth, this->cameraHeight, "rtspsrc location=rtsp://172.16.10.108/101 user-id=admin user-pw=123456a@ latency=0 ! rtph264depay !  h264parse ! nvv4l2decoder ! nvvidconv ! video/x-raw, format=BGRx");
-                if( !camera )
-                {
+            if (!capSuccess) {
+                camera = gstCamera::Create(this->cameraWidth, this->cameraHeight, this->camera_source.c_str());
+                if (!camera) {
                     printf("failed to initialize camera device\n");
                     throw std::exception();
                 }
-                if( !camera->Open() )
-                {
+                if (!camera->Open()) {
                     printf("failed to open camera for streaming\n");
                     throw std::exception();
                 }
@@ -283,15 +272,17 @@ public:
             this->imagesQueue2.push(imgRGBA);
         }
     }
+
     std::thread ReadImagesThread() {
-        return std::thread([this] {ReadImages();});
+        return std::thread([this] { ReadImages(); });
     }
 
     std::thread SendRequestsThread() {
-        return std::thread([this] {SendRequests();});
+        return std::thread([this] { SendRequests(); });
     }
+
     std::thread ReceiveResponsesThread() {
-        return std::thread([this] {ReceiveResponses();});
+        return std::thread([this] { ReceiveResponses(); });
     }
 
 private:
@@ -300,7 +291,7 @@ private:
     std::shared_ptr<ClientReaderWriter<JSReq, JSResp>> stream;
     CConcurrentQueue<std::vector<LabeledFaceIn>> facesQueue;
     CConcurrentQueue<cv::Mat> imagesQueue;
-    CConcurrentQueue<float*> imagesQueue2;
+    CConcurrentQueue<float *> imagesQueue2;
 
 };
 
@@ -309,8 +300,13 @@ int main(int argc, char **argv) {
     Json::Reader reader;
     Json::Value configs;
     reader.parse(file_input, configs);
+    std::string cameraIP = configs["camera_ip"].asString();
+    int cameraWidth = configs["camera_width"].asInt();
+    int cameraHeight = configs["camera_height"].asInt();
+    std::string cameraType = configs["camera_type"].asString();
+    std::string userName = configs["user_name"].asString();
+    std::string passWord = configs["pass_word"].asString();
     std::string multiple_camera_host = configs["multiple_camera_host"].asString() + ":50051";
-    int numberLanes = configs["strLane"].asInt();
     int detectionFrequency = configs["detection_frequency"].asInt();
     int recognitionFrequency = configs["recognition_frequency"].asInt();
     int maxAge = configs["max_age"].asInt();
@@ -318,31 +314,13 @@ int main(int argc, char **argv) {
     float faceDetectThreash = configs["face_detect_threash"].asFloat();
     float iouThreash = configs["iou_threash"].asFloat();
     int fontScale = configs["font_scale"].asInt();
-    int delayToIgnore = configs["delay_to_ignore"].asInt();
-    int cameraWidth = configs["camera_width"].asInt();
-    int cameraHeight = configs["camera_height"].asInt();
+    int registrationSetId = configs["registration_set_id"].asInt();
 
-    std::string camera_source;
-    if (configs["hikvision"].asBool()){
-        if (configs["use_gstreamer"].asBool()){
-            camera_source = "rtspsrc location=rtsp://" + configs["camera_source"].asString() +
-                            "/101 user-id=admin user-pw=123456a@ latency=0 ! rtph264depay ! h264parse ! avdec_h264 ! videoconvert ! appsink";
-        } else{
-            camera_source = "rtsp://admin:123456a@@" + configs["camera_source"].asString() + ":554/Streaming/Channels/101";
-        }
-    } else{
-        if (configs["use_gstreamer"].asBool()){
-            camera_source = "rtspsrc location=rtsp://" + configs["camera_source"].asString() +
-                            ":554/axis-media/media.amp user-id=root user-pw=abcd1234 latency=0 ! rtph264depay ! h264parse ! avdec_h264 ! videoconvert ! appsink";
-        } else{
-            camera_source = "rtsp://root:abcd1234@" + configs["camera_source"].asString() + ":554/axis-media/media.amp";
-        }
-    }
-    std::string model_path = configs["model_path"].asString();
+    std::string camera_source = MakeCameraSource(cameraIP, cameraType, userName, passWord);
     Screen *screen = DefaultScreenOfDisplay(XOpenDisplay(NULL));
-    CameraClient cameraClient(camera_source, multiple_camera_host, model_path, numberLanes, detectionFrequency, recognitionFrequency,
-                              maxAge, minHits, iouThreash, faceDetectThreash, fontScale, delayToIgnore, cv::Size(screen->width, screen->height),
-                              cameraWidth, cameraHeight);
+    CameraClient cameraClient(camera_source, multiple_camera_host, registrationSetId, detectionFrequency,
+                              recognitionFrequency, maxAge, minHits, iouThreash, faceDetectThreash, fontScale,
+                              cv::Size(screen->width, screen->height), cameraWidth, cameraHeight);
     try {
         std::thread t0 = cameraClient.ReadImagesThread();
         std::thread t1 = cameraClient.ReceiveResponsesThread();
@@ -350,7 +328,7 @@ int main(int argc, char **argv) {
         t0.join();
         t1.join();
         t2.join();
-    } catch (const std::exception&){
+    } catch (const std::exception &) {
         return 2;
     }
 }
