@@ -170,9 +170,6 @@ public:
                                     pBox.x, pBox.y,pBox.x + pBox.width,pBox.y + pBox.height, 1.3);
                             tie(cropedImage, new_left, new_top) = CropFaceImageWithMargin(origin_image,
                                     pBox.x, pBox.y,pBox.x + pBox.width,pBox.y + pBox.height, 1.4);
-                            it->new_top = new_top;
-                            it->new_left = new_left;
-                            it->faceImage = cropedImage.clone();
                             UnlabeledFace *face = jsReq.add_faces();
                             std::vector<uchar> buf;
                             success = cv::imencode(".jpg", cropedImage, buf);

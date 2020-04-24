@@ -81,11 +81,8 @@ public:
     bool m_is_tracking;
     string source_track_id;
     string name;
-    cv::Mat faceImage;
     Rect_<float> box;
     vector<float> landmarks;
-    float new_left;
-    float new_top;
     int init_frame_count;
 
 private:

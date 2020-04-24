@@ -93,7 +93,6 @@ void SORTtracker::step(vector<TrackingBox> detections, const Size &img_size, sha
         Rect_<float> pBox = (*it).predict();
         if (pBox.x > 0 && pBox.y > 0 && pBox.x + pBox.width < img_size.width &&
             pBox.y + pBox.height < img_size.height) {
-//            it->box = pBox;
             predictedBoxes.push_back(pBox);
             it++;
         } else {
@@ -203,6 +202,36 @@ void SORTtracker::step(vector<TrackingBox> detections, const Size &img_size, sha
             res.frame = frame_count;
             res.age = (*it).m_time_since_update;
         }
+
+        // create names vector
+        vector<string> names;
+        for (auto &it : trackers) {
+            names.push_back(it.name);
+        }
+
+        //create vector of duplicate names
+        std::map<std::string, int> countMap;
+        // Iterate over the vector and store the frequency of each element in map
+        for (auto & name : names)
+        {
+            auto result = countMap.insert(std::pair<std::string, int>(name, 1));
+            if (result.second == false)
+                result.first->second++;
+        }
+        vector<string> duplicateNames;
+        for (auto & elem : countMap)
+        {
+            if (elem.second > 1)
+            {
+                duplicateNames.push_back(elem.first);
+            }
+        }
+
+        // filter duplicated names
+        if(std::find(duplicateNames.begin(), duplicateNames.end(), it->name) != duplicateNames.end()) {
+            it->name = "";
+        }
+
 
         // remove dead tracker (if time since update > max_age)
         if ((*it).m_time_since_update > max_age){
