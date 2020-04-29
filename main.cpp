@@ -52,7 +52,8 @@ public:
 
     CameraClient(std::string camera_source, std::string multiple_camera_host, int areaId,
                  int detectionFrequency, int recognitionFrequency, int maxAge, int minHits, float iouThreash,
-                 float faceDetectThreash, int fontScale, cv::Size screenSize, int cameraWidth, int cameraHeight, std::string direction) {
+                 float faceDetectThreash, int fontScale, cv::Size screenSize, int cameraWidth, int cameraHeight,
+                 std::string direction) {
         this->camera_source = camera_source;
         this->multiple_camera_host = multiple_camera_host;
         this->screenSize = screenSize;
@@ -67,13 +68,9 @@ public:
         this->cameraHeight = cameraHeight;
         this->areaId = areaId;
         this->direction = direction;
-        CreateConnectionStream();
-    }
-
-    void CreateConnectionStream() {
         this->channel = grpc::CreateChannel(this->multiple_camera_host, grpc::InsecureChannelCredentials());
         this->stub_ = FaceProcessing::NewStub(channel);
-        ClientContext* context = new ClientContext;
+        ClientContext *context = new ClientContext;
         context->AddMetadata("area_id", grpc::string(std::to_string(this->areaId)));
         context->AddMetadata("direction", grpc::string(this->direction));
         this->stream = this->stub_->recognize_face_js(context);
@@ -104,6 +101,7 @@ public:
             display_image = origin_image.clone();
             cv::cvtColor(display_image, display_image, cv::COLOR_RGB2BGR);
             JSReq jsReq;
+            /* Detect faces in an image */
             detectionCount = detectionCount + 1;
             if (detectionCount == this->detectionFrequency) {
                 detectionCount = 0;
@@ -135,9 +133,12 @@ public:
                     tmp_det.push_back(trackingBox);
                 }
             }
+            /* Detect faces in an image */
             this->facesQueue.pop(facesOut);
+            // update tracking
             tracker.step(tmp_det, display_image.size(), stream);
             if (!faceInfo.empty()) {
+                /* Make Grpc request and get face faces label from queue */
                 for (auto it = tracker.trackers.begin(); it != tracker.trackers.end();) {
                     Rect_<float> pBox = (*it).box;
                     if (pBox.x > 0 && pBox.y > 0 && pBox.x + pBox.width < display_image.size().width &&
@@ -148,15 +149,6 @@ public:
                                     it->name = k.person_name;
                                 }
                             }
-                        }
-                        std::string displayName;
-                        cv::Scalar color;
-                        if (it->name.empty()) {
-                            displayName = "unknown";
-                            color = CV_RGB(255, 0, 0);
-                        } else {
-                            displayName = it->name;
-                            color = CV_RGB(0, 255, 0);
                         }
                         if (it->name.empty()) {
                             std::tie(cropedImage, new_left, new_top) = CropFaceImageWithMargin(display_image.clone(),
@@ -181,12 +173,12 @@ public:
                                 }
                             }
                         }
-                        WriteText(display_image, displayName, cv::Point(pBox.x, pBox.y), pBox.width, drawer);
-                        cv::Rect rect = cv::Rect(pBox.x, pBox.y, pBox.width, pBox.height);
-                        DrawRectangle(display_image, rect, 3, 3, color);
                     }
                     it++;
                 }
+                /* Make Grpc request and get face faces label from queue */
+
+                /* Send Grpc request */
                 recognitionCount = recognitionCount + 1;
                 if (recognitionCount == this->recognitionFrequency) {
                     recognitionCount = 0;
@@ -198,6 +190,11 @@ public:
                         throw std::exception();
                     }
                 }
+                /* Send Grpc request */
+
+                /* Draw box and face label */
+                WriteTextAndBox(display_image, drawer, tracker.trackers);
+                /* Draw box and face label */
             }
             resize(display_image, display_image, screenSize);
             namedWindow("camera_client", WND_PROP_FULLSCREEN);
