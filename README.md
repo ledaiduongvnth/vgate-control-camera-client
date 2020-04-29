@@ -12,7 +12,7 @@ https://docs.nvidia.com/sdk-manager/install-with-sdkm-jetson/index.html#install-
 ## Install dependencies:
 
 ````shell script
-sudo apt-get install libjsoncpp-dev libboost-all-dev libc-ares-dev libglew-dev libssl-dev cmake build-essential autoconf libtool pkg-config
+sudo apt-get install -y libjsoncpp-dev libboost-all-dev libc-ares-dev libglew-dev libssl-dev cmake build-essential autoconf libtool pkg-config
 ````
 
 #### Install Freetype to support display Vietnamese language:
