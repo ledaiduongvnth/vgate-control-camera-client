@@ -9,17 +9,14 @@ https://developer.nvidia.com/embedded/learn/get-started-jetson-nano-devkit
 
 https://docs.nvidia.com/sdk-manager/install-with-sdkm-jetson/index.html#install-with-sdkm-jetson
 
-## Install libjsoncpp:
-sudo apt-get install libjsoncpp-dev
+## Install dependencies:
 
-## Install libboots
-sudo apt-get install libboost-all-dev libc-ares-dev libglew-dev
+````shell script
+sudo apt-get install libjsoncpp-dev libboost-all-dev libc-ares-dev libglew-dev libssl-dev cmake build-essential autoconf libtool pkg-config
+````
 
-## instal Openssl
-sudo apt-get install libssl-dev 
-
-
-## Install Freetype to support display Vietnamese language:
+#### Install Freetype to support display Vietnamese language:
+````shell script
 cd
 curl -L  https://download.savannah.gnu.org/releases/freetype/freetype-2.9.1.tar.gz > freetype-2.9.1.tar.gz 
 tar xvfz freetype-2.9.1.tar.gz
@@ -28,16 +25,18 @@ cd freetype-2.9.1
 make
 sudo make install
 sudo ldconfig
+````
 
 ## Install Grpc c++
+````shell script
 cd
-sudo apt-get install build-essential autoconf libtool pkg-config
-sudo apt-get install cmake
 git clone -b v1.23.0 https://github.com/grpc/grpc
 cd grpc
 git submodule update --init
+`````
 
-#### 3, Install protobuf from source
+#### Install protobuf from source
+````shell script
 cd third_party/protobuf
 mkdir -p cmake/build
 cd cmake/build
@@ -45,15 +44,19 @@ cmake  -Dprotobuf_BUILD_TESTS=OFF ..
 make -j4
 sudo make install
 sudo ldconfig
+````
 
 
 #### To avoid "all warnings being treated as errors" while compiling boringssl:
+````shell script
 cd ~/grpc/third_party/boringssl
 sudo apt install nano
 nano CMakeLists.txt
+````
 remove flag: "-Werror" on CMakeLists.txt
 
 #### Build and install Grpc
+````shell script
 cd ~/grpc
 mkdir -p cmake/build
 cd cmake/build
@@ -61,13 +64,17 @@ cmake -DgRPC_INSTALL=ON -DgRPC_BUILD_TESTS=OFF -DgRPC_PROTOBUF_PROVIDER=package 
 make -j4
 sudo make install 
 sudo ldconfig
+````
 
 ## Build the project
 #### 1, Clone the project source 
+````shell script
 cd
 git clone https://github.com/ledaiduongvnth/vgate-control-camera-client.git
+````
 
 #### 2, Install jetson-utils lib:
+````shell script
 cd ~/vgate-control-camera-client/jetson-utils
 mkdir build
 cd build
@@ -75,13 +82,18 @@ cmake ..
 make -j4
 sudo make install 
 sudo ldconfig
+````
 
 #### 3, Compile the source code:
+````shell script
 cd ~/vgate-control-camera-client
 mkdir build
 cd build
 cmake ..
 make -j4
+````
 
 #### 4, Run the binary:
+````shell script
 ./camera_client
+````
