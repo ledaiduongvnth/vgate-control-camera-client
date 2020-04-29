@@ -50,8 +50,8 @@ void DrawRectangle(cv::Mat img, cv::Rect rect, int r, int thickness, cv::Scalar 
 }
 
 
-void WriteTextAndBox(cv::Mat &displayImage, DrawText &drawer, vector<KalmanTracker> trackers) {
-    for (auto it = trackers.begin(); it != trackers.end();) {
+void WriteTextAndBox(cv::Mat &displayImage, DrawText &drawer, vector<KalmanTracker> listFaces) {
+    for (auto it = listFaces.begin(); it != listFaces.end();) {
         Rect_<float> pBox = (*it).box;
         if (pBox.x > 0 && pBox.y > 0 && pBox.x + pBox.width < displayImage.size().width &&
             pBox.y + pBox.height < displayImage.size().height) {

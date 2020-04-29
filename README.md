@@ -97,3 +97,19 @@ make -j4
 ````shell script
 ./camera_client
 ````
+
+
+# Customize the display screen by the customer's requirements:
+All the customization is performed inside of the vgate-control-camera-client/utils/image_proc.h
+Given a list of face's boxes and face's labels Which is listFaces.
+````C++
+void WriteTextAndBox(cv::Mat &displayImage, DrawText &drawer, vector<KalmanTracker> listFaces) {
+    for (auto it = trackers.begin(); it != trackers.end();) {
+        /* Box contains face's coordinates Which is an Opencv Rect_, see more https://docs.opencv.org/3.4/d2/d44/classcv_1_1Rect__.html */
+        Rect_<float> pBox = (*it).box;
+        // label of the face
+        it->name
+        it++;
+    }
+}
+````
