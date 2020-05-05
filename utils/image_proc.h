@@ -9,6 +9,7 @@
 #include <opencv2/opencv.hpp>
 #include <codecvt>
 #include <KalmanTracker.h>
+#include <SORTtracker.h>
 #include "DrawText.h"
 
 std::tuple<cv::Mat, int, int>
@@ -50,11 +51,11 @@ void DrawRectangle(cv::Mat img, cv::Rect rect, int r, int thickness, cv::Scalar 
 }
 
 
-void WriteTextAndBox(cv::Mat &displayImage, DrawText &drawer, vector<KalmanTracker> listFaces) {
-    for (auto it = listFaces.begin(); it != listFaces.end();) {
+void WriteTextAndBox(cv::Mat &displayImage, DrawText &drawer, SORTtracker sortTrackers) {
+    for (auto it = sortTrackers.trackers.begin(); it != sortTrackers.trackers.end();) {
         Rect_<float> pBox = (*it).box;
         if (pBox.x > 0 && pBox.y > 0 && pBox.x + pBox.width < displayImage.size().width &&
-            pBox.y + pBox.height < displayImage.size().height) {
+            pBox.y + pBox.height < displayImage.size().height && sortTrackers.frame_count - it->init_frame_count>3) {
             std::string displayName;
             cv::Scalar color;
             if (it->name.empty()) {

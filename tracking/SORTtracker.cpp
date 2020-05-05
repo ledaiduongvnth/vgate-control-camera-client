@@ -99,7 +99,9 @@ void SORTtracker::step(vector<TrackingBox> detections, const Size &img_size, sha
             bool is_save;
             (frame_count - it->init_frame_count > 20) ? (is_save = true) : (is_save = false);
             it->save(stream, is_save);
-            printf("track:%s, save:%d\n", it->source_track_id.c_str(), is_save);
+            if(is_save){
+                printf("save track:%s\n", it->source_track_id.c_str());
+            }
             it = trackers.erase(it);
         }
     }
@@ -236,9 +238,11 @@ void SORTtracker::step(vector<TrackingBox> detections, const Size &img_size, sha
         // remove dead tracker (if time since update > max_age)
         if ((*it).m_time_since_update > max_age){
             bool is_save;
-            (frame_count - it->init_frame_count > 10) ? (is_save = true) : (is_save = false);
+            (frame_count - it->init_frame_count > 20) ? (is_save = true) : (is_save = false);
             it->save(stream, is_save);
-            printf("track:%s, save:%d\n", it->source_track_id.c_str(), is_save);
+            if(is_save){
+                printf("save track:%s\n", it->source_track_id.c_str());
+            }
             it = trackers.erase(it);
         }
         else{

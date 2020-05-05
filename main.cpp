@@ -79,11 +79,11 @@ public:
     }
 
     void SendRequests() {
-        cv::Mat origin_image, display_image, cropedImage;
+        cv::Mat originImage, displayImage, cropedImage;
         std::vector<FaceDetectInfo> faceInfo;
         std::vector<LabeledFaceIn> facesOut;
         std::vector<TrackingBox> tmp_det;
-        SORTtracker tracker(this->maxAge, this->minHits, this->iouThreash);
+        SORTtracker sortTrackers(this->maxAge, this->minHits, this->iouThreash);
         DrawText drawer(this->fontScale);
         bool success, send_success, first_detections = true, capSuccess1, capSuccess2;
         int new_left, new_top, detectionCount = 0, recognitionCount = 0;
@@ -91,7 +91,7 @@ public:
         RetinaFace *rf = new RetinaFace((string &) "model_path", "net3");
         while (1) {
             float *cudaImage;
-            capSuccess1 = this->imagesQueue.pop(origin_image);
+            capSuccess1 = this->imagesQueue.pop(originImage);
             if (!capSuccess1) {
                 continue;
             }
@@ -99,8 +99,8 @@ public:
             if (!capSuccess2) {
                 continue;
             }
-            display_image = origin_image.clone();
-            cv::cvtColor(display_image, display_image, cv::COLOR_RGB2BGR);
+            displayImage = originImage.clone();
+            cv::cvtColor(displayImage, displayImage, cv::COLOR_RGB2BGR);
             JSReq jsReq;
             /* Detect faces in an image */
             detectionCount = detectionCount + 1;
@@ -108,10 +108,10 @@ public:
                 detectionCount = 0;
             }
             if (first_detections) {
-                tracker.init(tmp_det);
+                sortTrackers.init(tmp_det);
                 first_detections = false;
-                float sw = 1.0 * display_image.cols / 640;
-                float sh = 1.0 * display_image.rows / 640;
+                float sw = 1.0 * displayImage.cols / 640;
+                float sh = 1.0 * displayImage.rows / 640;
                 scale = sw > sh ? sw : sh;
                 scale = scale > 1.0 ? scale : 1.0;
             }
@@ -137,13 +137,13 @@ public:
             /* Detect faces in an image */
             this->facesQueue.pop(facesOut);
             // update tracking
-            tracker.step(tmp_det, display_image.size(), stream);
+            sortTrackers.step(tmp_det, displayImage.size(), stream);
             if (!faceInfo.empty()) {
                 /* Make Grpc request and get face faces label from queue */
-                for (auto it = tracker.trackers.begin(); it != tracker.trackers.end();) {
+                for (auto it = sortTrackers.trackers.begin(); it != sortTrackers.trackers.end();) {
                     Rect_<float> pBox = (*it).box;
-                    if (pBox.x > 0 && pBox.y > 0 && pBox.x + pBox.width < display_image.size().width &&
-                        pBox.y + pBox.height < display_image.size().height) {
+                    if (pBox.x > 0 && pBox.y > 0 && pBox.x + pBox.width < displayImage.size().width &&
+                        pBox.y + pBox.height < displayImage.size().height) {
                         if (!facesOut.empty()) {
                             for (auto &k : facesOut) {
                                 if (k.track_id == it->source_track_id) {
@@ -152,7 +152,7 @@ public:
                             }
                         }
                         if (it->name.empty()) {
-                            std::tie(cropedImage, new_left, new_top) = CropFaceImageWithMargin(display_image.clone(),
+                            std::tie(cropedImage, new_left, new_top) = CropFaceImageWithMargin(displayImage.clone(),
                                                                                                pBox.x, pBox.y,
                                                                                                pBox.x + pBox.width,
                                                                                                pBox.y + pBox.height,
@@ -194,13 +194,13 @@ public:
                 /* Send Grpc request */
 
                 /* Draw box and face label */
-                WriteTextAndBox(display_image, drawer, tracker.trackers);
+                WriteTextAndBox(displayImage, drawer, sortTrackers);
                 /* Draw box and face label */
             }
-            resize(display_image, display_image, screenSize);
+            resize(displayImage, displayImage, screenSize);
             namedWindow("camera_client", WND_PROP_FULLSCREEN);
             setWindowProperty("camera_client", WND_PROP_FULLSCREEN, WINDOW_FULLSCREEN);
-            imshow("camera_client", display_image);
+            imshow("camera_client", displayImage);
             waitKey(1);
         }
     }
