@@ -430,7 +430,7 @@ bool gstCamera::buildLaunchStr( gstCameraSrc src )
 		ss << "video/x-raw, width=(int)" << mWidth << ", height=(int)" << mHeight << ", "; 
 		
 	#if NV_TENSORRT_MAJOR >= 5
-		ss << "format=YUY2 ! videoconvert ! video/x-raw, format=RGB ! videoconvert !";
+		ss << "format=YUY2 ! videoconvert ! video/x-raw, format=RGB ! videoconvert ! videoflip method=horizontal-flip !";
 	#else
 		ss << "format=RGB ! videoconvert ! video/x-raw, format=RGB ! videoconvert !";
 	#endif
