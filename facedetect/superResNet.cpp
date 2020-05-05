@@ -51,7 +51,7 @@ superResNet::superResNet(int cameraWidth, int cameraHeight, std::string camera_s
     void *gpu = NULL;
     camera->Capture(&cpu, &gpu, 1000);
     camera->ConvertRGBA(gpu, &cudaInput, false);
-
+    camera->Close();
 }
 
 

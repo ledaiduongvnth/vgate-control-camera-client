@@ -49,6 +49,7 @@ public:
     int cameraHeight;
     int areaId;
     std::string direction;
+    superResNet* net;
 
     CameraClient(std::string camera_source, std::string multiple_camera_host, int areaId,
                  int detectionFrequency, int recognitionFrequency, int maxAge, int minHits, float iouThreash,
@@ -74,10 +75,10 @@ public:
         context->AddMetadata("area_id", grpc::string(std::to_string(this->areaId)));
         context->AddMetadata("direction", grpc::string(this->direction));
         this->stream = this->stub_->recognize_face_js(context);
+        this->net = superResNet::Create(this->cameraWidth, this->cameraHeight, this->camera_source);
     }
 
     void SendRequests() {
-        superResNet *net = superResNet::Create(this->cameraWidth, this->cameraHeight, this->camera_source);
         cv::Mat origin_image, display_image, cropedImage;
         std::vector<FaceDetectInfo> faceInfo;
         std::vector<LabeledFaceIn> facesOut;
@@ -117,7 +118,7 @@ public:
             if (detectionCount == 0) {
                 tmp_det.clear();
                 faceInfo.clear();
-                net->Detect(cudaImage, this->cameraWidth, this->cameraHeight, rf, faceInfo, this->faceDetectThreash);
+                this->net->Detect(cudaImage, this->cameraWidth, this->cameraHeight, rf, faceInfo, this->faceDetectThreash);
                 for (auto &t : faceInfo) {
                     TrackingBox trackingBox;
                     trackingBox.box.x = t.rect.x1 * scale;

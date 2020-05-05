@@ -65,6 +65,9 @@ void WriteTextAndBox(cv::Mat &displayImage, DrawText &drawer, vector<KalmanTrack
                 color = CV_RGB(0, 255, 0);
             }
 
+            cv::Rect rect = cv::Rect(pBox.x, pBox.y, pBox.width, pBox.height);
+            DrawRectangle(displayImage, rect, 3, 3, color);
+
             cv::Mat overlay = displayImage.clone();
             cv::Mat output = displayImage.clone();
             int baseline = 0;
@@ -83,9 +86,6 @@ void WriteTextAndBox(cv::Mat &displayImage, DrawText &drawer, vector<KalmanTrack
             std::wstring ws(displayName.size(), L' ');
             ws.resize(std::mbstowcs(&ws[0], displayName.c_str(), displayName.size()));
             drawer.PrintText(displayImage, ws, pBox.x, pBox.y, cv::Scalar(255, 255, 255));
-
-            cv::Rect rect = cv::Rect(pBox.x, pBox.y, pBox.width, pBox.height);
-            DrawRectangle(displayImage, rect, 3, 3, color);
         }
         it++;
     }

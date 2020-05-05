@@ -27,7 +27,7 @@ std::string MakeCameraSource(std::string host, std::string cameraType, std::stri
                 " latency=0 ! rtph264depay !  h264parse ! nvv4l2decoder ! nvvidconv ! video/x-raw, format=BGRx";
     }
     if (cameraType == "webcam") {
-        cameraSource = "dev/video0";
+        cameraSource = "/dev/video0";
     }
 
     return cameraSource;
