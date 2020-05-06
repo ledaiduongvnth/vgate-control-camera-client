@@ -114,9 +114,16 @@ void WriteTextAndBox(cv::Mat &displayImage, DrawText &drawer, SORTtracker sortTr
 }
 ````
 # Using Supervisor to manage the program(Optional):
-Install supervisor by the following post
-https://www.digitalocean.com/community/tutorials/how-to-install-and-manage-supervisor-on-ubuntu-and-debian-vps
+Install redis
 ````shell script
+sudo apt install python3-pip
+sudo pip3 install redis
+````
+
+Install supervisor
+````shell script
+sudo apt install supervisor
+sudo service supervisor stop
 cd ~/vgate-control-camera-client/zsupervisor
 sudo cp camera-client.conf relay.conf /etc/supervisor/conf.d/
 sudo service supervisor restart
