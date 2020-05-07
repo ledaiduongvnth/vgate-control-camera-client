@@ -198,11 +198,11 @@ public:
                 /* Draw box and face label */
                 WriteTextAndBox(displayImage, drawer, sortTrackers);
                 /* Draw box and face label */
-                if(this->rotateImage){
-                    cv::Mat dst;
-                    cv::flip(displayImage, dst, -1);
-                    displayImage = dst;
-                }
+            }
+            if(this->rotateImage){
+                cv::Mat dst;
+                cv::flip(displayImage, dst, -1);
+                displayImage = dst;
             }
             resize(displayImage, displayImage, screenSize);
             namedWindow("camera_client", WND_PROP_FULLSCREEN);
