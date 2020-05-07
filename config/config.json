@@ -3,6 +3,7 @@
   "camera_width": 1280,
   "camera_height": 720,
   "camera_type": "hikvision",
+  "rotate_image": true,
   "user_name": "admin",
   "pass_word": "abcd1234",
   "multiple_camera_host": "172.16.10.12",

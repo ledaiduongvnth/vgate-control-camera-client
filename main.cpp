@@ -50,11 +50,12 @@ public:
     int areaId;
     std::string direction;
     superResNet* net;
+    bool rotateImage;
 
     CameraClient(std::string camera_source, std::string multiple_camera_host, int areaId,
                  int detectionFrequency, int recognitionFrequency, int maxAge, int minHits, float iouThreash,
                  float faceDetectThreash, int fontScale, cv::Size screenSize, int cameraWidth, int cameraHeight,
-                 std::string direction) {
+                 std::string direction, bool rotateImage) {
         this->camera_source = camera_source;
         this->multiple_camera_host = multiple_camera_host;
         this->screenSize = screenSize;
@@ -76,6 +77,7 @@ public:
         context->AddMetadata("direction", grpc::string(this->direction));
         this->stream = this->stub_->recognize_face_js(context);
         this->net = superResNet::Create(this->cameraWidth, this->cameraHeight, this->camera_source);
+        this->rotateImage = rotateImage;
     }
 
     void SendRequests() {
@@ -196,6 +198,11 @@ public:
                 /* Draw box and face label */
                 WriteTextAndBox(displayImage, drawer, sortTrackers);
                 /* Draw box and face label */
+                if(this->rotateImage){
+                    cv::Mat dst;
+                    cv::flip(displayImage, dst, -1);
+                    displayImage = dst;
+                }
             }
             resize(displayImage, displayImage, screenSize);
             namedWindow("camera_client", WND_PROP_FULLSCREEN);
@@ -307,6 +314,7 @@ int main(int argc, char **argv) {
     int cameraWidth = configs["camera_width"].asInt();
     int cameraHeight = configs["camera_height"].asInt();
     std::string cameraType = configs["camera_type"].asString();
+    bool rotateImage = configs["rotate_image"].asBool();
     std::string userName = configs["user_name"].asString();
     std::string passWord = configs["pass_word"].asString();
     std::string multiple_camera_host = configs["multiple_camera_host"].asString() + ":50051";
@@ -324,7 +332,7 @@ int main(int argc, char **argv) {
     Screen *screen = DefaultScreenOfDisplay(XOpenDisplay(NULL));
     CameraClient cameraClient(camera_source, multiple_camera_host, areaId, detectionFrequency,
                               recognitionFrequency, maxAge, minHits, iouThreash, faceDetectThreash, fontScale,
-                              cv::Size(screen->width, screen->height), cameraWidth, cameraHeight, direction);
+                              cv::Size(screen->width, screen->height), cameraWidth, cameraHeight, direction, rotateImage);
     try {
         std::thread t0 = cameraClient.ReadImagesThread();
         std::thread t1 = cameraClient.ReceiveResponsesThread();
