@@ -57,11 +57,11 @@ public:
     }
 };
 
-class RetinaFace
+class postProcessRetina
 {
 public:
-    RetinaFace(string &model, string network = "net3", float nms = 0.4);
-    ~RetinaFace();
+    postProcessRetina(string &model, string network = "net3", float nms = 0.4);
+    ~postProcessRetina();
 
     void detect(std::vector<std::vector<float>> results, float threshold, vector<FaceDetectInfo> &faceInfo, int model_size);
 private:

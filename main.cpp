@@ -1,4 +1,4 @@
-#include <RetinaFace.h>
+#include <postProcessRetina.h>
 #include <opencv2/videoio.hpp>
 #include <memory>
 #include <string>
@@ -17,7 +17,7 @@
 #include <unistd.h>
 #include "DrawText.h"
 #include "gstCamera.h"
-#include "superResNet.h"
+#include "retinaNet.h"
 #include "fstream"
 #include "base64.h"
 
@@ -49,7 +49,7 @@ public:
     int cameraHeight;
     int areaId;
     std::string direction;
-    superResNet* net;
+    retinaNet* net;
     bool rotateImage;
 
     CameraClient(std::string camera_source, std::string multiple_camera_host, int areaId,
@@ -76,7 +76,7 @@ public:
         context->AddMetadata("area_id", grpc::string(std::to_string(this->areaId)));
         context->AddMetadata("direction", grpc::string(this->direction));
         this->stream = this->stub_->recognize_face_js(context);
-        this->net = superResNet::Create(this->cameraWidth, this->cameraHeight, this->camera_source);
+        this->net = retinaNet::Create(this->cameraWidth, this->cameraHeight, this->camera_source);
         this->rotateImage = rotateImage;
     }
 
@@ -90,7 +90,7 @@ public:
         bool success, send_success, first_detections = true, capSuccess1, capSuccess2;
         int new_left, new_top, detectionCount = 0, recognitionCount = 0;
         float scale;
-        RetinaFace *rf = new RetinaFace((string &) "model_path", "net3");
+        postProcessRetina *rf = new postProcessRetina((string &) "model_path", "net3");
         while (1) {
             float *cudaImage;
             capSuccess1 = this->imagesQueue.pop(originImage);

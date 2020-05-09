@@ -1,4 +1,4 @@
-#include "RetinaFace.h"
+#include "postProcessRetina.h"
 #include <cuda_runtime_api.h>
 #include <tuple>
 
@@ -169,7 +169,7 @@ void clip_boxes(anchor_box &box, int width, int height)
 }
 
 
-RetinaFace::RetinaFace(string &model, string network, float nms)
+postProcessRetina::postProcessRetina(string &model, string network, float nms)
     : network(network), nms_threshold(nms)
 {
     int fmc = 3;
@@ -249,11 +249,11 @@ RetinaFace::RetinaFace(string &model, string network, float nms)
     }
 }
 
-RetinaFace::~RetinaFace()
+postProcessRetina::~postProcessRetina()
 {
 }
 
-vector<anchor_box> RetinaFace::bbox_pred(vector<anchor_box> anchors, vector<cv::Vec4f> regress)
+vector<anchor_box> postProcessRetina::bbox_pred(vector<anchor_box> anchors, vector<cv::Vec4f> regress)
 {
 
     vector<anchor_box> rects(anchors.size());
@@ -277,7 +277,7 @@ vector<anchor_box> RetinaFace::bbox_pred(vector<anchor_box> anchors, vector<cv::
     return rects;
 }
 
-anchor_box RetinaFace::bbox_pred(anchor_box anchor, cv::Vec4f regress)
+anchor_box postProcessRetina::bbox_pred(anchor_box anchor, cv::Vec4f regress)
 {
     anchor_box rect;
 
@@ -299,7 +299,7 @@ anchor_box RetinaFace::bbox_pred(anchor_box anchor, cv::Vec4f regress)
     return rect;
 }
 
-vector<FacePts> RetinaFace::landmark_pred(vector<anchor_box> anchors, vector<FacePts> facePts)
+vector<FacePts> postProcessRetina::landmark_pred(vector<anchor_box> anchors, vector<FacePts> facePts)
 {
     vector<FacePts> pts(anchors.size());
     for(size_t i = 0; i < anchors.size(); i++) {
@@ -317,7 +317,7 @@ vector<FacePts> RetinaFace::landmark_pred(vector<anchor_box> anchors, vector<Fac
     return pts;
 }
 
-FacePts RetinaFace::landmark_pred(anchor_box anchor, FacePts facePt)
+FacePts postProcessRetina::landmark_pred(anchor_box anchor, FacePts facePt)
 {
     FacePts pt;
     float width = anchor.x2 - anchor.x1 + 1;
@@ -333,12 +333,12 @@ FacePts RetinaFace::landmark_pred(anchor_box anchor, FacePts facePt)
     return pt;
 }
 
-bool RetinaFace::CompareBBox(const FaceDetectInfo & a, const FaceDetectInfo & b)
+bool postProcessRetina::CompareBBox(const FaceDetectInfo & a, const FaceDetectInfo & b)
 {
     return a.score > b.score;
 }
 
-std::vector<FaceDetectInfo> RetinaFace::nms(std::vector<FaceDetectInfo>& bboxes, float threshold)
+std::vector<FaceDetectInfo> postProcessRetina::nms(std::vector<FaceDetectInfo>& bboxes, float threshold)
 {
     std::vector<FaceDetectInfo> bboxes_nms;
     std::sort(bboxes.begin(), bboxes.end(), CompareBBox);
@@ -393,7 +393,7 @@ std::vector<FaceDetectInfo> RetinaFace::nms(std::vector<FaceDetectInfo>& bboxes,
 }
 
 
-void  RetinaFace::detect(std::vector<std::vector<float>> results, float threshold, vector<FaceDetectInfo> &faceInfo, int model_size)
+void  postProcessRetina::detect(std::vector<std::vector<float>> results, float threshold, vector<FaceDetectInfo> &faceInfo, int model_size)
 {
     vector<int> aaa = {20, 40, 80};
 

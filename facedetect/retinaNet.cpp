@@ -21,7 +21,7 @@
  */
 
 #include <gstCamera.h>
-#include "superResNet.h"
+#include "retinaNet.h"
 #include "cudaUtility.h"
 
 
@@ -33,7 +33,7 @@ void imagePadding32f4C(void *src, int srcWidth, int srcHeight, void *dst, int ds
 
 
 // constructor
-superResNet::superResNet(int cameraWidth, int cameraHeight, std::string camera_source)
+retinaNet::retinaNet(int cameraWidth, int cameraHeight, std::string camera_source)
 {
     gstCamera *camera = gstCamera::Create(cameraWidth, cameraHeight, camera_source.c_str());
     if( !camera )
@@ -56,16 +56,16 @@ superResNet::superResNet(int cameraWidth, int cameraHeight, std::string camera_s
 
 
 // Destructor
-superResNet::~superResNet()
+retinaNet::~retinaNet()
 {
 
 }
 
 
 // Create
-superResNet* superResNet::Create(int cameraWidth, int cameraHeight, std::string camera_source)
+retinaNet* retinaNet::Create(int cameraWidth, int cameraHeight, std::string camera_source)
 {
-	superResNet* net = new superResNet(cameraWidth, cameraHeight, camera_source);
+	retinaNet* net = new retinaNet(cameraWidth, cameraHeight, camera_source);
 
 	const char* model_path  = "../facedetect/model/retina.onnx";
 	const char* input_blob  = "data_input";
@@ -87,14 +87,14 @@ superResNet* superResNet::Create(int cameraWidth, int cameraHeight, std::string 
 
 	if( !net->LoadNetwork(NULL, model_path, NULL, input_blob, output_blobs, maxBatchSize) )
 	{
-		printf(LOG_TRT "failed to load superResNet model\n");
+		printf(LOG_TRT "failed to load retinaNet model\n");
 		return NULL;
 	}
 
 	return net;
 }
 
-int superResNet::Detect( float* rgba, uint32_t width, uint32_t height, RetinaFace* rf, std::vector<FaceDetectInfo>& faceInfo, float threshold)
+int retinaNet::Detect(float* rgba, uint32_t width, uint32_t height, postProcessRetina* rf, std::vector<FaceDetectInfo>& faceInfo, float threshold)
 {
 
     if( !rgba || width == 0 || height == 0  )

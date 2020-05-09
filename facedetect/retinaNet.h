@@ -21,11 +21,11 @@
  */
 
 #include "tensorNet.h"
-#include "RetinaFace.h"
+#include "postProcessRetina.h"
 
 
 /**
- * @note superResNet is only supported with TensorRT 5.0 and newer,
+ * @note retinaNet is only supported with TensorRT 5.0 and newer,
  * as it uses ONNX models and requires ONNX import support in TensorRT.
  */
 #if NV_TENSORRT_MAJOR >= 5
@@ -35,27 +35,27 @@
 
 /**
  * Super Resolution Network
- * @ingroup superResNet
+ * @ingroup retinaNet
  */
-class superResNet : public tensorNet
+class retinaNet : public tensorNet
 {
 public:
 	/**
 	 * Load super resolution network
 	 */
-	static superResNet* Create(int cameraWidth, int cameraHeight, std::string camera_source);
+	static retinaNet* Create(int cameraWidth, int cameraHeight, std::string camera_source);
 
 	float* cudaInput;
 
 	/**
 	 * Destroy
 	 */
-	~superResNet();
-    int Detect(float* rgba, uint32_t width, uint32_t height, RetinaFace* rf, std::vector<FaceDetectInfo>& faceInfo, float threshold);
+	~retinaNet();
+    int Detect(float* rgba, uint32_t width, uint32_t height, postProcessRetina* rf, std::vector<FaceDetectInfo>& faceInfo, float threshold);
 
 
 protected:
-	superResNet(int cameraWidth, int cameraHeight, std::string camera_source);
+	retinaNet(int cameraWidth, int cameraHeight, std::string camera_source);
 };
 
 
