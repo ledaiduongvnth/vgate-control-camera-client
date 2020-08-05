@@ -6,7 +6,7 @@
   "rotate_image": true,
   "user_name": "admin",
   "pass_word": "abcd1234",
-  "multiple_camera_host": "172.16.10.12",
+  "multiple_camera_host": "172.16.10.12:50051",
   "detection_frequency": 1,
   "recognition_frequency": 4,
   "max_age": 1,

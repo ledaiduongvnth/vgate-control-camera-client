@@ -317,7 +317,7 @@ int main(int argc, char **argv) {
     bool rotateImage = configs["rotate_image"].asBool();
     std::string userName = configs["user_name"].asString();
     std::string passWord = configs["pass_word"].asString();
-    std::string multiple_camera_host = configs["multiple_camera_host"].asString() + ":50051";
+    std::string multiple_camera_host = configs["multiple_camera_host"].asString();
     int detectionFrequency = configs["detection_frequency"].asInt();
     int recognitionFrequency = configs["recognition_frequency"].asInt();
     int maxAge = configs["max_age"].asInt();
