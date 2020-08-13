@@ -310,13 +310,10 @@ int main(int argc, char **argv) {
     Json::Reader reader;
     Json::Value configs;
     reader.parse(file_input, configs);
-    std::string cameraIP = configs["camera_ip"].asString();
+    std::string camera_source = configs["camera_source"].asString();
     int cameraWidth = configs["camera_width"].asInt();
     int cameraHeight = configs["camera_height"].asInt();
-    std::string cameraType = configs["camera_type"].asString();
     bool rotateImage = configs["rotate_image"].asBool();
-    std::string userName = configs["user_name"].asString();
-    std::string passWord = configs["pass_word"].asString();
     std::string multiple_camera_host = configs["multiple_camera_host"].asString();
     int detectionFrequency = configs["detection_frequency"].asInt();
     int recognitionFrequency = configs["recognition_frequency"].asInt();
@@ -328,7 +325,6 @@ int main(int argc, char **argv) {
     int areaId = configs["area_id"].asInt();
     std::string direction = configs["direction"].asString();
 
-    std::string camera_source = MakeCameraSource(cameraIP, cameraType, userName, passWord);
     Screen *screen = DefaultScreenOfDisplay(XOpenDisplay(NULL));
     CameraClient cameraClient(camera_source, multiple_camera_host, areaId, detectionFrequency,
                               recognitionFrequency, maxAge, minHits, iouThreash, faceDetectThreash, fontScale,
