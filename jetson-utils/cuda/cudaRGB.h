@@ -25,103 +25,221 @@
 
 
 #include "cudaUtility.h"
-#include <stdint.h>
+
 
 
 //////////////////////////////////////////////////////////////////////////////////
-/// @name 8-bit RGB/BGR to Floating-point RGBA
+/// @name RGB/RGBA to BGR/BGRA (or vice-versa)
+/// @see cudaConvertColor() from cudaColorspace.h for automated format conversion
 /// @ingroup colorspace
 //////////////////////////////////////////////////////////////////////////////////
 
 ///@{
 	
 /**
- * Convert 8-bit fixed-point RGB image to 32-bit floating-point RGBA image
- * @ingroup colorspace
+ * Convert uchar3 RGB image to uchar3 BGR (or convert BGR to RGB).
+ * This function swaps the red and blue channels, so if the input is RGB it will 
+ * be converted to RGB, and if the input is BGR it will be converted to RGB.
  */
-cudaError_t cudaRGB8ToRGBA32( uchar3* input, float4* output, size_t width, size_t height );
+cudaError_t cudaRGB8ToBGR8( uchar3* input, uchar3* output, size_t width, size_t height );
 
 /**
- * Convert 8-bit fixed-point BGR image to 32-bit floating-point RGBA image
- * @ingroup colorspace
+ * Convert float3 RGB image to float3 BGR (or convert BGR to RGB).
+ * This function swaps the red and blue channels, so if the input is RGB it will 
+ * be converted to RGB, and if the input is BGR it will be converted to RGB.
  */
-cudaError_t cudaBGR8ToRGBA32( uchar3* input, float4* output, size_t width, size_t height );
+cudaError_t cudaRGB32ToBGR32( float3* input, float3* output, size_t width, size_t height );
+
+/**
+ * Convert uchar4 RGBA image to uchar4 BGRA (or convert BGRA to RGBA).
+ * This function swaps the red and blue channels, so if the input is RGBA it will 
+ * be converted to RGBA, and if the input is BGR it will be converted to RGBA.
+ */
+cudaError_t cudaRGBA8ToBGRA8( uchar4* input, uchar4* output, size_t width, size_t height );
+
+/**
+ * Convert float4 RGBA image to float4 BGRA (or convert BGRA to RGBA).
+ * This function swaps the red and blue channels, so if the input is RGBA it will 
+ * be converted to RGBA, and if the input is BGR it will be converted to RGBA.
+ */
+cudaError_t cudaRGBA32ToBGRA32( float4* input, float4* output, size_t width, size_t height );
+
 
 ///@}
-
-//////////////////////////////////////////////////////////////////////////////////
-/// @name Floating-point RGBA to 8-bit RGB/RGBA
-/// @ingroup colorspace
-//////////////////////////////////////////////////////////////////////////////////
-
-///@{
-
-/**
- * Convert 32-bit floating-point RGBA image into 8-bit fixed-point RGB image.
- * Assumes 0.0-255.0f input range, output range is 0-255.
- * @ingroup colorspace
- */
-cudaError_t cudaRGBA32ToRGB8( float4* input, uchar3* output, size_t width, size_t height );
-
-/**
- * Convert 32-bit floating-point RGBA image into 8-bit fixed-point RGB image,
- * with the floating-point input range specified by the user.  Output range is 0-255.
- * @ingroup colorspace
- */
-cudaError_t cudaRGBA32ToRGB8( float4* input, uchar3* output, size_t width, size_t height, const float2& inputRange );
-
-/**
- * Convert 32-bit floating-point RGBA image into 8-bit fixed-point RGBA image.
- * Assumes 0.0-255.0f input range, output range is 0-255.
- * @ingroup colorspace
- */
-cudaError_t cudaRGBA32ToRGBA8( float4* input, uchar4* output, size_t width, size_t height );
-
-/**
- * Convert 32-bit floating-point RGBA image into 8-bit fixed-point RGBA image,
- * with the floating-point input range specified by the user.  Output range is 0-255.
- * @ingroup colorspace
- */
-cudaError_t cudaRGBA32ToRGBA8( float4* input, uchar4* output, size_t width, size_t height, const float2& inputRange );
-
-///@}
-
-//////////////////////////////////////////////////////////////////////////////////
-/// @name Floating-point RGBA to 8-bit BGR/BGRA
-/// @ingroup colorspace
-//////////////////////////////////////////////////////////////////////////////////
-
-///@{
 	
-/**
- * Convert 32-bit floating-point RGBA image into 8-bit fixed-point BGR image.
- * Assumes 0.0-255.0f input range, output range is 0-255.
- * @ingroup colorspace
- */
-cudaError_t cudaRGBA32ToBGR8( float4* input, uchar3* output, size_t width, size_t height );
+//////////////////////////////////////////////////////////////////////////////////
+/// @name 8-bit RGB/BGR to 8-bit RGBA/BGRA (or vice-versa)
+/// @see cudaConvertColor() from cudaColorspace.h for automated format conversion
+/// @ingroup colorspace
+//////////////////////////////////////////////////////////////////////////////////
+
+///@{
 
 /**
- * Convert 32-bit floating-point RGBA image into 8-bit fixed-point BGR image,
- * with the floating-point input range specified by the user.  Output range is 0-255.
- * @ingroup colorspace
+ * Convert uchar3 RGB/BGR image to uchar4 RGBA/BGRA image
+ *
+ * @param swapRedBlue if true, swap the input's red and blue channels in the output -
+ *                    i.e if the input is RGB and output is BGR, or vice versa.  
+ *                    The default is false, and the channels will remain the same.
  */
-cudaError_t cudaRGBA32ToBGR8( float4* input, uchar3* output, size_t width, size_t height, const float2& inputRange );
+cudaError_t cudaRGB8ToRGBA8( uchar3* input, uchar4* output, size_t width, size_t height, bool swapRedBlue=false );
 
 /**
- * Convert 32-bit floating-point RGBA image into 8-bit fixed-point BGRA image.
- * Assumes 0.0-255.0f input range, output range is 0-255.
- * @ingroup colorspace
+ * Convert uchar4 RGBA/BGRA image to uchar3 RGB/BGR image
+ *
+ * @param swapRedBlue if true, swap the input's red and blue channels in the output -
+ *                    i.e if the input is RGB and output is BGR, or vice versa.  
+ *                    The default is false, and the channels will remain the same.
  */
-cudaError_t cudaRGBA32ToBGRA8( float4* input, uchar4* output, size_t width, size_t height );
+cudaError_t cudaRGBA8ToRGB8( uchar4* input, uchar3* output, size_t width, size_t height, bool swapRedBlue=false );
+
+///@}
+
+
+//////////////////////////////////////////////////////////////////////////////////
+/// @name Floating-point RGB/BGR to floating-point RGBA/BGRA (or vice versa)
+/// @see cudaConvertColor() from cudaColorspace.h for automated format conversion
+/// @ingroup colorspace
+//////////////////////////////////////////////////////////////////////////////////
+
+///@{
 
 /**
- * Convert 32-bit floating-point RGBA image into 8-bit fixed-point BGRA image,
- * with the floating-point input range specified by the user.  Output range is 0-255.
- * @ingroup colorspace
+ * Convert float3 RGB/BGR image into float4 RGBA/BGRA image.
+ *
+ * @param swapRedBlue if true, swap the input's red and blue channels in the output -
+ *                    i.e if the input is RGB and output is BGR, or vice versa.  
+ *                    The default is false, and the channels will remain the same.
  */
-cudaError_t cudaRGBA32ToBGRA8( float4* input, uchar4* output, size_t width, size_t height, const float2& inputRange );
+cudaError_t cudaRGB32ToRGBA32( float3* input, float4* output, size_t width, size_t height, bool swapRedBlue=false );
+
+/**
+ * Convert float4 RGBA/BGRA image into float3 RGB/BGR image.
+ *
+ * @param swapRedBlue if true, swap the input's red and blue channels in the output -
+ *                    i.e if the input is RGB and output is BGR, or vice versa.  
+ *                    The default is false, and the channels will remain the same.
+ */
+cudaError_t cudaRGBA32ToRGB32( float4* input, float3* output, size_t width, size_t height, bool swapRedBlue=false );
+
+///@}
+
+
+//////////////////////////////////////////////////////////////////////////////////
+/// @name 8-bit images to floating-point images
+/// @see cudaConvertColor() from cudaColorspace.h for automated format conversion
+/// @ingroup colorspace
+//////////////////////////////////////////////////////////////////////////////////
+
+///@{
+
+/**
+ * Convert uchar3 RGB/BGR image to float3 RGB/BGR image
+ *
+ * @param swapRedBlue if true, swap the input's red and blue channels in the output -
+ *                    i.e if the input is RGB and output is BGR, or vice versa.  
+ *                    The default is false, and the channels will remain the same.
+ */
+cudaError_t cudaRGB8ToRGB32( uchar3* input, float3* output, size_t width, size_t height, bool swapRedBlue=false );
+
+/**
+ * Convert uchar3 RGB/BGR image to float4 RGBA/BGRA image
+ *
+ * @param swapRedBlue if true, swap the input's red and blue channels in the output -
+ *                    i.e if the input is RGB and output is BGR, or vice versa.  
+ *                    The default is false, and the channels will remain the same.
+ */
+cudaError_t cudaRGB8ToRGBA32( uchar3* input, float4* output, size_t width, size_t height, bool swapRedBlue=false );
+
+/**
+ * Convert uchar4 RGBA/BGRA image to float3 RGB/BGR image
+ *
+ * @param swapRedBlue if true, swap the input's red and blue channels in the output -
+ *                    i.e if the input is RGB and output is BGR, or vice versa.  
+ *                    The default is false, and the channels will remain the same.
+ */
+cudaError_t cudaRGBA8ToRGB32( uchar4* input, float3* output, size_t width, size_t height, bool swapRedBlue=false );
+
+/**
+ * Convert uchar4 RGBA/BGRA image to float4 RGBA/BGRA image
+ *
+ * @param swapRedBlue if true, swap the input's red and blue channels in the output -
+ *                    i.e if the input is RGB and output is BGR, or vice versa.  
+ *                    The default is false, and the channels will remain the same.
+ */
+cudaError_t cudaRGBA8ToRGBA32( uchar4* input, float4* output, size_t width, size_t height, bool swapRedBlue=false );
+
+///@}
+
+
+//////////////////////////////////////////////////////////////////////////////////
+/// @name Floating-point images to 8-bit images
+/// @see cudaConvertColor() from cudaColorspace.h for automated format conversion
+/// @ingroup colorspace
+//////////////////////////////////////////////////////////////////////////////////
+
+///@{
+
+/**
+ * Convert float3 RGB/BGR image into uchar3 RGB/BGR image.
+ *
+ * @param swapRedBlue if true, swap the input's red and blue channels in the output -
+ *                    i.e if the input is RGB and output is BGR, or vice versa.  
+ *                    The default is false, and the channels will remain the same.
+ *
+ * @param pixelRange specifies the floating-point pixel value range of the input image, 
+ *                   which is used to rescale the fixed-point pixel outputs to [0,255].
+ *                   The default input range is [0,255], where no rescaling occurs.
+ *                   Other common input ranges are [-1, 1] or [0,1].
+ */
+cudaError_t cudaRGB32ToRGB8( float3* input, uchar3* output, size_t width, size_t height, 
+					    bool swapRedBlue=false, const float2& pixelRange=make_float2(0,255) );
+
+/**
+ * Convert float3 RGB/BGR image into uchar4 RGBA/BGRA image.
+ *
+ * @param swapRedBlue if true, swap the input's red and blue channels in the output -
+ *                    i.e if the input is RGB and output is BGR, or vice versa.  
+ *                    The default is false, and the channels will remain the same.
+ *
+ * @param pixelRange specifies the floating-point pixel value range of the input image, 
+ *                   which is used to rescale the fixed-point pixel outputs to [0,255].
+ *                   The default input range is [0,255], where no rescaling occurs.
+ *                   Other common input ranges are [-1, 1] or [0,1].
+ */
+cudaError_t cudaRGB32ToRGBA8( float3* input, uchar4* output, size_t width, size_t height, 
+						bool swapRedBlue=false, const float2& pixelRange=make_float2(0,255) );
+
+/**
+ * Convert float4 RGBA/BGRA image into uchar3 image.
+ *
+ * @param swapRedBlue if true, swap the input's red and blue channels in the output -
+ *                    i.e if the input is RGB and output is BGR, or vice versa.  
+ *                    The default is false, and the channels will remain the same.
+ *
+ * @param pixelRange specifies the floating-point pixel value range of the input image, 
+ *                   which is used to rescale the fixed-point pixel outputs to [0,255].
+ *                   The default input range is [0,255], where no rescaling occurs.
+ *                   Other common input ranges are [-1, 1] or [0,1].
+ */
+cudaError_t cudaRGBA32ToRGB8( float4* input, uchar3* output, size_t width, size_t height, 
+						bool swapRedBlue=false, const float2& pixelRange=make_float2(0,255) );
+
+/**
+ * Convert float4 RGBA/BGRA image into uchar4 RGBA/BGRA image.
+ *
+ * @param swapRedBlue if true, swap the input's red and blue channels in the output -
+ *                    i.e if the input is RGB and output is BGR, or vice versa.  
+ *                    The default is false, and the channels will remain the same.
+ *
+ * @param pixelRange specifies the floating-point pixel value range of the input image, 
+ *                   which is used to rescale the fixed-point pixel outputs to [0,255].
+ *                   The default input range is [0,255], where no rescaling occurs.
+ *                   Other common input ranges are [-1, 1] or [0,1].
+ */
+cudaError_t cudaRGBA32ToRGBA8( float4* input, uchar4* output, size_t width, size_t height, 
+						 bool swapRedBlue=false, const float2& pixelRange=make_float2(0,255) );
 
 ///@}
 
 #endif
-

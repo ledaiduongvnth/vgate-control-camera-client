@@ -24,31 +24,36 @@
 #define __GSTREAMER_ENCODER_H__
 
 #include "gstUtility.h"
+#include "videoOutput.h"
+#include "RingBuffer.h"
 
 
 /**
- * Hardware-accelerated H.264/H.265 video encoder for Jetson using GStreamer.
- * The encoder can write the encoded video to disk in .mkv or .h264/.h265 formats,
- * or handle streaming network transmission to remote host(s) via RTP/RTSP protocol.
+ * Hardware-accelerated video encoder for Jetson using GStreamer.
+ *
+ * The encoder can write the encoded video to disk in (MKV, MP4, AVI, FLV),
+ * or stream over the network to a remote host via RTP/RTSP using UDP/IP.
+ * The supported encoder codecs are H.264, H.265, VP8, VP9, and MJPEG.
+ *
+ * @note gstEncoder implements the videoOutput interface and is intended to
+ * be used through that as opposed to directly.  videoOutput implements
+ * additional command-line parsing of videoOptions to construct instances.
+ *
+ * @see videoOutput
  * @ingroup codec
  */
-class gstEncoder
+class gstEncoder : public videoOutput
 {
 public:
 	/**
-	 * Create an encoder instance that outputs to a file on disk.
+	 * Create an encoder from the provided video options.
 	 */
-	static gstEncoder* Create( gstCodec codec, uint32_t width, uint32_t height, const char* filename );
-	
+	static gstEncoder* Create( const videoOptions& options );
+
 	/**
-	 * Create an encoder instance that streams over the network.
+	 * Create an encoder instance from resource URI and codec.
 	 */
-	static gstEncoder* Create( gstCodec codec, uint32_t width, uint32_t height, const char* ipAddress, uint16_t port );
-	
-	/**
-	 * Create an encoder instance that outputs to a file on disk and streams over the network.
-	 */
-	static gstEncoder* Create( gstCodec codec, uint32_t width, uint32_t height, const char* filename, const char* ipAddress, uint16_t port );
+	static gstEncoder* Create( const URI& resource, videoOptions::Codec codec );
 	
 	/**
 	 * Destructor
@@ -56,53 +61,70 @@ public:
 	~gstEncoder();
 	
 	/**
-	 * Encode the next fixed-point RGBA frame.
-	 * Expects 8-bit per channel, 32-bit per pixel unsigned image, range 0-255.
-	 * It is assumed the width of the buffer is equal to GetWidth(),
-	 * and that the height of the buffer is equal to GetHeight().
-	 * This function performs colorspace conversion using CUDA, so the
-	 * buffer pointer is expected to be CUDA memory allocated on the GPU.
-	 * @param buffer CUDA pointer to the RGBA image.
+	 * Encode the next frame.
+	 * @see videoOutput::Render()
 	 */
-	bool EncodeRGBA( uint8_t* buffer );
-
-	/**
-	 * Encode the next floating-point RGBA frame.
-	 * It is assumed the width of the buffer is equal to GetWidth(),
-	 * and that the height of the buffer is equal to GetHeight().
-	 * This function performs colorspace conversion using CUDA, so the
-	 * buffer pointer is expected to be CUDA memory allocated on the GPU.
-	 * @param buffer CUDA pointer to the RGBA image.
-	 * @param maxPixelValue indicates the maximum pixel intensity (typically 255.0f or 1.0f)
-	 */
-	bool EncodeRGBA( float* buffer, float maxPixelValue=255.0f );
-
-	/**
-	 * Encode the next I420 frame provided by the user.
-	 * Expects 12-bpp (bit per pixel) image in YUV I420 format.
-	 * This image is passed to GStreamer, so CPU pointer should be used.
-	 * @param buffer CPU pointer to the I420 image
-	 */
-	bool EncodeI420( void* buffer, size_t size );
+	template<typename T> bool Render( T* image, uint32_t width, uint32_t height )		{ return Render((void**)image, width, height, imageFormatFromType<T>()); }
 	
 	/**
-	 * Retrieve the width that the encoder was created for, in pixels.
+	 * Encode the next frame.
+	 * @see videoOutput::Render()
 	 */
-	inline uint32_t GetWidth() const			{ return mWidth; }
+	virtual bool Render( void* image, uint32_t width, uint32_t height, imageFormat format );
 
 	/**
-	 * Retrieve the height that the encoder was created for, in pixels.
+	 * Open the stream.
+	 * @see videoOutput::Open()
 	 */
-	inline uint32_t GetHeight() const			{ return mHeight; }
+	virtual bool Open();
+
+	/**
+	 * Close the stream.
+	 * @see videoOutput::Open()
+	 */
+	virtual void Close();
+
+	/**
+	 * Return the interface type (gstEncoder::Type)
+	 */
+	virtual inline uint32_t GetType() const		{ return Type; }
+
+	/**
+	 * Unique type identifier of gstEncoder class.
+	 */
+	static const uint32_t Type = (1 << 2);
+
+	/**
+	 * String array of supported video file extensions, terminated
+	 * with a NULL sentinel value.  The supported extension are:
+	 *
+	 *    - MKV
+	 *    - MP4 / QT
+	 *    - AVI
+	 *    - FLV
+	 *
+	 * @see IsSupportedExtension() to check a string against this list.
+	 */
+	static const char* SupportedExtensions[];
+
+	/**
+	 * Return true if the extension is in the list of SupportedExtensions.
+	 * @param ext string containing the extension to be checked (should not contain leading dot)
+	 * @see SupportedExtensions for the list of supported video file extensions.
+	 */
+	static bool IsSupportedExtension( const char* ext );
 
 protected:
-	gstEncoder();
+	gstEncoder( const videoOptions& options );
 	
+	bool init();
+
+	void checkMsgBus();
 	bool buildCapsStr();
 	bool buildLaunchStr();
 	
-	bool init( gstCodec codec, uint32_t width, uint32_t height, const char* filename, const char* ipAddress, uint16_t port );
-	
+	bool encodeYUV( void* buffer, size_t size );
+
 	static void onNeedData( _GstElement* pipeline, uint32_t size, void* user_data );
 	static void onEnoughData( _GstElement* pipeline, void* user_data );
 
@@ -110,10 +132,7 @@ protected:
 	_GstCaps*    mBufferCaps;
 	_GstElement* mAppSrc;
 	_GstElement* mPipeline;
-	gstCodec     mCodec;
 	bool         mNeedData;
-	uint32_t     mWidth;
-	uint32_t     mHeight;
 	
 	std::string  mCapsStr;
 	std::string  mLaunchStr;
@@ -121,11 +140,7 @@ protected:
 	std::string  mOutputIP;
 	uint16_t     mOutputPort;
 
-	// format conversion buffers
-	void* mCpuRGBA;
-	void* mGpuRGBA;
-	void* mCpuI420;
-	void* mGpuI420;
+	RingBuffer mBufferYUV;
 };
  
  

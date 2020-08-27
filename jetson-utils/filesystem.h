@@ -29,30 +29,18 @@
 
 
 /**
- * Given a relative path, resolve the absolute path based on the location 
- * of the process that calls the function.
+ * Given a relative path, resolve the absolute path using the working directory.
  *
- * For example, if the application is located at "/home/user/my_process"
- * and `absolutePath("resources/example")` is called, then this function
- * would return the path "/home/user/resources/example".
+ * For example, if the current working directory `/home/user/` and
+ * `absolutePath("resources/example")` is called, then this function
+ * would return the path `/home/user/resources/example`.
  * 
+ * If the path is already an absolute path (i.e. it begins with `/` or `~/`)
+ * then this function will be ignored and the path will be returned as-is.
+ *
  * @ingroup filesystem
  */
 std::string absolutePath( const std::string& relative_path );
-
-
-/**
- * Return a list of all the files in the specified directory.
- *
- * @param path the path of the directory
- * @param list the output list of all files in the directory
- * @param includePath if true, the list of filenames will be prefixed with the path
- *                    if false (default), the list of filenames will contain filenames/extensions only
- *
- * @ingroup filesystem
- */
-//bool listDirectory( const char* path, std::vector<std::string>& list, bool includePath=false );
-
 
 /**
  * Locate a file from common system locations.
@@ -78,21 +66,71 @@ std::string locateFile( const std::string& path );
  */
 std::string locateFile( const std::string& path, std::vector<std::string>& locations );
 
+/**
+ * Join two paths, and properly include a path separator (`/`) as needed.
+ * For example, 'pathJoin("~/workspace", "somefile.xml")` would return `~/workspace/somefile.xml`.
+ * @ingroup filesystem
+ */
+std::string pathJoin( const std::string& a, const std::string& b );
+
+/**
+ * Return the parent directory of the specified path, removing the filename and extension.
+ * For example, `pathDir("~/workspace/somefile.xml")` would return `~/workspace/`
+ * @ingroup filesystem
+ */
+std::string pathDir( const std::string& path );
+
+/**
+ * File types
+ * @ingroup filesystem
+ */
+enum fileTypes
+{
+	FILE_MISSING = 0,
+	FILE_REGULAR = (1 << 0),
+	FILE_DIR     = (1 << 1),
+	FILE_LINK    = (1 << 2),
+	FILE_CHAR    = (1 << 3),
+	FILE_BLOCK   = (1 << 4),
+	FILE_FIFO    = (1 << 5),
+	FILE_SOCKET  = (1 << 6)
+};
+
+/**
+ * Return a sorted list of the files in the specified directory.  listDir() will glob files from
+ * the specified path, and filter against wildcard characters including `*` and `?`.
+ * For example, valid paths would include `~/workspace`, `~/workspace/*.jpg`, ect.
+ * @see here for a description of wildcard matching:  https://www.man7.org/linux/man-pages/man7/glob.7.html
+ * @param path the path of the directory (may include wildcard characters)
+ * @param[out] list the alphanumerically sorted output list of the files in the directory
+ * @param mask filter by file type (by default, any file including directories will be included).
+ *             The mask should consist of fileTypes OR'd together (e.g. `FILE_REGULAR|FILE_DIR`).
+ * @ingroup filesystem
+ */
+bool listDir( const std::string& path, std::vector<std::string>& list, uint32_t mask=0 );
 
 /**
  * Verify path and return true if the file exists.
- *
- * @param regularFilesOnly If false (which is the default), then fileExists() includes filesystem entries 
- *                         like directories, device files, and sockets when verifying the path.
- *
- *                         If regularFilesOnly parameter is true, then fileExists() will verify the path 
- *                         is to a readable, "regular" file.  Other file types (for example directories)
- *                         will result in fileExists() returning false.
- *
+ * @param mask filter by file type (by default, any file including directories will be checked).
+ *             The mask should consist of fileTypes OR'd together (e.g. `FILE_REGULAR|FILE_DIR`).
  * @ingroup filesystem
  */
-bool fileExists( const char* path, bool regularFilesOnly=false );
+bool fileExists( const std::string& path, uint32_t mask=0 );
 
+/**
+ * Return true if the file is one of the types in the fileTypes mask.
+ * @param mask file types to check against (@see fileTypes)
+ *             The mask should consist of fileTypes OR'd together (e.g. `FILE_REGULAR|FILE_DIR`).
+ * @ingroup filesystem
+ */
+bool fileIsType( const std::string& path, uint32_t mask );
+
+/**
+ * Return the file type, or FILE_MISSING if it doesn't exist.
+ * @see fileTypes
+ * @ingroup filesystem
+ */
+uint32_t fileType( const std::string& path );
 
 /**
  * Return the size (in bytes) of the specified file.
@@ -103,16 +141,7 @@ bool fileExists( const char* path, bool regularFilesOnly=false );
  *
  * @ingroup filesystem
  */
-size_t fileSize( const char* path );
-
-
-/**
- * Extract the path out of the supplied string, removing the filename and extension
- * For example, `filePath("~/user/somefile.xml")` would return `~/user`
- * @ingroup filesystem
- */
-std::string filePath( const std::string& filename );
-
+size_t fileSize( const std::string& path );
 
 /**
  * Extract the file extension from the path.
@@ -122,24 +151,42 @@ std::string filePath( const std::string& filename );
  */
 std::string fileExtension( const std::string& path );
 
+/**
+ * Return true if the file has the given extension, otherwise false.
+ * For example, `fileHasExtension("~/workspace/image.jpg", "jpg")` would return true.
+ * @ingroup filesystem
+ */
+bool fileHasExtension( const std::string& path, const std::string& extension );
+
+/**
+ * Return true if the file has one of the given extensions, otherwise false.
+ * @ingroup filesystem
+ */
+bool fileHasExtension( const std::string& path, const std::vector<std::string>& extensions );
+
+/**
+ * Return true if the file has one of the given extensions, otherwise false.
+ * For example, `fileHasExtension("image.jpg", {"jpg", "jpeg", NULL})` would return true.
+ * @param extensions list of extensions, should end with `NULL` sentinel.
+ * @ingroup filesystem
+ */
+bool fileHasExtension( const std::string& path, const char** extensions );
 
 /**
  * Return the input string with the file extension removed
- * For example, `strRemoveExtension("~/user/somefile.xml")`
+ * For example, `fileRemoveExtension("~/workspace/somefile.xml")`
  * would return `~/user/somefile`.
  * @ingroup filesystem
  */
 std::string fileRemoveExtension( const std::string& filename );
 
-
 /**
  * Return the input string with a changed file extension
- * For example, `strChangeExtension("~/user/somefile.xml", "zip")`
+ * For example, `fileChangeExtension("~/workspace/somefile.xml", "zip")`
  * would return `~/user/somefile.zip`.
  * @ingroup filesystem
  */
 std::string fileChangeExtension( const std::string& filename, const std::string& newExtension );
-
 
 /**
  * Return the absolute path that of the calling process executable,
@@ -147,7 +194,6 @@ std::string fileChangeExtension( const std::string& filename, const std::string&
  * @ingroup filesystem
  */
 std::string processPath();
-
 
 /**
  * Return the directory that the calling process resides in.
@@ -160,7 +206,6 @@ std::string processPath();
  * @ingroup filesystem
  */
 std::string processDirectory();
-
 
 /**
  * Return the current working directory of the calling process.

@@ -25,16 +25,54 @@
 
 
 #include "cudaUtility.h"
+#include "imageFormat.h"
 
 
 /**
- * Rebase the pixel intensities of an image between two scales.
- * For example, convert an image with values 0.0-255 to 0.0-1.0.
- * @ingroup cuda
+ * Normalize the pixel intensities of a floating-point grayscale image between two scales.
+ * For example, convert an image with values between `[0,1]` to `[0,255]`
+ * @param input_range the range of pixel values of the input image (e.g. `[0,1]`)
+ * @param output_range the desired range of pixel values of the output image (e.g. `[0,255]`)
+ * @ingroup normalization
  */
-cudaError_t cudaNormalizeRGBA( float4* input,  const float2& input_range,
-						 float4* output, const float2& output_range,
-						 size_t  width,  size_t height );
+cudaError_t cudaNormalize( float* input,  const float2& input_range,
+					  float* output, const float2& output_range,
+					  size_t width,  size_t height );
+
+/**
+ * Normalize the pixel intensities of a float3 RGB/BGR image between two scales.
+ * For example, convert an image with values between `[0,1]` to `[0,255]`
+ * @param input_range the range of pixel values of the input image (e.g. `[0,1]`)
+ * @param output_range the desired range of pixel values of the output image (e.g. `[0,255]`)
+ * @ingroup normalization
+ */
+cudaError_t cudaNormalize( float3* input,  const float2& input_range,
+					  float3* output, const float2& output_range,
+					  size_t  width,  size_t height );
+
+/**
+ * Normalize the pixel intensities of a float4 RGBA/BGRA image between two scales.
+ * For example, convert an image with values between `[0,1]` to `[0,255]`
+ * @param input_range the range of pixel values of the input image (e.g. `[0,1]`)
+ * @param output_range the desired range of pixel values of the output image (e.g. `[0,255]`)
+ * @ingroup normalization
+ */
+cudaError_t cudaNormalize( float4* input,  const float2& input_range,
+					  float4* output, const float2& output_range,
+					  size_t  width,  size_t height );
+
+/**
+ * Normalize the pixel intensities of an image between two scales.
+ * For example, convert an image with values between `[0,1]` to `[0,255]`
+ * @param input_range the range of pixel values of the input image (e.g. `[0,1]`)
+ * @param output_range the desired range of pixel values of the output image (e.g. `[0,255]`)
+ * @param format the image format - valid formats are gray32f, rgb32f/bgr32f, and rgba32f/bgra32f.
+ * @ingroup normalization
+ */
+cudaError_t cudaNormalize( void* input,  const float2& input_range,
+					  void* output, const float2& output_range,
+					  size_t width, size_t height, imageFormat format );
+
 
 #endif
 

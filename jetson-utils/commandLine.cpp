@@ -21,7 +21,9 @@
  */
 
 #include "commandLine.h"
+#include "logging.h"
 
+#include <string>
 #include <string.h>
 #include <strings.h>
 
@@ -29,8 +31,8 @@
 #define ARGC_START 0
 
 
-// strRemoveDelimiter
-static inline int strRemoveDelimiter( char delimiter, const char* string )
+// search for the end of a leading character in a string (e.g. '--foo')
+static inline int strFindDelimiter( char delimiter, const char* string )
 {
     int string_start = 0;
 
@@ -44,26 +46,85 @@ static inline int strRemoveDelimiter( char delimiter, const char* string )
 }
 
 
+// replace hyphens for underscores and vice-versa (returns NULL if no changes)
+static inline char* strSwapDelimiter( const char* string )
+{
+	if( !string )
+		return NULL;
+	
+	// determine if the original char is in the string
+	bool found = false;
+	const int str_length = strlen(string);
+
+	for( int n=0; n < str_length; n++ )
+	{
+		if( string[n] == '-' || string[n] == '_' )
+		{
+			found = true;
+			break;
+		}
+	}
+
+	if( !found )
+		return NULL;
+	
+	// allocate a new string to modify
+	char* new_str = (char*)malloc(str_length);
+
+	if( !new_str )
+		return NULL;
+
+	strcpy(new_str, string);
+
+	// replace instances of the old char
+	for( int n=0; n < str_length; n++ )
+	{
+		if( new_str[n] == '-' )
+			new_str[n] = '_';
+		else if( new_str[n] == '_' )
+			new_str[n] = '-';
+	}
+
+	return new_str;
+}
+	
+
 // constructor
-commandLine::commandLine( const int pArgc, char** pArgv )
+commandLine::commandLine( const int pArgc, char** pArgv, const char* extraFlag )
 {
 	argc = pArgc;
 	argv = pArgv;
+
+	AddFlag(extraFlag);
+
+	Log::ParseCmdLine(*this);
+}
+
+
+// constructor
+commandLine::commandLine( const int pArgc, char** pArgv, const char** extraArgs )
+{
+	argc = pArgc;
+	argv = pArgv;
+
+	AddArgs(extraArgs);
+
+	Log::ParseCmdLine(*this);
 }
 
 
 // GetInt
-int commandLine::GetInt( const char* string_ref, int default_value ) const
+int commandLine::GetInt( const char* string_ref, int default_value, bool allowOtherDelimiters ) const
 {
 	if( argc < 1 )
-		return 0;
+		return default_value;
 
 	bool bFound = false;
-    int value = -1;
+	int value = -1;
 
 	for( int i=ARGC_START; i < argc; i++ )
 	{
-		const int string_start = strRemoveDelimiter('-', argv[i]);
+		const int string_start = strFindDelimiter('-', argv[i]);
 		
 		if( string_start == 0 )
 			continue;
@@ -89,25 +150,48 @@ int commandLine::GetInt( const char* string_ref, int default_value ) const
 	}
  
 
-	if (bFound)
+	if( bFound )
 		return value;
  
-	return default_value;
+	if( !allowOtherDelimiters )
+		return default_value;
+
+	// try looking for the argument with delimiters swapped
+	char* swapped_ref = strSwapDelimiter(string_ref);
+
+	if( !swapped_ref )
+		return default_value;
+
+	value = GetInt(swapped_ref, default_value, false);
+	free(swapped_ref);
+	return value;
 }
 
 
+// GetUnsignedInt
+uint32_t commandLine::GetUnsignedInt( const char* argName, uint32_t defaultValue, bool allowOtherDelimiters ) const
+{
+	const int val = GetInt(argName, (int)defaultValue, allowOtherDelimiters);
+
+	if( val < 0 )
+		return defaultValue;
+
+	return val;
+} 
+
+
 // GetFloat
-float commandLine::GetFloat( const char* string_ref, float default_value ) const
+float commandLine::GetFloat( const char* string_ref, float default_value, bool allowOtherDelimiters ) const
 {
 	if( argc < 1 )
-		return 0;
+		return default_value;
 
 	bool bFound = false;
 	float value = -1;
 
 	for (int i=ARGC_START; i < argc; i++)
 	{
-		const int string_start = strRemoveDelimiter('-', argv[i]);
+		const int string_start = strFindDelimiter('-', argv[i]);
 		
 		if( string_start == 0 )
 			continue;
@@ -135,19 +219,30 @@ float commandLine::GetFloat( const char* string_ref, float default_value ) const
 	if( bFound )
 		return value;
 
-	return default_value;
+	if( !allowOtherDelimiters )
+		return default_value;
+
+	// try looking for the argument with delimiters swapped
+	char* swapped_ref = strSwapDelimiter(string_ref);
+
+	if( !swapped_ref )
+		return default_value;
+
+	value = GetFloat(swapped_ref, default_value, false);
+	free(swapped_ref);
+	return value;
 }
 
 
 // GetFlag
-bool commandLine::GetFlag( const char* string_ref ) const
+bool commandLine::GetFlag( const char* string_ref, bool allowOtherDelimiters ) const
 {
 	if( argc < 1 )
 		return false;
 
 	for (int i=ARGC_START; i < argc; i++)
 	{
-		const int string_start = strRemoveDelimiter('-', argv[i]);
+		const int string_start = strFindDelimiter('-', argv[i]);
 		
 		if( string_start == 0 )
 			continue;
@@ -162,19 +257,30 @@ bool commandLine::GetFlag( const char* string_ref ) const
 			return true;
 	}
     
-	return false;
+	if( !allowOtherDelimiters )
+		return false;
+
+	// try looking for the argument with delimiters swapped
+	char* swapped_ref = strSwapDelimiter(string_ref);
+
+	if( !swapped_ref )
+		return false;
+
+	const bool value = GetFlag(swapped_ref, false);
+	free(swapped_ref);
+	return value;
 }
 
 
 // GetString
-const char* commandLine::GetString( const char* string_ref, const char* default_value ) const
+const char* commandLine::GetString( const char* string_ref, const char* default_value, bool allowOtherDelimiters ) const
 {
 	if( argc < 1 )
-		return 0;
+		return default_value;
 
 	for (int i=ARGC_START; i < argc; i++)
 	{
-		const int string_start  = strRemoveDelimiter('-', argv[i]);
+		const int string_start  = strFindDelimiter('-', argv[i]);
 		
 		if( string_start == 0 )
 			continue;
@@ -187,21 +293,32 @@ const char* commandLine::GetString( const char* string_ref, const char* default_
 			//*string_retval = &string_argv[length+1];
 	}
 
-	return default_value;
+	if( !allowOtherDelimiters )
+		return default_value;
+
+	// try looking for the argument with delimiters swapped
+	char* swapped_ref = strSwapDelimiter(string_ref);
+
+	if( !swapped_ref )
+		return default_value;
+
+	const char* value = GetString(swapped_ref, default_value, false);
+	free(swapped_ref);
+	return value;
 }
 
 
 // GetPosition
 const char* commandLine::GetPosition( unsigned int position, const char* default_value ) const
 {
-	if( argc < 1 )
-		return 0;
+	if( argc < 1 || position >= GetPositionArgs() )
+		return default_value;
 
 	unsigned int position_count = 0;
 	
 	for (int i=1/*ARGC_START*/; i < argc; i++)
 	{
-		const int string_start = strRemoveDelimiter('-', argv[i]);
+		const int string_start = strFindDelimiter('-', argv[i]);
 		
 		if( string_start != 0 )
 			continue;
@@ -223,7 +340,7 @@ unsigned int commandLine::GetPositionArgs() const
 	
 	for (int i=1/*ARGC_START*/; i < argc; i++)
 	{
-		const int string_start = strRemoveDelimiter('-', argv[i]);
+		const int string_start = strFindDelimiter('-', argv[i]);
 		
 		if( string_start != 0 )
 			continue;
@@ -233,3 +350,82 @@ unsigned int commandLine::GetPositionArgs() const
 
 	return position_count;
 }
+
+
+// AddArg
+void commandLine::AddArg( const char* arg )
+{
+	if( !arg )
+		return;
+
+	const size_t arg_length = strlen(arg);
+
+	if( arg_length == 0 )
+		return;
+
+	const int new_argc = argc + 1;
+	char** new_argv = (char**)malloc(sizeof(char*) * new_argc);
+
+	if( !new_argv )
+		return;
+
+	for( int n=0; n < argc; n++ )
+		new_argv[n] = argv[n];
+
+	new_argv[argc] = (char*)malloc(arg_length + 1);
+
+	if( !new_argv[argc] )
+		return;
+
+	strcpy(new_argv[argc], arg);
+
+	argc = new_argc;
+	argv = new_argv;
+}
+
+
+// AddArgs
+void commandLine::AddArgs( const char** args )
+{
+	if( !args )
+		return;
+
+	int arg_count = 0;
+
+	while(true)
+	{
+		if( !args[arg_count] )
+			return;
+		
+		AddArg(args[arg_count]);
+		arg_count++;
+	}
+}
+
+
+// AddFlag
+void commandLine::AddFlag( const char* flag )
+{
+	if( !flag || strlen(flag) == 0 )
+		return;
+
+	if( GetFlag(flag) )
+		return;
+
+	const std::string arg = std::string("--") + flag;
+	AddArg(arg.c_str());
+}
+
+
+// Print
+void commandLine::Print() const
+{
+	for( int n=0; n < argc; n++ )
+		printf("%s ", argv[n]);
+
+	printf("\n");
+}
+
+
+
+

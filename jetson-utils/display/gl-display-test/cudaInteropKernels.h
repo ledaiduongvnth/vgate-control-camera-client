@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, NVIDIA CORPORATION. All rights reserved.
+ * Copyright (c) 2019, NVIDIA CORPORATION. All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -20,18 +20,24 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#include "Mutex.h"
+#ifndef __CUDA_INTEROP_KERNELS_H__
+#define __CUDA_INTEROP_KERNELS_H__
+
+#include "cudaUtility.h"
 
 
-// constructor
-CMutex::CMutex()
+// PointVertex
+struct PointVertex
 {
-	pthread_mutex_init(&mID, NULL);
-}
+	float3 pos;
+	uchar4 color;
+};
 
 
-// destructor
-CMutex::~CMutex()
-{
-	pthread_mutex_destroy(&mID);
-}
+// generate a grid of NxN points distributed over the world size,
+// with a random time factor animating the height of the points
+cudaError_t cudaGeneratePointGrid( PointVertex* points, uint32_t N, 
+							float world_size, float time );
+
+
+#endif

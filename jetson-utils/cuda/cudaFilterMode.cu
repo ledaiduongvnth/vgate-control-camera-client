@@ -19,18 +19,36 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
- 
-#ifndef __PYTHON_BINDINGS_NUMPY__
-#define __PYTHON_BINDINGS_NUMPY__
-
-#include "PyUtils.h"
 
 
-// Register functions
-PyMethodDef* PyNumPy_RegisterFunctions();
-
-// Register types
-bool PyNumPy_RegisterTypes( PyObject* module );
+#include "cudaFilterMode.h"
+#include <strings.h>
 
 
-#endif
+// cudaFilterModeFromStr
+cudaFilterMode cudaFilterModeFromStr( const char* str, cudaFilterMode default_value )
+{
+	if( !str )
+		return default_value;
+
+	if( strcasecmp(str, "linear") == 0 )
+		return FILTER_LINEAR;
+	else if( strcasecmp(str, "point") == 0 || strcasecmp(str, "nearest") == 0 )
+		return FILTER_POINT;
+
+	return default_value;
+}
+
+
+// cudaFilterModeToStr
+const char* cudaFilterModeToStr( cudaFilterMode filter )
+{
+	if( filter == FILTER_LINEAR )
+		return "linear";
+
+	return "point";
+}
+
+
+
+

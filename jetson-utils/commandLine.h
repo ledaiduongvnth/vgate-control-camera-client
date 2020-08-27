@@ -25,11 +25,12 @@
 
 
 #include <stdlib.h>	
+#include <stdint.h>
 
 
 /**
- * Command line parser class.
- * @ingroup util
+ * Command line parser for extracting flags, values, and strings.
+ * @ingroup commandLine
  */
 class commandLine
 {
@@ -37,45 +38,79 @@ public:
 	/**
 	 * Constructor, takes the command line from `main()`
 	 */
-	commandLine( const int argc, char** argv );
+	commandLine( const int argc, char** argv, const char* extraFlag=NULL );
+
+	/**
+	 * Constructor, takes the command line from `main()`
+	 */
+	commandLine( const int argc, char** argv, const char** extraArgs );
 
 	/**
 	 * Checks to see whether the specified flag was included on the 
 	 * command line.   For example, if argv contained `--foo`, then 
 	 * `GetFlag("foo")` would return `true`
 	 *
+	 * @param allowOtherDelimiters if true (default), the argName will be 
+	 *          matched against occurances containing either `-` or `_`.  
+	 *          For example, `--foo-bar` and `--foo_bar` would be the same.
+	 *
 	 * @returns `true`, if the flag with argName was found
 	 *          `false`, if the flag with argName was not found
 	 */
-	bool GetFlag( const char* argName ) const;
+	bool GetFlag( const char* argName, bool allowOtherDelimiters=true ) const;
 	
 	/**
 	 * Get float argument.  For example if argv contained `--foo=3.14159`, 
 	 * then `GetInt("foo")` would return `3.14159f`
 	 *
+	 * @param allowOtherDelimiters if true (default), the argName will be 
+	 *          matched against occurances containing either `-` or `_`.  
+	 *          For example, `--foo-bar` and `--foo_bar` would be the same.
+	 *
 	 * @returns `defaultValue` if the argument couldn't be found. (`0.0` by default).
 	 *          Otherwise, returns the value of the argument.
 	 */
-	float GetFloat( const char* argName, float defaultValue=0.0f ) const;
+	float GetFloat( const char* argName, float defaultValue=0.0f, bool allowOtherDelimiters=true ) const;
 
 	/**
 	 * Get integer argument.  For example if argv contained `--foo=100`, 
 	 * then `GetInt("foo")` would return `100`
 	 *
+	 * @param allowOtherDelimiters if true (default), the argName will be 
+	 *          matched against occurances containing either `-` or `_`.  
+	 *          For example, `--foo-bar` and `--foo_bar` would be the same.
+	 *
 	 * @returns `defaultValue` if the argument couldn't be found (`0` by default).
 	 *          Otherwise, returns the value of the argument. 
 	 */
-	int GetInt( const char* argName, int defaultValue=0 ) const; 
+	int GetInt( const char* argName, int defaultValue=0, bool allowOtherDelimiters=true ) const; 
+
+	/**
+	 * Get unsigned integer argument.  For example if argv contained `--foo=100`, 
+	 * then `GetUnsignedInt("foo")` would return `100`
+	 *
+	 * @param allowOtherDelimiters if true (default), the argName will be 
+	 *          matched against occurances containing either `-` or `_`.  
+	 *          For example, `--foo-bar` and `--foo_bar` would be the same.
+	 *
+	 * @returns `defaultValue` if the argument couldn't be found, or if the value
+	 *          was negative (`0` by default). Otherwise, returns the parsed value.
+	 */
+	uint32_t GetUnsignedInt( const char* argName, uint32_t defaultValue=0, bool allowOtherDelimiters=true ) const; 
 
 	/**
 	 * Get string argument.  For example if argv contained `--foo=bar`,
 	 * then `GetString("foo")` would return `"bar"`
 	 *
+	 * @param allowOtherDelimiters if true (default), the argName will be 
+	 *          matched against occurances containing either `-` or `_`.  
+	 *          For example, `--foo-bar` and `--foo_bar` would be the same.
+	 *
 	 * @returns `defaultValue` if the argument couldn't be found (`NULL` by default).
 	 *          Otherwise, returns a pointer to the argument value string
 	 *          from the `argv` array.
 	 */
-	const char* GetString( const char* argName, const char* defaultValue=NULL ) const;
+	const char* GetString( const char* argName, const char* defaultValue=NULL, bool allowOtherDelimiters=true ) const;
 
 	/**
 	 * Get positional string argument.  Positional arguments aren't named, but rather
@@ -96,6 +131,26 @@ public:
 	unsigned int GetPositionArgs() const;
 	
 	/**
+	 * Add an argument to the command line.
+	 */
+	void AddArg( const char* arg );
+
+	/**
+	 * Add arguments to the command line.
+	 */
+	void AddArgs( const char** args );
+
+	/**
+	 * Add a flag to the command line.
+	 */
+	void AddFlag( const char* flag );
+
+	/**
+	 * Print out the command line for reference.
+	 */
+	void Print() const;
+
+	/**
 	 * The argument count that the object was created with from main()
 	 */
 	int argc;
@@ -105,6 +160,13 @@ public:
 	 */
 	char** argv;
 };
+
+
+/**
+ * Specify a positional argument index.
+ * @ingroup commandLine
+ */
+#define ARG_POSITION(x) x
 
 
 #endif

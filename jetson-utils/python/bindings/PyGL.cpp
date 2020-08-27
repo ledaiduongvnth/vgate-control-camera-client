@@ -24,6 +24,7 @@
 #include "PyCUDA.h"
 
 #include "glDisplay.h"
+#include "logging.h"
 
 
 // PyDisplay container
@@ -36,7 +37,7 @@ typedef struct {
 // New
 static PyObject* PyDisplay_New( PyTypeObject *type, PyObject *args, PyObject *kwds )
 {
-	printf(LOG_PY_UTILS "PyDisplay_New()\n");
+	LogDebug(LOG_PY_UTILS "PyDisplay_New()\n");
 	
 	// allocate a new container
 	PyDisplay_Object* self = (PyDisplay_Object*)type->tp_alloc(type, 0);
@@ -55,21 +56,23 @@ static PyObject* PyDisplay_New( PyTypeObject *type, PyObject *args, PyObject *kw
 // Init
 static int PyDisplay_Init( PyDisplay_Object* self, PyObject *args, PyObject *kwds )
 {
-	printf(LOG_PY_UTILS "PyDisplay_Init()\n");
+	LogDebug(LOG_PY_UTILS "PyDisplay_Init()\n");
 	
 	// parse arguments
+	int width = -1;
+	int height = -1;
 	float bg_color[] = { 0.05f, 0.05f, 0.05f, 1.0f };
 	const char* title = glDisplay::DEFAULT_TITLE;
-	static char* kwlist[] = {"title", "r", "g", "b", "a", NULL};
+	static char* kwlist[] = {"title", "width", "height", "r", "g", "b", "a", NULL};
 
-	if( !PyArg_ParseTupleAndKeywords(args, kwds, "|sffff", kwlist, &title, &bg_color[0], &bg_color[1], &bg_color[2], &bg_color[3]))
+	if( !PyArg_ParseTupleAndKeywords(args, kwds, "|siiffff", kwlist, &title, &width, &height, &bg_color[0], &bg_color[1], &bg_color[2], &bg_color[3]))
 	{
 		PyErr_SetString(PyExc_Exception, LOG_PY_UTILS "glDisplay.__init()__ failed to parse args tuple");
 		return -1;
 	}
   
 	// create the display object
-	glDisplay* display = glDisplay::Create(title, bg_color[0], bg_color[1], bg_color[2], bg_color[3]);
+	glDisplay* display = glDisplay::Create(title, width, height, bg_color[0], bg_color[1], bg_color[2], bg_color[3]);
 
 	if( !display )
 	{
@@ -85,7 +88,7 @@ static int PyDisplay_Init( PyDisplay_Object* self, PyObject *args, PyObject *kwd
 // Deallocate
 static void PyDisplay_Dealloc( PyDisplay_Object* self )
 {
-	printf(LOG_PY_UTILS "PyDisplay_Dealloc()\n");
+	LogDebug(LOG_PY_UTILS "PyDisplay_Dealloc()\n");
 
 	// free the display
 	if( self->display != NULL )
@@ -156,32 +159,26 @@ static PyObject* PyDisplay_Render( PyDisplay_Object* self, PyObject* args, PyObj
 	int height = 0;
 	int norm   = 1;
 
-	static char* kwlist[] = {"image", "width", "height", "x", "y", "normalize", NULL};
+	const char* format_str = "rgba32f";
+	static char* kwlist[] = {"image", "width", "height", "x", "y", "normalize", "format", NULL};
 
-	if( !PyArg_ParseTupleAndKeywords(args, kwds, "Oii|ffi", kwlist, &capsule, &width, &height, &x, &y, &norm))
+	if( !PyArg_ParseTupleAndKeywords(args, kwds, "O|iiffis", kwlist, &capsule, &width, &height, &x, &y, &norm, &format_str))
 	{
 		PyErr_SetString(PyExc_Exception, LOG_PY_UTILS "glDisplay.Render() failed to parse args tuple");
 		return NULL;
 	}
 
-	// verify dimensions
-	if( width <= 0 || height <= 0 )
-	{
-		PyErr_SetString(PyExc_Exception, LOG_PY_UTILS "glDisplay.Render() image dimensions are invalid");
-		return NULL;
-	}
+	// parse format string
+	imageFormat format = imageFormatFromStr(format_str);
 
 	// get pointer to image data
-	void* img = PyCUDA_GetPointer(capsule);
+	void* ptr = PyCUDA_GetImage(capsule, &width, &height, &format);
 
-	if( !img )
-	{
-		PyErr_SetString(PyExc_Exception, LOG_PY_UTILS "glDisplay.Render() failed to get image pointer from PyCapsule container");
+	if( !ptr )
 		return NULL;
-	}
 
 	// render the image
-	self->display->Render((float*)img, width, height, x, y, norm > 0 ? true : false);
+	self->display->RenderImage(ptr, width, height, format, x, y, norm > 0 ? true : false);
 
 	// return void
 	Py_RETURN_NONE;
@@ -207,32 +204,26 @@ static PyObject* PyDisplay_RenderOnce( PyDisplay_Object* self, PyObject* args, P
 	int height = 0;
 	int norm   = 1;
 
-	static char* kwlist[] = {"image", "width", "height", "x", "y", "normalize", NULL};
+	const char* format_str = "rgba32f";
+	static char* kwlist[] = {"image", "width", "height", "x", "y", "normalize", "format", NULL};
 
-	if( !PyArg_ParseTupleAndKeywords(args, kwds, "Oii|ffi", kwlist, &capsule, &width, &height, &x, &y, &norm))
+	if( !PyArg_ParseTupleAndKeywords(args, kwds, "O|iiffis", kwlist, &capsule, &width, &height, &x, &y, &norm))
 	{
 		PyErr_SetString(PyExc_Exception, LOG_PY_UTILS "glDisplay.RenderOnce() failed to parse args tuple");
 		return NULL;
 	}
 
-	// verify dimensions
-	if( width <= 0 || height <= 0 )
-	{
-		PyErr_SetString(PyExc_Exception, LOG_PY_UTILS "glDisplay.RenderOnce() image dimensions are invalid");
-		return NULL;
-	}
+	// parse format string
+	imageFormat format = imageFormatFromStr(format_str);
 
 	// get pointer to image data
-	void* img = PyCUDA_GetPointer(capsule);
+	void* ptr = PyCUDA_GetImage(capsule, &width, &height, &format);
 
-	if( !img )
-	{
-		PyErr_SetString(PyExc_Exception, LOG_PY_UTILS "glDisplay.RenderOnce() failed to get image pointer from PyCapsule container");
+	if( !ptr )
 		return NULL;
-	}
 
 	// render the image
-	self->display->RenderOnce((float*)img, width, height, x, y, norm > 0 ? true : false);
+	self->display->RenderOnce(ptr, width, height, format, x, y, norm > 0 ? true : false);
 
 	// return void
 	Py_RETURN_NONE;
@@ -353,8 +344,8 @@ static PyObject* PyDisplay_IsClosed( PyDisplay_Object* self )
 }
 
 
-// UserEvents
-static PyObject* PyDisplay_UserEvents( PyDisplay_Object* self )
+// ProcessEvents
+static PyObject* PyDisplay_ProcessEvents( PyDisplay_Object* self )
 {
 	if( !self || !self->display )
 	{
@@ -362,7 +353,7 @@ static PyObject* PyDisplay_UserEvents( PyDisplay_Object* self )
 		return NULL;
 	}
 
-	self->display->UserEvents();
+	self->display->ProcessEvents();
 	Py_RETURN_NONE; 
 }
 
@@ -387,7 +378,7 @@ static PyMethodDef PyDisplay_Methods[] =
 	{ "IsClosed", (PyCFunction)PyDisplay_IsClosed, METH_NOARGS, "Returns true if the window has been closed"},
 	{ "SetBackgroundColor", (PyCFunction)PyDisplay_SetBackgroundColor, METH_VARARGS|METH_KEYWORDS, "Set the window background color"},
 	{ "SetTitle", (PyCFunction)PyDisplay_SetTitle, METH_VARARGS, "Set the window title string"},
-	{ "UserEvents", (PyCFunction)PyDisplay_UserEvents, METH_NOARGS, "Process UI events"},
+	{ "ProcessEvents", (PyCFunction)PyDisplay_ProcessEvents, METH_NOARGS, "Process UI events"},
 	{NULL}  /* Sentinel */
 };
 
@@ -408,7 +399,7 @@ bool PyGL_RegisterTypes( PyObject* module )
 	 
 	if( PyType_Ready(&PyDisplay_Type) < 0 )
 	{
-		printf(LOG_PY_UTILS "glDisplay PyType_Ready() failed\n");
+		LogError(LOG_PY_UTILS "glDisplay PyType_Ready() failed\n");
 		return false;
 	}
 	
@@ -416,7 +407,7 @@ bool PyGL_RegisterTypes( PyObject* module )
     
 	if( PyModule_AddObject(module, "glDisplay", (PyObject*)&PyDisplay_Type) < 0 )
 	{
-		printf(LOG_PY_UTILS "glDisplay PyModule_AddObject('glDisplay') failed\n");
+		LogError(LOG_PY_UTILS "glDisplay PyModule_AddObject('glDisplay') failed\n");
 		return false;
 	}
 

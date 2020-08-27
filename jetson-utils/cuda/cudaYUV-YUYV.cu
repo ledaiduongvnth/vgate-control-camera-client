@@ -21,181 +21,219 @@
  */
 
 #include "cudaYUV.h"
+#include "imageFormat.h"
 
 
-inline __device__ __host__ float clamp(float f, float a, float b)
-{
-    return fmaxf(a, fminf(f, b));
+//-----------------------------------------------------------------------------------
+// YUV to RGB colorspace conversion
+//-----------------------------------------------------------------------------------
+static inline __device__ float clamp( float x )	
+{ 
+	return fminf(fmaxf(x, 0.0f), 255.0f); 
 }
 
+static inline __device__ float3 YUV2RGB(float Y, float U, float V)
+{
+	U -= 128.0f;
+	V -= 128.0f;
 
-/* From RGB to YUV
+#if 1
+	return make_float3(clamp(Y + 1.4065f * V),
+    				    clamp(Y - 0.3455f * U - 0.7169f * V),
+				    clamp(Y + 1.7790f * U));
+#else
+	return make_float3(clamp(Y + 1.402f * V),
+    				    clamp(Y - 0.344f * U - 0.714f * V),
+				    clamp(Y + 1.772f * U));
+#endif
+}
 
-   Y = 0.299R + 0.587G + 0.114B
-   U = 0.492 (B-Y)
-   V = 0.877 (R-Y)
-
-   It can also be represented as:
-
-   Y =  0.299R + 0.587G + 0.114B
-   U = -0.147R - 0.289G + 0.436B
-   V =  0.615R - 0.515G - 0.100B
-
-   From YUV to RGB
-
-   R = Y + 1.140V
-   G = Y - 0.395U - 0.581V
-   B = Y + 2.032U
- */
+//-----------------------------------------------------------------------------------
+// YUYV/UYVY are macropixel formats, and two RGB pixels are output at once.
+// Define vectors with 6 and 8 elements so they can be written at one time.
+// These are similar to those from cudaVector.h, except for 6/8 elements.
+//-----------------------------------------------------------------------------------
+struct /*__align__(6)*/ uchar6
+{
+   uint8_t x0, y0, z0, x1, y1, z1;
+};
 
 struct __align__(8) uchar8
 {
-   uint8_t a0, a1, a2, a3, a4, a5, a6, a7;
+   uint8_t x0, y0, z0, w0, x1, y1, z1, w1;
 };
-static __host__ __device__ __forceinline__ uchar8 make_uchar8(uint8_t a0, uint8_t a1, uint8_t a2, uint8_t a3, uint8_t a4, uint8_t a5, uint8_t a6, uint8_t a7)
+
+struct /*__align__(24)*/ float6
 {
-   uchar8 val = {a0, a1, a2, a3, a4, a5, a6, a7};
-   return val;
-}
+   float x0, y0, z0, x1, y1, z1;
+};
+
+struct __align__(32) float8
+{
+   float x0, y0, z0, w0, x1, y1, z1, w1;
+};
+
+template<class T> struct vecTypeInfo;
+
+template<> struct vecTypeInfo<uchar6> { typedef uint8_t Base; };
+template<> struct vecTypeInfo<uchar8> { typedef uint8_t Base; };
+
+template<> struct vecTypeInfo<float6> { typedef float Base; };
+template<> struct vecTypeInfo<float8> { typedef float Base; };
+
+template<typename T> struct vec_assert_false : std::false_type { };
+
+#define BaseType typename vecTypeInfo<T>::Base
+
+template<typename T> inline __host__ __device__ T make_vec(BaseType x0, BaseType y0, BaseType z0, BaseType w0, BaseType x1, BaseType y1, BaseType z1, BaseType w1) { static_assert(vec_assert_false<T>::value, "invalid vector type - supported types are uchar6, uchar8, float6, float8");  }
+
+template<> inline __host__ __device__ uchar6 make_vec( uint8_t x0, uint8_t y0, uint8_t z0, uint8_t w0, uint8_t x1, uint8_t y1, uint8_t z1, uint8_t w1 )	{ return {x0, y0, z0, x1, y1, z1}; }
+template<> inline __host__ __device__ uchar8 make_vec( uint8_t x0, uint8_t y0, uint8_t z0, uint8_t w0, uint8_t x1, uint8_t y1, uint8_t z1, uint8_t w1 )	{ return {x0, y0, z0, w1, x1, y1, z1, w1}; }
+
+template<> inline __host__ __device__ float6 make_vec( float x0, float y0, float z0, float w0, float x1, float y1, float z1, float w1 )				{ return {x0, y0, z0, x1, y1, z1}; }
+template<> inline __host__ __device__ float8 make_vec( float x0, float y0, float z0, float w0, float x1, float y1, float z1, float w1 )				{ return {x0, y0, z0, w1, x1, y1, z1, w1}; }
 
 
 //-----------------------------------------------------------------------------------
 // YUYV/UYVY to RGBA
 //-----------------------------------------------------------------------------------
-template <bool formatUYVY>
-__global__ void yuyvToRgba( uchar4* src, int srcAlignedWidth, uchar8* dst, int dstAlignedWidth, int width, int height )
+template <typename T, imageFormat format>
+__global__ void YUYVToRGBA( uchar4* src, T* dst, int halfWidth, int height )
 {
 	const int x = blockIdx.x * blockDim.x + threadIdx.x;
 	const int y = blockIdx.y * blockDim.y + threadIdx.y;
 
-	if( x >= srcAlignedWidth || y >= height )
+	if( x >= halfWidth || y >= height )
 		return;
 
-	const uchar4 macroPx = src[y * srcAlignedWidth + x];
+	const uchar4 macroPx = src[y * halfWidth + x];
 
 	// Y0 is the brightness of pixel 0, Y1 the brightness of pixel 1.
-	// U0 and V0 is the color of both pixels.
-	// UYVY [ U0 | Y0 | V0 | Y1 ] 
-	// YUYV [ Y0 | U0 | Y1 | V0 ]
-	const float y0 = formatUYVY ? macroPx.y : macroPx.x;
-	const float y1 = formatUYVY ? macroPx.w : macroPx.z; 
-	const float u = (formatUYVY ? macroPx.x : macroPx.y) - 128.0f;
-	const float v = (formatUYVY ? macroPx.z : macroPx.w) - 128.0f;
+	// U and V is the color of both pixels.
+	float y0, y1, u, v;
 
-	const float4 px0 = make_float4( y0 + 1.4065f * v,
-							  y0 - 0.3455f * u - 0.7169f * v,
-							  y0 + 1.7790f * u, 255.0f );
+	if( format == IMAGE_YUYV )
+	{
+		// YUYV [ Y0 | U0 | Y1 | V0 ]
+		y0 = macroPx.x;
+		y1 = macroPx.z;
+		u  = macroPx.y;
+		v  = macroPx.w;
+	}
+	else if( format == IMAGE_YVYU )
+	{
+		// YVYU [ Y0 | V0 | Y1 | U0 ]
+		y0 = macroPx.x;
+		y1 = macroPx.z;
+		u  = macroPx.w;
+		v  = macroPx.y;
+	}
+	else // if( format == IMAGE_UYVY )
+	{
+		// UYVY [ U0 | Y0 | V0 | Y1 ]
+		y0 = macroPx.y;
+		y1 = macroPx.w;
+		u  = macroPx.x;
+		v  = macroPx.z;
+	}
 
-	const float4 px1 = make_float4( y1 + 1.4065f * v,
-							  y1 - 0.3455f * u - 0.7169f * v,
-							  y1 + 1.7790f * u, 255.0f );
+	// this function outputs two pixels from one YUYV macropixel
+	const float3 px0 = YUV2RGB(y0, u, v);
+	const float3 px1 = YUV2RGB(y1, u, v);
 
-	dst[y * dstAlignedWidth + x] = make_uchar8( clamp(px0.x, 0.0f, 255.0f), 
-									    clamp(px0.y, 0.0f, 255.0f),
-									    clamp(px0.z, 0.0f, 255.0f),
-									    clamp(px0.w, 0.0f, 255.0f),
-									    clamp(px1.x, 0.0f, 255.0f),
-									    clamp(px1.y, 0.0f, 255.0f),
-									    clamp(px1.z, 0.0f, 255.0f),
-									    clamp(px1.w, 0.0f, 255.0f) );
+	dst[y * halfWidth + x] = make_vec<T>(px0.x, px0.y, px0.z, 255,
+								  px1.x, px1.y, px1.z, 255);
 } 
 
-template<bool formatUYVY>
-cudaError_t launchYUYV( uchar2* input, size_t inputPitch, uchar4* output, size_t outputPitch, size_t width, size_t height)
+template<typename T, imageFormat format>
+static cudaError_t launchYUYVToRGB( void* input, T* output, size_t width, size_t height)
 {
-	if( !input || !inputPitch || !output || !outputPitch || !width || !height )
+	if( !input || !output || !width || !height )
 		return cudaErrorInvalidValue;
 
-	const dim3 block(8,8);
-	const dim3 grid(iDivUp(width/2, block.x), iDivUp(height, block.y));
+	const int  halfWidth = width / 2;	// two pixels are output at once
+	const dim3 blockDim(8,8);
+	const dim3 gridDim(iDivUp(halfWidth, blockDim.x), iDivUp(height, blockDim.y));
 
-	const int srcAlignedWidth = inputPitch / sizeof(uchar4);	// normally would be uchar2, but we're doubling up pixels
-	const int dstAlignedWidth = outputPitch / sizeof(uchar8);	// normally would be uchar4 ^^^
-
-	//printf("yuyvToRgba %zu %zu %i %i %i %i %i\n", width, height, (int)formatUYVY, srcAlignedWidth, dstAlignedWidth, grid.x, grid.y);
-
-	yuyvToRgba<formatUYVY><<<grid, block>>>((uchar4*)input, srcAlignedWidth, (uchar8*)output, dstAlignedWidth, width, height);
+	YUYVToRGBA<T, format><<<gridDim, blockDim>>>((uchar4*)input, output, halfWidth, height);
 
 	return CUDA(cudaGetLastError());
 }
 
 
-cudaError_t cudaUYVYToRGBA( uchar2* input, uchar4* output, size_t width, size_t height )
+// cudaYUYVToRGB (uchar3)
+cudaError_t cudaYUYVToRGB( void* input, uchar3* output, size_t width, size_t height )
 {
-	return cudaUYVYToRGBA(input, width * sizeof(uchar2), output, width * sizeof(uchar4), width, height);
+	return launchYUYVToRGB<uchar6, IMAGE_YUYV>(input, (uchar6*)output, width, height);
 }
 
-cudaError_t cudaUYVYToRGBA( uchar2* input, size_t inputPitch, uchar4* output, size_t outputPitch, size_t width, size_t height )
+// cudaYUYVToRGB (float3)
+cudaError_t cudaYUYVToRGB( void* input, float3* output, size_t width, size_t height )
 {
-	return launchYUYV<true>(input, inputPitch, output, outputPitch, width, height);
+	return launchYUYVToRGB<float6, IMAGE_YUYV>(input, (float6*)output, width, height);
 }
 
-cudaError_t cudaYUYVToRGBA( uchar2* input, uchar4* output, size_t width, size_t height )
+// cudaYUYVToRGBA (uchar4)
+cudaError_t cudaYUYVToRGBA( void* input, uchar4* output, size_t width, size_t height )
 {
-	return cudaYUYVToRGBA(input, width * sizeof(uchar2), output, width * sizeof(uchar4), width, height);
+	return launchYUYVToRGB<uchar8, IMAGE_YUYV>(input, (uchar8*)output, width, height);
 }
 
-cudaError_t cudaYUYVToRGBA( uchar2* input, size_t inputPitch, uchar4* output, size_t outputPitch, size_t width, size_t height )
+// cudaYUYVToRGBA (float4)
+cudaError_t cudaYUYVToRGBA( void* input, float4* output, size_t width, size_t height )
 {
-	return launchYUYV<false>(input, inputPitch, output, outputPitch, width, height);
+	return launchYUYVToRGB<float8, IMAGE_YUYV>(input, (float8*)output, width, height);
 }
-
 
 //-----------------------------------------------------------------------------------
-// YUYV/UYVY to grayscale
+
+// cudaUYVYToRGB (uchar3)
+cudaError_t cudaUYVYToRGB( void* input, uchar3* output, size_t width, size_t height )
+{
+	return launchYUYVToRGB<uchar6, IMAGE_UYVY>(input, (uchar6*)output, width, height);
+}
+
+// cudaUYVYToRGB (float3)
+cudaError_t cudaUYVYToRGB( void* input, float3* output, size_t width, size_t height )
+{
+	return launchYUYVToRGB<float6, IMAGE_UYVY>(input, (float6*)output, width, height);
+}
+
+// cudaUYVYToRGBA (uchar4)
+cudaError_t cudaUYVYToRGBA( void* input, uchar4* output, size_t width, size_t height )
+{
+	return launchYUYVToRGB<uchar8, IMAGE_UYVY>(input, (uchar8*)output, width, height);
+}
+
+// cudaUYVYToRGBA (float4)
+cudaError_t cudaUYVYToRGBA( void* input, float4* output, size_t width, size_t height )
+{
+	return launchYUYVToRGB<float8, IMAGE_UYVY>(input, (float8*)output, width, height);
+}
+
 //-----------------------------------------------------------------------------------
 
-template <bool formatUYVY>
-__global__ void yuyvToGray( uchar4* src, int srcAlignedWidth, float2* dst, int dstAlignedWidth, int width, int height )
+// cudaYVYUToRGB (uchar3)
+cudaError_t cudaYVYUToRGB( void* input, uchar3* output, size_t width, size_t height )
 {
-	const int x = blockIdx.x * blockDim.x + threadIdx.x;
-	const int y = blockIdx.y * blockDim.y + threadIdx.y;
-
-	if( x >= srcAlignedWidth || y >= height )
-		return;
-
-	const uchar4 macroPx = src[y * srcAlignedWidth + x];
-
-	const float y0 = formatUYVY ? macroPx.y : macroPx.x;
-	const float y1 = formatUYVY ? macroPx.w : macroPx.z; 
-
-	dst[y * dstAlignedWidth + x] = make_float2(y0/255.0f, y1/255.0f);
-} 
-
-template<bool formatUYVY>
-cudaError_t launchGrayYUYV( uchar2* input, size_t inputPitch, float* output, size_t outputPitch, size_t width, size_t height)
-{
-	if( !input || !inputPitch || !output || !outputPitch || !width || !height )
-		return cudaErrorInvalidValue;
-
-	const dim3 block(8,8);
-	const dim3 grid(iDivUp(width/2, block.x), iDivUp(height, block.y));
-
-	const int srcAlignedWidth = inputPitch / sizeof(uchar4);	// normally would be uchar2, but we're doubling up pixels
-	const int dstAlignedWidth = outputPitch / sizeof(float2);	// normally would be float ^^^
-
-	yuyvToGray<formatUYVY><<<grid, block>>>((uchar4*)input, srcAlignedWidth, (float2*)output, dstAlignedWidth, width, height);
-
-	return CUDA(cudaGetLastError());
+	return launchYUYVToRGB<uchar6, IMAGE_YVYU>(input, (uchar6*)output, width, height);
 }
 
-cudaError_t cudaUYVYToGray( uchar2* input, float* output, size_t width, size_t height )
+// cudaYUYVToRGB (float3)
+cudaError_t cudaYVYUToRGB( void* input, float3* output, size_t width, size_t height )
 {
-	return cudaUYVYToGray(input, width * sizeof(uchar2), output, width * sizeof(uint8_t), width, height);
+	return launchYUYVToRGB<float6, IMAGE_YVYU>(input, (float6*)output, width, height);
 }
 
-cudaError_t cudaUYVYToGray( uchar2* input, size_t inputPitch, float* output, size_t outputPitch, size_t width, size_t height )
+// cudaYUYVToRGBA (uchar4)
+cudaError_t cudaYVYUToRGBA( void* input, uchar4* output, size_t width, size_t height )
 {
-	return launchGrayYUYV<true>(input, inputPitch, output, outputPitch, width, height);
+	return launchYUYVToRGB<uchar8, IMAGE_YVYU>(input, (uchar8*)output, width, height);
 }
 
-cudaError_t cudaYUYVToGray( uchar2* input, float* output, size_t width, size_t height )
+// cudaYUYVToRGBA (float4)
+cudaError_t cudaYVYUToRGBA( void* input, float4* output, size_t width, size_t height )
 {
-	return cudaYUYVToGray(input, width * sizeof(uchar2), output, width * sizeof(float), width, height);
-}
-
-cudaError_t cudaYUYVToGray( uchar2* input, size_t inputPitch, float* output, size_t outputPitch, size_t width, size_t height )
-{
-	return launchGrayYUYV<false>(input, inputPitch, output, outputPitch, width, height);
+	return launchYUYVToRGB<float8, IMAGE_YVYU>(input, (float8*)output, width, height);
 }
 

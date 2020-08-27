@@ -24,17 +24,45 @@
 #define __PYTHON_BINDINGS_CUDA__
 
 #include "PyUtils.h"
+#include "imageFormat.h"
 
+// PyCudaMemory object
+typedef struct {
+	PyObject_HEAD
+	void* ptr;
+	size_t size;
+	bool mapped;
+	bool freeOnDelete;
+} PyCudaMemory;
 
-// Name of memory capsules
-#define CUDA_MALLOC_MEMORY_CAPSULE	PY_UTILS_MODULE_NAME ".cudaMalloc"
-#define CUDA_MAPPED_MEMORY_CAPSULE PY_UTILS_MODULE_NAME ".cudaAllocMapped"
+// PyCudaImage object
+typedef struct {
+	PyCudaMemory base;
+	imageFormat format;
+	uint32_t    width;
+	uint32_t    height;
+	Py_ssize_t  shape[3];
+	Py_ssize_t  strides[3];
+} PyCudaImage;
 
-// Create memory capsule
-PyObject* PyCUDA_RegisterMemory( void* gpuPtr, bool freeOnDelete=true );
+// Create memory objects
+PyObject* PyCUDA_RegisterMemory( void* ptr, size_t size, bool mapped=false, bool freeOnDelete=true );
+//PyObject* PyCUDA_RegisterMappedMemory( void* ptr, size_t size, bool freeOnDelete=true );
 
-// Create mapped memory capsule
-PyObject* PyCUDA_RegisterMappedMemory( void* cpuPtr, void* gpuPtr, bool freeOnDelete=true );
+// Create image objects
+PyObject* PyCUDA_RegisterImage( void* ptr, uint32_t width, uint32_t height, imageFormat format, bool mapped=false, bool freeOnDelete=true );
+//PyObject* PyCUDA_RegisterMappedImage( void* ptr, uint32_t width, uint32_t height, imageFormat format, bool freeOnDelete=true );
+
+// type checks
+bool PyCUDA_IsMemory( PyObject* object );
+bool PyCUDA_IsImage( PyObject* object );
+
+// cast operators
+PyCudaMemory* PyCUDA_GetMemory( PyObject* object );
+PyCudaImage* PyCUDA_GetImage( PyObject* object );
+
+// retrieve from capsule
+void* PyCUDA_GetImage( PyObject* object, int* width, int* height, imageFormat* format );
 
 // Register functions
 PyMethodDef* PyCUDA_RegisterFunctions();
@@ -42,13 +70,6 @@ PyMethodDef* PyCUDA_RegisterFunctions();
 // Register types
 bool PyCUDA_RegisterTypes( PyObject* module );
 
-// Retrieve pointer from capsule object
-inline void* PyCUDA_GetPointer( PyObject* capsule ) 
-{
-	if( PyCapsule_IsValid(capsule, CUDA_MAPPED_MEMORY_CAPSULE) != 0 )
-		return PyCapsule_GetPointer(capsule, CUDA_MAPPED_MEMORY_CAPSULE); 
-	else if( PyCapsule_IsValid(capsule, CUDA_MALLOC_MEMORY_CAPSULE) )
-		return PyCapsule_GetPointer(capsule, CUDA_MALLOC_MEMORY_CAPSULE); 
-}
 
 #endif
+

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 #
 # Copyright (c) 2019, NVIDIA CORPORATION. All rights reserved.
 #
@@ -48,7 +48,7 @@ camera.Open()
 while display.IsOpen():
 	image, width, height = camera.CaptureRGBA()
 	display.RenderOnce(image, width, height)
-	display.SetTitle("{:s} | {:d}x{:d} | {:.0f} FPS".format("Camera Viewer", width, height, display.GetFPS()))
+	display.SetTitle("{:s} | {:d}x{:d} | {:.1f} FPS".format("Camera Viewer", width, height, display.GetFPS()))
 	
 # close the camera
 camera.Close()

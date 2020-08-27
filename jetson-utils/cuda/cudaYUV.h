@@ -25,155 +25,256 @@
 
 
 #include "cudaUtility.h"
-#include <stdint.h>
 
 
 //////////////////////////////////////////////////////////////////////////////////
-/// @name RGBA to YUV 4:2:0 planar (I420 & YV12)
+/// @name YUV I420 4:2:0 planar to RGB
+/// @see cudaConvertColor() from cudaColorspace.h for automated format conversion
 /// @ingroup colorspace
 //////////////////////////////////////////////////////////////////////////////////
 
 ///@{
+
+/**
+ * Convert a YUV I420 planar image to RGB uchar3.
+ */
+cudaError_t cudaI420ToRGB(void* input, uchar3* output, size_t width, size_t height);
+
+/**
+ * Convert a YUV I420 planar image to RGB float3.
+ */
+cudaError_t cudaI420ToRGB(void* input, float3* output, size_t width, size_t height);
+
+/**
+ * Convert a YUV I420 planar image to RGBA uchar4.
+ */
+cudaError_t cudaI420ToRGBA(void* input, uchar4* output, size_t width, size_t height);
+
+/**
+ * Convert a YUV I420 planar image to RGB float4.
+ */
+cudaError_t cudaI420ToRGBA(void* input, float4* output, size_t width, size_t height);
+
+///@}
+
+
+//////////////////////////////////////////////////////////////////////////////////
+/// @name YUV YV12 4:2:0 planar to RGB
+/// @see cudaConvertColor() from cudaColorspace.h for automated format conversion
+/// @ingroup colorspace
+//////////////////////////////////////////////////////////////////////////////////
+
+///@{
+
+/**
+ * Convert a YUV YV12 planar image to RGB uchar3.
+ */
+cudaError_t cudaYV12ToRGB(void* input, uchar3* output, size_t width, size_t height);
+
+/**
+ * Convert a YUV YV12 planar image to RGB float3.
+ */
+cudaError_t cudaYV12ToRGB(void* input, float3* output, size_t width, size_t height);
+
+/**
+ * Convert a YUV YV12 planar image to RGBA uchar4.
+ */
+cudaError_t cudaYV12ToRGBA(void* input, uchar4* output, size_t width, size_t height);
+
+/**
+ * Convert a YUV YV12 planar image to RGB float4.
+ */
+cudaError_t cudaYV12ToRGBA(void* input, float4* output, size_t width, size_t height);
+
+///@}
+
+
+//////////////////////////////////////////////////////////////////////////////////
+/// @name RGB to YUV I420 4:2:0 planar
+/// @see cudaConvertColor() from cudaColorspace.h for automated format conversion
+/// @ingroup colorspace
+//////////////////////////////////////////////////////////////////////////////////
+
+///@{
+
+/**
+ * Convert an RGB uchar3 buffer into YUV I420 planar.
+ */
+cudaError_t cudaRGBToI420( uchar3* input, void* output, size_t width, size_t height );
+
+/**
+ * Convert an RGB float3 buffer into YUV I420 planar.
+ */
+cudaError_t cudaRGBToI420( float3* input, void* output, size_t width, size_t height );
 
 /**
  * Convert an RGBA uchar4 buffer into YUV I420 planar.
- * @ingroup colorspace
  */
-cudaError_t cudaRGBAToI420( uchar4* input, uint8_t* output, size_t width, size_t height );
+cudaError_t cudaRGBAToI420( uchar4* input, void* output, size_t width, size_t height );
 
 /**
- * Convert an RGBA uchar4 texture into YUV I420 planar.
- * @ingroup colorspace
+ * Convert an RGBA float4 buffer into YUV I420 planar.
  */
-cudaError_t cudaRGBAToI420( uchar4* input, size_t inputPitch, uint8_t* output, size_t outputPitch, size_t width, size_t height );
+cudaError_t cudaRGBAToI420( float4* input, void* output, size_t width, size_t height );
+
+///@}
+
+
+//////////////////////////////////////////////////////////////////////////////////
+/// @name RGB to YUV YV12 4:2:0 planar
+/// @see cudaConvertColor() from cudaColorspace.h for automated format conversion
+/// @ingroup colorspace
+//////////////////////////////////////////////////////////////////////////////////
+
+///@{
+
+/**
+ * Convert an RGB uchar3 buffer into YUV YV12 planar.
+ */
+cudaError_t cudaRGBToYV12( uchar3* input, void* output, size_t width, size_t height );
+
+/**
+ * Convert an RGB float3 buffer into YUV YV12 planar.
+ */
+cudaError_t cudaRGBToYV12( float3* input, void* output, size_t width, size_t height );
 
 /**
  * Convert an RGBA uchar4 buffer into YUV YV12 planar.
- * @ingroup colorspace
  */
-cudaError_t cudaRGBAToYV12( uchar4* input, uint8_t* output, size_t width, size_t height );
+cudaError_t cudaRGBAToYV12( uchar4* input, void* output, size_t width, size_t height );
 
 /**
- * Convert an RGBA uchar4 texture into YUV YV12 planar.
- * @ingroup colorspace
+ * Convert an RGBA float4 buffer into YUV YV12 planar.
  */
-cudaError_t cudaRGBAToYV12( uchar4* input, size_t inputPitch, uint8_t* output, size_t outputPitch, size_t width, size_t height );
+cudaError_t cudaRGBAToYV12( float4* input, void* output, size_t width, size_t height );
 
 ///@}
 
 
 //////////////////////////////////////////////////////////////////////////////////
-/// @name YUV 4:2:2 packed (UYVY & YUYV) to RGBA
+/// @name YUV YUYV 4:2:2 packed to RGB
+/// @see cudaConvertColor() from cudaColorspace.h for automated format conversion
 /// @ingroup colorspace
 //////////////////////////////////////////////////////////////////////////////////
 
 ///@{
 
 /**
- * Convert a UYVY 422 packed image into RGBA uchar4.
- * @ingroup colorspace
+ * Convert a YUYV 422 packed image into RGB uchar3.
  */
-cudaError_t cudaUYVYToRGBA( uchar2* input, uchar4* output, size_t width, size_t height );
+cudaError_t cudaYUYVToRGB( void* input, uchar3* output, size_t width, size_t height );
 
 /**
- * Convert a UYVY 422 packed image into RGBA uchar4.
- * @ingroup colorspace
+ * Convert a YUYV 422 packed image into RGB float3.
  */
-cudaError_t cudaUYVYToRGBA( uchar2* input, size_t inputPitch, uchar4* output, size_t outputPitch, size_t width, size_t height );
+cudaError_t cudaYUYVToRGB( void* input, float3* output, size_t width, size_t height );
 
 /**
  * Convert a YUYV 422 packed image into RGBA uchar4.
- * @ingroup colorspace
  */
-cudaError_t cudaYUYVToRGBA( uchar2* input, uchar4* output, size_t width, size_t height );
+cudaError_t cudaYUYVToRGBA( void* input, uchar4* output, size_t width, size_t height );
 
 /**
- * Convert a YUYV 422 packed image into RGBA uchar4.
- * @ingroup colorspace
+ * Convert a YUYV 422 packed image into RGBA float4.
  */
-cudaError_t cudaYUYVToRGBA( uchar2* input, size_t inputPitch, uchar4* output, size_t outputPitch, size_t width, size_t height );
+cudaError_t cudaYUYVToRGBA( void* input, float4* output, size_t width, size_t height );
 
 ///@}
 
 
 //////////////////////////////////////////////////////////////////////////////////
-/// @name UYUV 4:2:2 packed (UYVY & YUYV) to grayscale
+/// @name YUV YVYU 4:2:2 packed to RGB
+/// @see cudaConvertColor() from cudaColorspace.h for automated format conversion
 /// @ingroup colorspace
 //////////////////////////////////////////////////////////////////////////////////
 
 ///@{
 
 /**
- * Convert a UYVY 422 packed image into a floating-point grayscale image.
- * @ingroup colorspace
+ * Convert a YVYU 422 packed image into RGB uchar3.
  */
-cudaError_t cudaUYVYToGray( uchar2* input, float* output, size_t width, size_t height );
+cudaError_t cudaYVYUToRGB( void* input, uchar3* output, size_t width, size_t height );
 
 /**
- * Convert a UYVY 422 packed image into a floating-point grayscale image.
- * @ingroup colorspace
+ * Convert a YVYU 422 packed image into RGB float3.
  */
-cudaError_t cudaUYVYToGray( uchar2* input, size_t inputPitch, float* output, size_t outputPitch, size_t width, size_t height );
+cudaError_t cudaYVYUToRGB( void* input, float3* output, size_t width, size_t height );
 
 /**
- * Convert a YUYV 422 packed image into a floating-point grayscale image.
- * @ingroup colorspace
+ * Convert a YVYU 422 packed image into RGBA uchar4.
  */
-cudaError_t cudaYUYVToGray( uchar2* input, float* output, size_t width, size_t height );
+cudaError_t cudaYVYUToRGBA( void* input, uchar4* output, size_t width, size_t height );
 
 /**
- * Convert a YUYV 422 packed image into a floating-point grayscale image.
- * @ingroup colorspace
+ * Convert a YVYU 422 packed image into RGBA float4.
  */
-cudaError_t cudaYUYVToGray( uchar2* input, size_t inputPitch, float* output, size_t outputPitch, size_t width, size_t height );
+cudaError_t cudaYVYUToRGBA( void* input, float4* output, size_t width, size_t height );
 
 ///@}
 
 
 //////////////////////////////////////////////////////////////////////////////////
-/// @name YUV NV12 to RGBA
+/// @name YUV UYVY 4:2:2 packed to RGB
+/// @see cudaConvertColor() from cudaColorspace.h for automated format conversion
 /// @ingroup colorspace
 //////////////////////////////////////////////////////////////////////////////////
 
 ///@{
+
+/**
+ * Convert a UYVY 422 packed image into RGB uchar3.
+ */
+cudaError_t cudaUYVYToRGB( void* input, uchar3* output, size_t width, size_t height );
+
+/**
+ * Convert a UYVY 422 packed image into RGB float3.
+ */
+cudaError_t cudaUYVYToRGB( void* input, float3* output, size_t width, size_t height );
+
+/**
+ * Convert a UYVY 422 packed image into RGBA uchar4.
+ */
+cudaError_t cudaUYVYToRGBA( void* input, uchar4* output, size_t width, size_t height );
+
+/**
+ * Convert a UYVY 422 packed image into RGBA float4.
+ */
+cudaError_t cudaUYVYToRGBA( void* input, float4* output, size_t width, size_t height );
+
+///@}
+
+
+//////////////////////////////////////////////////////////////////////////////////
+/// @name YUV NV12 4:2:0 to RGB
+/// @see cudaConvertColor() from cudaColorspace.h for automated format conversion
+/// @ingroup colorspace
+//////////////////////////////////////////////////////////////////////////////////
+
+///@{
+
+/**
+ * Convert an NV12 texture (semi-planar 4:2:0) to RGB uchar3 format.
+ * NV12 = 8-bit Y plane followed by an interleaved U/V plane with 2x2 subsampling.
+ */
+cudaError_t cudaNV12ToRGB( void* input, uchar3* output, size_t width, size_t height );
+
+/**
+ * Convert an NV12 texture (semi-planar 4:2:0) to RGB float3 format.
+ * NV12 = 8-bit Y plane followed by an interleaved U/V plane with 2x2 subsampling.
+ */
+cudaError_t cudaNV12ToRGB( void* input, float3* output, size_t width, size_t height );
 
 /**
  * Convert an NV12 texture (semi-planar 4:2:0) to RGBA uchar4 format.
  * NV12 = 8-bit Y plane followed by an interleaved U/V plane with 2x2 subsampling.
- * @ingroup colorspace
  */
-cudaError_t cudaNV12ToRGBA( uint8_t* input, uchar4* output, size_t width, size_t height );
-
-/**
- * Convert an NV12 texture (semi-planar 4:2:0) to RGBA uchar4 format.
- * NV12 = 8-bit Y plane followed by an interleaved U/V plane with 2x2 subsampling.
- * @ingroup colorspace
- */
-cudaError_t cudaNV12ToRGBA( uint8_t* input, size_t inputPitch, uchar4* output, size_t outputPitch, size_t width, size_t height );
+cudaError_t cudaNV12ToRGBA( void* input, uchar4* output, size_t width, size_t height );
 
 /**
  * Convert an NV12 texture (semi-planar 4:2:0) to RGBA float4 format.
  * NV12 = 8-bit Y plane followed by an interleaved U/V plane with 2x2 subsampling.
- * @ingroup colorspace
  */
-cudaError_t cudaNV12ToRGBA32( uint8_t* input, float4* output, size_t width, size_t height );
-
-/**
- * Convert an NV12 texture (semi-planar 4:2:0) to RGBA float4 format.
- * NV12 = 8-bit Y plane followed by an interleaved U/V plane with 2x2 subsampling.
- * @ingroup colorspace
- */
-cudaError_t cudaNV12ToRGBA32( uint8_t* input, size_t inputPitch, float4* output, size_t outputPitch, size_t width, size_t height );
-
-/**
- * Setup NV12 color conversion constants.
- * cudaNV12SetupColorspace() isn't necessary for the user to call, it will be
- * called automatically by cudaNV12ToRGBA() with a hue of 0.0.
- * However if you want to setup custom constants (ie with a hue different than 0),
- * then you can call cudaNV12SetupColorspace() at any time, overriding the default.
- * @ingroup colorspace
- */
-cudaError_t cudaNV12SetupColorspace( float hue = 0.0f ); 
+cudaError_t cudaNV12ToRGBA( void* input, float4* output, size_t width, size_t height );
 
 ///@}
 

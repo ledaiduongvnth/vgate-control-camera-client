@@ -1,6 +1,6 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 #
-# Copyright (c) 2019, NVIDIA CORPORATION. All rights reserved.
+# Copyright (c) 2020, NVIDIA CORPORATION. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -23,7 +23,6 @@
 
 import jetson.utils
 import argparse
-import ctypes
 import numpy
 
 # parse the command line
@@ -31,17 +30,16 @@ parser = argparse.ArgumentParser('Map CUDA to memory to numpy ndarray')
 
 parser.add_argument("--width", type=int, default=4, help="width of the array (in float elements)")
 parser.add_argument("--height", type=int, default=2, help="height of the array (in float elements)")
-parser.add_argument("--depth", type=int, default=3, help="depth of the array (in float elements)")
 
 opt = parser.parse_args()
 
 # allocate cuda memory
-cuda_mem = jetson.utils.cudaAllocMapped(opt.height * opt.width * opt.depth * ctypes.sizeof(ctypes.c_float))
-print(cuda_mem)
+cuda_img = jetson.utils.cudaAllocMapped(width=opt.width, height=opt.height, format='rgb32f')
+print(cuda_img)
 
 # create a numpy ndarray that references the CUDA memory
 # it won't be copied, but uses the same memory underneath
-array = jetson.utils.cudaToNumpy(cuda_mem, opt.width, opt.height, opt.depth)
+array = jetson.utils.cudaToNumpy(cuda_img)
 
 print("\ncudaToNumpy() array:")
 print(type(array))
