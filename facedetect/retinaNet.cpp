@@ -46,11 +46,7 @@ retinaNet::retinaNet(int cameraWidth, int cameraHeight, std::string camera_sourc
         printf("failed to open camera for streaming\n");
         throw std::exception();
     }
-
-    void *cpu = NULL;
-    void *gpu = NULL;
-    camera->Capture(&cpu, &gpu, 1000);
-    camera->ConvertRGBA(gpu, &cudaInput, false);
+    camera->CaptureRGBA(&cudaInput, 1000, true);
     camera->Close();
 }
 
