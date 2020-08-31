@@ -252,17 +252,11 @@ public:
         cv::Mat origin_image;
         while (1) {
             float *imgRGBA = NULL;
-            void *cpu = NULL;
-            void *gpu = NULL;
-            capSuccess = camera->Capture(&cpu, &gpu, 1000);
+            capSuccess = camera->CaptureRGBA(&imgRGBA, 1000, true);
             if (!capSuccess) {
                 printf("failed to capture frame\n");
             }
-            capSuccess = camera->ConvertRGBA(gpu, &imgRGBA, false);
-            if (!capSuccess) {
-                printf("failed to convert from NV12 to RGBA\n");
-            }
-            origin_image = cv::Mat(this->cameraHeight, this->cameraWidth, CV_8UC3, (void *) cpu);
+            origin_image = cv::Mat(this->cameraHeight, this->cameraWidth, CV_8UC3, imgRGBA);
             if (!capSuccess) {
                 camera = gstCamera::Create(this->cameraWidth, this->cameraHeight, this->camera_source.c_str());
                 if (!camera) {
