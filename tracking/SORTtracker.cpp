@@ -84,7 +84,7 @@ void SORTtracker::init(vector<TrackingBox> detections) {
     }
 }
 
-void SORTtracker::step(vector<TrackingBox> detections, const Size &img_size, shared_ptr<ClientReaderWriter<JSReq, JSResp>> stream) {
+void SORTtracker::step(vector<TrackingBox> detections, const Size &img_size) {
     frame_count++;
 
     //for each Kalman tracker: try to predict next box; if failed, erase tracker
@@ -98,7 +98,6 @@ void SORTtracker::step(vector<TrackingBox> detections, const Size &img_size, sha
         } else {
             bool is_save;
             (frame_count - it->init_frame_count > 20) ? (is_save = true) : (is_save = false);
-            it->save(stream, is_save);
             if(is_save){
                 printf("save track:%s\n", it->source_track_id.c_str());
             }
@@ -239,7 +238,6 @@ void SORTtracker::step(vector<TrackingBox> detections, const Size &img_size, sha
         if ((*it).m_time_since_update > max_age){
             bool is_save;
             (frame_count - it->init_frame_count > 20) ? (is_save = true) : (is_save = false);
-            it->save(stream, is_save);
             if(is_save){
                 printf("save track:%s\n", it->source_track_id.c_str());
             }

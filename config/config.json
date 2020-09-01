@@ -1,5 +1,5 @@
 {
-  "camera_source": "rtspsrc location=rtsp://172.16.10.84/101 user-id=admin  user-pw=abcd1234 latency=0 ! rtph264depay !  h264parse ! nvv4l2decoder ! nvvidconv ! video/x-raw, format=BGRx",
+  "camera_source": "rtspsrc location=rtsp://10.61.185.18/101 user-id=admin  user-pw=Admin123 latency=0 ! rtph264depay !  h264parse ! nvv4l2decoder ! nvvidconv ! video/x-raw, format=BGRx",
   "camera_width": 1280,
   "camera_height": 720,
   "rotate_image": true,

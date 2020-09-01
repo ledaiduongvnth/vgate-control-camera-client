@@ -1,12 +1,7 @@
 #include <postProcessRetina.h>
 #include <opencv2/videoio.hpp>
-#include <memory>
 #include <string>
 #include <thread>
-#include <grpcpp/channel.h>
-#include <grpcpp/client_context.h>
-#include <grpcpp/create_channel.h>
-#include <grpcpp/security/credentials.h>
 #include "multiple_camera_server.grpc.pb.h"
 #include "image_proc.h"
 #include "queue.h"
@@ -21,16 +16,6 @@
 #include "fstream"
 #include "base64.h"
 
-using grpc::Channel;
-using grpc::ClientContext;
-using grpc::ClientReader;
-using grpc::ClientReaderWriter;
-using grpc::ClientWriter;
-using multiple_camera_server::FaceProcessing;
-using multiple_camera_server::JSReq;
-using multiple_camera_server::JSResp;
-using multiple_camera_server::LabeledFace;
-using multiple_camera_server::UnlabeledFace;
 
 class CameraClient {
 public:
@@ -70,12 +55,6 @@ public:
         this->cameraHeight = cameraHeight;
         this->areaId = areaId;
         this->direction = direction;
-        this->channel = grpc::CreateChannel(this->multiple_camera_host, grpc::InsecureChannelCredentials());
-        this->stub_ = FaceProcessing::NewStub(channel);
-        ClientContext *context = new ClientContext;
-        context->AddMetadata("area_id", grpc::string(std::to_string(this->areaId)));
-        context->AddMetadata("direction", grpc::string(this->direction));
-        this->stream = this->stub_->recognize_face_js(context);
         this->net = retinaNet::Create(this->cameraWidth, this->cameraHeight, this->camera_source);
         this->rotateImage = rotateImage;
     }
@@ -139,7 +118,7 @@ public:
             /* Detect faces in an image */
             this->facesQueue.pop(facesOut);
             // update tracking
-            sortTrackers.step(tmp_det, displayImage.size(), stream);
+            sortTrackers.step(tmp_det, displayImage.size());
             if (!faceInfo.empty()) {
                 /* Make Grpc request and get face faces label from queue */
                 for (auto it = sortTrackers.trackers.begin(); it != sortTrackers.trackers.end();) {
@@ -187,11 +166,6 @@ public:
                     recognitionCount = 0;
                 }
                 if (recognitionCount == 0) {
-                    send_success = stream->Write(jsReq);
-                    if (!send_success) {
-                        printf("failed to send grpc\n");
-                        throw std::exception();
-                    }
                 }
                 /* Send Grpc request */
 
@@ -209,32 +183,6 @@ public:
             setWindowProperty("camera_client", WND_PROP_FULLSCREEN, WINDOW_FULLSCREEN);
             imshow("camera_client", displayImage);
             waitKey(1);
-        }
-    }
-
-    void ReceiveResponses() {
-        JSResp jSResp;
-        std::vector<LabeledFaceIn> faces;
-        LabeledFaceIn labeledFaceIn;
-        LabeledFace labeledFace;
-        bool receive_success;
-        while (true) {
-            receive_success = stream->Read(&jSResp);
-            if (!receive_success) {
-                printf("failed to receive grpc\n");
-                throw std::exception();
-            }
-            if (!jSResp.faces().empty() && receive_success) {
-                for (int i = 0; i < jSResp.faces().size(); ++i) {
-                    labeledFace = jSResp.faces(i);
-                    labeledFaceIn.track_id = labeledFace.track_id();
-                    labeledFaceIn.registration_id = labeledFace.registration_id();
-                    labeledFaceIn.person_name = labeledFace.person_name();
-                    labeledFaceIn.confidence = labeledFace.confidence();
-                    faces.emplace_back(labeledFaceIn);
-                }
-                this->facesQueue.push(faces);
-            }
         }
     }
 
@@ -291,14 +239,8 @@ public:
         return std::thread([this] { SendRequests(); });
     }
 
-    std::thread ReceiveResponsesThread() {
-        return std::thread([this] { ReceiveResponses(); });
-    }
 
 private:
-    std::shared_ptr<Channel> channel;
-    std::unique_ptr<FaceProcessing::Stub> stub_{};
-    std::shared_ptr<ClientReaderWriter<JSReq, JSResp>> stream;
     CConcurrentQueue<std::vector<LabeledFaceIn>> facesQueue;
     CConcurrentQueue<cv::Mat> imagesQueue;
     CConcurrentQueue<float *> imagesQueue2;
@@ -331,10 +273,8 @@ int main(int argc, char **argv) {
                               cv::Size(screen->width, screen->height), cameraWidth, cameraHeight, direction, rotateImage);
     try {
         std::thread t0 = cameraClient.ReadImagesThread();
-        std::thread t1 = cameraClient.ReceiveResponsesThread();
         std::thread t2 = cameraClient.SendRequestsThread();
         t0.join();
-        t1.join();
         t2.join();
     } catch (const std::exception &) {
         return 2;
