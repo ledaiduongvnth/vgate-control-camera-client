@@ -6,8 +6,6 @@
 #include <map>
 #include <opencv2/opencv.hpp>
 
-using namespace cv;
-using namespace std;
 
 struct anchor_win
 {
@@ -42,9 +40,9 @@ struct anchor_cfg
 {
 public:
     int STRIDE;
-    vector<int> SCALES;
+    std::vector<int> SCALES;
     int BASE_SIZE;
-    vector<float> RATIOS;
+    std::vector<float> RATIOS;
     int ALLOWED_BORDER;
 
     anchor_cfg()
@@ -60,14 +58,14 @@ public:
 class postProcessRetina
 {
 public:
-    postProcessRetina(string &model, string network = "net3", float nms = 0.4);
+    postProcessRetina(std::string &model, std::string network = "net3", float nms = 0.4);
     ~postProcessRetina();
 
-    void detect(std::vector<std::vector<float>> results, float threshold, vector<FaceDetectInfo> &faceInfo, int model_size);
+    void detect(std::vector<std::vector<float>> results, float threshold, std::vector<FaceDetectInfo> &faceInfo, int model_size);
 private:
     anchor_box bbox_pred(anchor_box anchor, cv::Vec4f regress);
-    vector<anchor_box> bbox_pred(vector<anchor_box> anchors, vector<cv::Vec4f> regress);
-    vector<FacePts> landmark_pred(vector<anchor_box> anchors, vector<FacePts> facePts);
+    std::vector<anchor_box> bbox_pred(std::vector<anchor_box> anchors, std::vector<cv::Vec4f> regress);
+    std::vector<FacePts> landmark_pred(std::vector<anchor_box> anchors, std::vector<FacePts> facePts);
     FacePts landmark_pred(anchor_box anchor, FacePts facePt);
     static bool CompareBBox(const FaceDetectInfo &a, const FaceDetectInfo &b);
     std::vector<FaceDetectInfo> nms(std::vector<FaceDetectInfo> &bboxes, float threshold);
@@ -78,16 +76,16 @@ private:
     float pixel_stds[3] = {1.0, 1.0, 1.0};
     float pixel_scale = 1.0;
 
-    string network;
+    std::string network;
     float nms_threshold;
-    vector<float> _ratio;
-    vector<anchor_cfg> cfg;
+    std::vector<float> _ratio;
+    std::vector<anchor_cfg> cfg;
 
-    vector<int> _feat_stride_fpn;
-    map<string, vector<anchor_box>> _anchors_fpn;
-    map<string, vector<anchor_box>> _anchors;
+    std::vector<int> _feat_stride_fpn;
+    std::map<std::string, std::vector<anchor_box>> _anchors_fpn;
+    std::map<std::string, std::vector<anchor_box>> _anchors;
 
-    map<string, int> _num_anchors;
+    std::map<std::string, int> _num_anchors;
 
 };
 

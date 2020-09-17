@@ -24,10 +24,10 @@ anchor_box _mkanchors(anchor_win win)
     return anchor;
 }
 
-vector<anchor_box> _ratio_enum(anchor_box anchor, vector<float> ratios)
+std::vector<anchor_box> _ratio_enum(anchor_box anchor, std::vector<float> ratios)
 {
     //Enumerate a set of anchors for each aspect ratio wrt an anchor.
-    vector<anchor_box> anchors;
+    std::vector<anchor_box> anchors;
     for(size_t i = 0; i < ratios.size(); i++) {
         anchor_win win = _whctrs(anchor);
         float size = win.w * win.h;
@@ -43,9 +43,9 @@ vector<anchor_box> _ratio_enum(anchor_box anchor, vector<float> ratios)
     return anchors;
 }
 
-vector<anchor_box> _scale_enum(anchor_box anchor, vector<int> scales)
+std::vector<anchor_box> _scale_enum(anchor_box anchor, std::vector<int> scales)
 {
-    vector<anchor_box> anchors;
+    std::vector<anchor_box> anchors;
     for(size_t i = 0; i < scales.size(); i++) {
         anchor_win win = _whctrs(anchor);
 
@@ -59,8 +59,8 @@ vector<anchor_box> _scale_enum(anchor_box anchor, vector<int> scales)
     return anchors;
 }
 
-vector<anchor_box> generate_anchors(int base_size = 16, vector<float> ratios = {0.5, 1, 2},
-                      vector<int> scales = {8, 64}, int stride = 16, bool dense_anchor = false)
+std::vector<anchor_box> generate_anchors(int base_size = 16, std::vector<float> ratios = {0.5, 1, 2},
+                                         std::vector<int> scales = {8, 64}, int stride = 16, bool dense_anchor = false)
 {
     anchor_box base_anchor;
     base_anchor.x1 = 0;
@@ -68,18 +68,18 @@ vector<anchor_box> generate_anchors(int base_size = 16, vector<float> ratios = {
     base_anchor.x2 = base_size - 1;
     base_anchor.y2 = base_size - 1;
 
-    vector<anchor_box> ratio_anchors;
+    std::vector<anchor_box> ratio_anchors;
     ratio_anchors = _ratio_enum(base_anchor, ratios);
 
-    vector<anchor_box> anchors;
+    std::vector<anchor_box> anchors;
     for(size_t i = 0; i < ratio_anchors.size(); i++) {
-        vector<anchor_box> tmp = _scale_enum(ratio_anchors[i], scales);
+        std::vector<anchor_box> tmp = _scale_enum(ratio_anchors[i], scales);
         anchors.insert(anchors.end(), tmp.begin(), tmp.end());
     }
 
     if(dense_anchor) {
         assert(stride % 2 == 0);
-        vector<anchor_box> anchors2 = anchors;
+        std::vector<anchor_box> anchors2 = anchors;
         for(size_t i = 0; i < anchors2.size(); i++) {
             anchors2[i].x1 += stride / 2;
             anchors2[i].y1 += stride / 2;
@@ -92,27 +92,27 @@ vector<anchor_box> generate_anchors(int base_size = 16, vector<float> ratios = {
     return anchors;
 }
 
-vector<vector<anchor_box>> generate_anchors_fpn(bool dense_anchor = false, vector<anchor_cfg> cfg = {})
+std::vector<std::vector<anchor_box>> generate_anchors_fpn(bool dense_anchor = false, std::vector<anchor_cfg> cfg = {})
 {
-    vector<vector<anchor_box>> anchors;
+    std::vector<std::vector<anchor_box>> anchors;
     for(size_t i = 0; i < cfg.size(); i++) {
         //stride从小到大[32 16 8]
         anchor_cfg tmp = cfg[i];
         int bs = tmp.BASE_SIZE;
-        vector<float> ratios = tmp.RATIOS;
-        vector<int> scales = tmp.SCALES;
+        std::vector<float> ratios = tmp.RATIOS;
+        std::vector<int> scales = tmp.SCALES;
         int stride = tmp.STRIDE;
 
-        vector<anchor_box> r = generate_anchors(bs, ratios, scales, stride, dense_anchor);
+        std::vector<anchor_box> r = generate_anchors(bs, ratios, scales, stride, dense_anchor);
         anchors.push_back(r);
     }
 
     return anchors;
 }
 
-vector<anchor_box> anchors_plane(int height, int width, int stride, vector<anchor_box> base_anchors)
+std::vector<anchor_box> anchors_plane(int height, int width, int stride, std::vector<anchor_box> base_anchors)
 {
-    vector<anchor_box> all_anchors;
+    std::vector<anchor_box> all_anchors;
     for(size_t k = 0; k < base_anchors.size(); k++) {
         for(int ih = 0; ih < height; ih++) {
             int sh = ih * stride;
@@ -132,7 +132,7 @@ vector<anchor_box> anchors_plane(int height, int width, int stride, vector<ancho
     return all_anchors;
 }
 
-void clip_boxes(vector<anchor_box> &boxes, int width, int height)
+void clip_boxes(std::vector<anchor_box> &boxes, int width, int height)
 {
     //Clip boxes to image boundaries.
     for(size_t i = 0; i < boxes.size(); i++) {
@@ -169,7 +169,7 @@ void clip_boxes(anchor_box &box, int width, int height)
 }
 
 
-postProcessRetina::postProcessRetina(string &model, string network, float nms)
+postProcessRetina::postProcessRetina(std::string &model, std::string network, float nms)
     : network(network), nms_threshold(nms)
 {
     int fmc = 3;
@@ -235,14 +235,14 @@ postProcessRetina::postProcessRetina(string &model, string network, float nms)
         std::cout << "please reconfig anchor_cfg" << network << std::endl;
     }
 
-    vector<int> outputW = {20, 40, 80};
-    vector<int> outputH = {20, 40, 80};
+    std::vector<int> outputW = {20, 40, 80};
+    std::vector<int> outputH = {20, 40, 80};
 
     bool dense_anchor = false;
-    vector<vector<anchor_box>> anchors_fpn = generate_anchors_fpn(dense_anchor, cfg);
+    std::vector<std::vector<anchor_box>> anchors_fpn = generate_anchors_fpn(dense_anchor, cfg);
     for(size_t i = 0; i < anchors_fpn.size(); i++) {
         int stride = _feat_stride_fpn[i];
-        string key = "stride" + std::to_string(_feat_stride_fpn[i]);
+        std::string key = "stride" + std::to_string(_feat_stride_fpn[i]);
         _anchors_fpn[key] = anchors_fpn[i];
         _num_anchors[key] = anchors_fpn[i].size();
         _anchors[key] = anchors_plane(outputH[i], outputW[i], stride, _anchors_fpn[key]);
@@ -253,10 +253,10 @@ postProcessRetina::~postProcessRetina()
 {
 }
 
-vector<anchor_box> postProcessRetina::bbox_pred(vector<anchor_box> anchors, vector<cv::Vec4f> regress)
+std::vector<anchor_box> postProcessRetina::bbox_pred(std::vector<anchor_box> anchors, std::vector<cv::Vec4f> regress)
 {
 
-    vector<anchor_box> rects(anchors.size());
+    std::vector<anchor_box> rects(anchors.size());
     for(size_t i = 0; i < anchors.size(); i++) {
         float width = anchors[i].x2 - anchors[i].x1 + 1;
         float height = anchors[i].y2 - anchors[i].y1 + 1;
@@ -299,9 +299,9 @@ anchor_box postProcessRetina::bbox_pred(anchor_box anchor, cv::Vec4f regress)
     return rect;
 }
 
-vector<FacePts> postProcessRetina::landmark_pred(vector<anchor_box> anchors, vector<FacePts> facePts)
+std::vector<FacePts> postProcessRetina::landmark_pred(std::vector<anchor_box> anchors, std::vector<FacePts> facePts)
 {
-    vector<FacePts> pts(anchors.size());
+    std::vector<FacePts> pts(anchors.size());
     for(size_t i = 0; i < anchors.size(); i++) {
         float width = anchors[i].x2 - anchors[i].x1 + 1;
         float height = anchors[i].y2 - anchors[i].y1 + 1;
@@ -393,12 +393,12 @@ std::vector<FaceDetectInfo> postProcessRetina::nms(std::vector<FaceDetectInfo>& 
 }
 
 
-void  postProcessRetina::detect(std::vector<std::vector<float>> results, float threshold, vector<FaceDetectInfo> &faceInfo, int model_size)
+void  postProcessRetina::detect(std::vector<std::vector<float>> results, float threshold, std::vector<FaceDetectInfo> &faceInfo, int model_size)
 {
-    vector<int> aaa = {20, 40, 80};
+    std::vector<int> aaa = {20, 40, 80};
 
     for(size_t i = 0; i < _feat_stride_fpn.size(); i++) {
-        string key = "stride" + std::to_string(_feat_stride_fpn[i]);
+        std::string key = "stride" + std::to_string(_feat_stride_fpn[i]);
 
         std::vector<float> score = results[i*3+2];
         std::vector<float>::iterator begin = score.begin() + score.size() / 2;

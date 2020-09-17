@@ -21,7 +21,7 @@ HungarianAlgorithm::~HungarianAlgorithm() {}
 //********************************************************//
 // A single function wrapper for solving assignment problem.
 //********************************************************//
-double HungarianAlgorithm::Solve(vector<vector<double> > &DistMatrix, vector<int> &Assignment) {
+double HungarianAlgorithm::Solve(std::vector<std::vector<double> > &DistMatrix, std::vector<int> &Assignment) {
     unsigned int nRows = DistMatrix.size();
     if (nRows == 0) return 0.0;
     unsigned int nCols = DistMatrix[0].size();

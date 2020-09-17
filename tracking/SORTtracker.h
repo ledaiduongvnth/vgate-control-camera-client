@@ -31,10 +31,9 @@
 #include "opencv2/core/core.hpp"
 #include <set>
 
-using namespace std;
 
 // Computes IOU between two bounding boxes
-double GetIOU(Rect_<float> bb_test, Rect_<float> bb_gt);
+double GetIOU(cv::Rect_<float> bb_test, cv::Rect_<float> bb_gt);
 
 /* Bounding box of the SORT tracker
  * frame: current frame number
@@ -46,8 +45,8 @@ struct TrackingBox {
     int frame;
     int id;
     int age;
-    Rect_<float> box;
-    vector<float> landmarks;
+    cv::Rect_<float> box;
+    std::vector<float> landmarks;
 
 };
 
@@ -64,17 +63,17 @@ public:
     double iouThreshold;
 
     //Kalman filter trackers
-    vector<KalmanTracker> trackers;
+    std::vector<KalmanTracker> trackers;
 
     //internal
-    vector<Rect_<float> > predictedBoxes;
-    vector<vector<double> > iouMatrix;
-    vector<int> assignment;
-    set<int> unmatchedDetections;
-    set<int> unmatchedTrajectories;
-    set<int> allItems;
-    set<int> matchedItems;
-    vector<cv::Point> matchedPairs;
+    std::vector<cv::Rect_<float> > predictedBoxes;
+    std::vector<std::vector<double> > iouMatrix;
+    std::vector<int> assignment;
+    std::set<int> unmatchedDetections;
+    std::set<int> unmatchedTrajectories;
+    std::set<int> allItems;
+    std::set<int> matchedItems;
+    std::vector<cv::Point> matchedPairs;
     unsigned int trkNum;
     unsigned int detNum;
 
@@ -92,13 +91,13 @@ public:
     /* initialize tracker with fresh detections
      * detections: bounding boxes of objects
      */
-    void init(vector<TrackingBox> detections);
+    void init(std::vector<TrackingBox> detections);
 
     /* update tracker and get tracking results
      * detections: new bounding boxes of objects
      * results: tracked boxes with id and other properties
      */
-    void step(vector<TrackingBox> detections, const Size &img_size, shared_ptr<ClientReaderWriter<JSReq, JSResp>> stream);
+    void step(std::vector<TrackingBox> detections, const cv::Size &img_size, std::shared_ptr<ClientReaderWriter<JSReq, JSResp>> stream);
 
 };
 

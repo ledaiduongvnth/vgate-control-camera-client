@@ -15,10 +15,7 @@ using grpc::ClientReaderWriter;
 
 using multiple_camera_server::UnlabeledFace;
 
-using namespace std;
-using namespace cv;
-
-#define StateType Rect_<float>
+#define StateType cv::Rect_<float>
 
 
 // This class represents the internel state of individual tracked objects observed as bounding box.
@@ -38,7 +35,7 @@ public:
 
     }
 
-    string randomString();
+    std::string randomString();
 
     KalmanTracker(StateType initRect, int hits_to_start = 3) {
         init_kf(initRect);
@@ -63,7 +60,7 @@ public:
 
     void update(StateType stateMat);
 
-    void save(shared_ptr<ClientReaderWriter<JSReq, JSResp>> stream, bool is_save);
+    void save(std::shared_ptr<ClientReaderWriter<JSReq, JSResp>> stream, bool is_save);
 
     StateType get_state();
 
@@ -79,10 +76,10 @@ public:
 
     int m_hits_to_start;
     bool m_is_tracking;
-    string source_track_id;
-    string name;
-    Rect_<float> box;
-    vector<float> landmarks;
+    std::string source_track_id;
+    std::string name;
+    cv::Rect_<float> box;
+    std::vector<float> landmarks;
     int init_frame_count;
 
 private:

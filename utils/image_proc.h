@@ -53,7 +53,7 @@ void DrawRectangle(cv::Mat img, cv::Rect rect, int r, int thickness, cv::Scalar 
 
 void WriteTextAndBox(cv::Mat &displayImage, DrawText &drawer, SORTtracker sortTrackers) {
     for (auto it = sortTrackers.trackers.begin(); it != sortTrackers.trackers.end();) {
-        Rect_<float> pBox = (*it).box;
+        cv::Rect_<float> pBox = (*it).box;
         if (pBox.x > 0 && pBox.y > 0 && pBox.x + pBox.width < displayImage.size().width &&
             pBox.y + pBox.height < displayImage.size().height && sortTrackers.frame_count - it->init_frame_count>3) {
             std::string displayName;

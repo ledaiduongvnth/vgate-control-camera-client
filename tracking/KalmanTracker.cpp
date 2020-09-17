@@ -11,11 +11,11 @@ int KalmanTracker::kf_count = 0;
 void KalmanTracker::init_kf(StateType stateMat) {
     int stateNum = 7;
     int measureNum = 4;
-    kf = KalmanFilter(stateNum, measureNum, 0);
+    kf = cv::KalmanFilter(stateNum, measureNum, 0);
 
-    measurement = Mat::zeros(measureNum, 1, CV_32F);
+    measurement = cv::Mat::zeros(measureNum, 1, CV_32F);
 
-    kf.transitionMatrix = (Mat_<float>(stateNum, stateNum) <<
+    kf.transitionMatrix = (cv::Mat_<float>(stateNum, stateNum) <<
                                                            1, 0, 0, 0, 1, 0, 0,
             0, 1, 0, 0, 0, 1, 0,
             0, 0, 1, 0, 0, 0, 1,
@@ -25,9 +25,9 @@ void KalmanTracker::init_kf(StateType stateMat) {
             0, 0, 0, 0, 0, 0, 1);
 
     setIdentity(kf.measurementMatrix);
-    setIdentity(kf.processNoiseCov, Scalar::all(1e-2));
-    setIdentity(kf.measurementNoiseCov, Scalar::all(1e-1));
-    setIdentity(kf.errorCovPost, Scalar::all(1));
+    setIdentity(kf.processNoiseCov, cv::Scalar::all(1e-2));
+    setIdentity(kf.measurementNoiseCov, cv::Scalar::all(1e-1));
+    setIdentity(kf.errorCovPost, cv::Scalar::all(1));
 
     // initialize state vector with bounding box in [cx,cy,s,r] style
     kf.statePost.at<float>(0, 0) = stateMat.x + stateMat.width / 2;
@@ -40,7 +40,7 @@ void KalmanTracker::init_kf(StateType stateMat) {
 // Predict the estimated bounding box.
 StateType KalmanTracker::predict() {
     // predict
-    Mat p = kf.predict();
+    cv::Mat p = kf.predict();
     m_age += 1;
 
     if (m_time_since_update > 0)
@@ -77,7 +77,7 @@ void KalmanTracker::update(StateType stateMat) {
 
 // Return the current state vector
 StateType KalmanTracker::get_state() {
-    Mat s = kf.statePost;
+    cv::Mat s = kf.statePost;
     return get_rect_xysr(s.at<float>(0, 0), s.at<float>(1, 0), s.at<float>(2, 0), s.at<float>(3, 0));
 }
 
@@ -97,8 +97,8 @@ StateType KalmanTracker::get_rect_xysr(float cx, float cy, float s, float r) {
     return StateType(x, y, w, h);
 }
 
-string KalmanTracker::randomString() {
-    string str = "AAAAAA";
+std::string KalmanTracker::randomString() {
+    std::string str = "AAAAAA";
 
     // string sequence
     str[0] = rand() % 26 + 65;
@@ -113,7 +113,7 @@ string KalmanTracker::randomString() {
     return str;
 }
 
-void KalmanTracker::save(shared_ptr<ClientReaderWriter<JSReq, JSResp>> stream, bool is_save) {
+void KalmanTracker::save(std::shared_ptr<ClientReaderWriter<JSReq, JSResp>> stream, bool is_save) {
     JSReq jsReq;
     UnlabeledFace *face = jsReq.add_faces();
     face->set_track_id(source_track_id);

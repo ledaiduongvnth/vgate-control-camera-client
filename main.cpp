@@ -90,7 +90,7 @@ public:
         bool success, send_success, first_detections = true, capSuccess1, capSuccess2;
         int new_left, new_top, detectionCount = 0, recognitionCount = 0;
         float scale;
-        postProcessRetina *rf = new postProcessRetina((string &) "model_path", "net3");
+        postProcessRetina *rf = new postProcessRetina((std::string &) "model_path", "net3");
         while (1) {
             float *cudaImage;
             capSuccess1 = this->imagesQueue.pop(originImage);
@@ -143,7 +143,7 @@ public:
             if (!faceInfo.empty()) {
                 /* Make Grpc request and get face faces label from queue */
                 for (auto it = sortTrackers.trackers.begin(); it != sortTrackers.trackers.end();) {
-                    Rect_<float> pBox = (*it).box;
+                    cv::Rect_<float> pBox = (*it).box;
                     if (pBox.x > 0 && pBox.y > 0 && pBox.x + pBox.width < displayImage.size().width &&
                         pBox.y + pBox.height < displayImage.size().height) {
                         if (!facesOut.empty()) {
@@ -205,10 +205,10 @@ public:
                 displayImage = dst;
             }
             resize(displayImage, displayImage, screenSize);
-            namedWindow("camera_client", WND_PROP_FULLSCREEN);
-            setWindowProperty("camera_client", WND_PROP_FULLSCREEN, WINDOW_FULLSCREEN);
+            namedWindow("camera_client", cv::WND_PROP_FULLSCREEN);
+            setWindowProperty("camera_client", cv::WND_PROP_FULLSCREEN, cv::WINDOW_FULLSCREEN);
             imshow("camera_client", displayImage);
-            waitKey(1);
+            cv::waitKey(1);
         }
     }
 

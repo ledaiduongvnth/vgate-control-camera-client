@@ -31,9 +31,8 @@
 
 #include "SORTtracker.h"
 
-using namespace std;
 
-double GetIOU(Rect_<float> bb_test, Rect_<float> bb_gt) {
+double GetIOU(cv::Rect_<float> bb_test, cv::Rect_<float> bb_gt) {
     float in = (bb_test & bb_gt).area();
     float un = bb_test.area() + bb_gt.area() - in;
 
@@ -59,7 +58,7 @@ SORTtracker::~SORTtracker() {
     KalmanTracker::kf_count = 0; // tracking id relies on this, so we have to reset it in each seq.
 }
 
-void SORTtracker::init(vector<TrackingBox> detections) {
+void SORTtracker::init(std::vector<TrackingBox> detections) {
     //clear state
     KalmanTracker::kf_count = 0;
 
@@ -84,13 +83,13 @@ void SORTtracker::init(vector<TrackingBox> detections) {
     }
 }
 
-void SORTtracker::step(vector<TrackingBox> detections, const Size &img_size, shared_ptr<ClientReaderWriter<JSReq, JSResp>> stream) {
+void SORTtracker::step(std::vector<TrackingBox> detections, const cv::Size &img_size, std::shared_ptr<ClientReaderWriter<JSReq, JSResp>> stream) {
     frame_count++;
 
     //for each Kalman tracker: try to predict next box; if failed, erase tracker
     predictedBoxes.clear();
-    for (vector<KalmanTracker>::iterator it = trackers.begin(); it != trackers.end();) {
-        Rect_<float> pBox = (*it).predict();
+    for (std::vector<KalmanTracker>::iterator it = trackers.begin(); it != trackers.end();) {
+        cv::Rect_<float> pBox = (*it).predict();
         if (pBox.x > 0 && pBox.y > 0 && pBox.x + pBox.width < img_size.width &&
             pBox.y + pBox.height < img_size.height) {
             predictedBoxes.push_back(pBox);
@@ -112,7 +111,7 @@ void SORTtracker::step(vector<TrackingBox> detections, const Size &img_size, sha
 
     //resize IOU matrix to be (trkNum x detNum)
     iouMatrix.clear();
-    iouMatrix.resize(trkNum, vector<double>(detNum, 0));
+    iouMatrix.resize(trkNum, std::vector<double>(detNum, 0));
 
     //compute 1-IOU for each pair of tracked/detected objects
     for (unsigned int i = 0; i < trkNum; i++) // compute iou matrix as a distance matrix
@@ -148,7 +147,7 @@ void SORTtracker::step(vector<TrackingBox> detections, const Size &img_size, sha
         //umnatchedItems = allItems - matchedItems
         set_difference(allItems.begin(), allItems.end(),
                        matchedItems.begin(), matchedItems.end(),
-                       insert_iterator<set<int> >(unmatchedDetections, unmatchedDetections.begin()));
+                       std::insert_iterator<std::set<int> >(unmatchedDetections, unmatchedDetections.begin()));
     } else if (detNum < trkNum) //there are unmatched trajectory/predictions
     {
         //unmatchedTrajectories = {trajectories that were not matched to any detection}
@@ -184,7 +183,7 @@ void SORTtracker::step(vector<TrackingBox> detections, const Size &img_size, sha
     }
 
     // create and initialise new trackers for unmatched detections
-    for (set<int>::iterator umd = unmatchedDetections.begin(); umd != unmatchedDetections.end(); umd++) {
+    for (std::set<int>::iterator umd = unmatchedDetections.begin(); umd != unmatchedDetections.end(); umd++) {
         KalmanTracker tracker = KalmanTracker(detections[*umd].box, min_hits);
         tracker.init_frame_count = frame_count;
         tracker.landmarks = detections[*umd].landmarks;
@@ -193,7 +192,7 @@ void SORTtracker::step(vector<TrackingBox> detections, const Size &img_size, sha
     }
 
     // get trackers' output
-    for (vector<KalmanTracker>::iterator it = trackers.begin(); it != trackers.end();) {
+    for (std::vector<KalmanTracker>::iterator it = trackers.begin(); it != trackers.end();) {
         //if (time since update < 1) and (hits >= min_hits or not enough frames passed)
         //push Kalman filter's state (box) to result
 
@@ -206,7 +205,7 @@ void SORTtracker::step(vector<TrackingBox> detections, const Size &img_size, sha
         }
 
         // create names vector
-        vector<string> names;
+        std::vector<std::string> names;
         for (auto &it : trackers) {
             names.push_back(it.name);
         }
@@ -220,7 +219,7 @@ void SORTtracker::step(vector<TrackingBox> detections, const Size &img_size, sha
             if (result.second == false)
                 result.first->second++;
         }
-        vector<string> duplicateNames;
+        std::vector<std::string> duplicateNames;
         for (auto & elem : countMap)
         {
             if (elem.second > 1)
