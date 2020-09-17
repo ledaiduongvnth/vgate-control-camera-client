@@ -72,6 +72,12 @@ public:
 	~glDisplay();
 
 	/**
+	 * Open the window.
+	 * @see videoOutput::Open()
+	 */
+	virtual bool Open();
+
+	/**
 	 * Returns true if the window is open.
 	 */
 	inline bool IsOpen() const 				{ return mStreaming; }
@@ -598,6 +604,7 @@ protected:
 	Cursor	   mCursors[256];
 	int	        mActiveCursor;
 	int          mDefaultCursor;
+	bool		   mInitialShow;
 	bool		   mRendering;
 	bool		   mResizedToFeed;
 	Atom		   mWindowClosedMsg;

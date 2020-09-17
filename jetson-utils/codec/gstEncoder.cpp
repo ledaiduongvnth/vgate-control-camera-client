@@ -366,7 +366,11 @@ bool gstEncoder::buildLaunchStr()
 		else if( mOptions.codec == videoOptions::CODEC_MJPEG )
 			ss << "rtpjpegpay";
 
-		ss << " config-interval=1 ! udpsink host=";
+		if (mOptions.codec == videoOptions::CODEC_H264 || mOptions.codec == videoOptions::CODEC_H265) {
+				ss << " config-interval=1 ! udpsink host=";
+		} else {
+				ss << " ! udpsink host=";
+		}
 		ss << uri.location << " ";
 
 		if( uri.port != 0 )
@@ -582,7 +586,7 @@ bool gstEncoder::Open()
 		return true;
 
 	// transition pipline to STATE_PLAYING
-	LogInfo(LOG_GSTREAMER "gstEncoder-- stopping pipeline, transitioning to GST_STATE_NULL\n");
+	LogInfo(LOG_GSTREAMER "gstEncoder-- starting pipeline, transitioning to GST_STATE_PLAYING\n");
 
 	const GstStateChangeReturn result = gst_element_set_state(mPipeline, GST_STATE_PLAYING);
 

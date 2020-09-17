@@ -60,6 +60,7 @@ glDisplay::glDisplay( const videoOptions& options ) : videoOutput(options)
 	mVisualX       = NULL;
 	mContextGL     = NULL;
 	mDisplayX      = NULL;
+	mInitialShow   = false;
 	mRendering     = false;
 	mResizedToFeed = false;
 	mActiveCursor  = OriginalCursor;
@@ -209,7 +210,6 @@ glDisplay* glDisplay::Create( const videoOptions& options )
 		return NULL;
 	}
 	
-	vp->mStreaming = true;
 	vp->mID = gDisplays.size();
 	gDisplays.push_back(vp);
 
@@ -323,9 +323,6 @@ bool glDisplay::initWindow()
 	// set default window title
 	XStoreName(mDisplayX, win, DEFAULT_TITLE);
 
-	// show the window
-	XMapWindow(mDisplayX, win);
-
 	// store variables
 	mWindowX = win;
 	mScreenX = screen;
@@ -339,6 +336,8 @@ bool glDisplay::initWindow()
 	mViewport[2] = mOptions.width; 
 	mViewport[3] = mOptions.height;
 
+	mStreaming = true;
+	
 	XFree(fbConfig);
 	return true;
 }
@@ -356,6 +355,22 @@ bool glDisplay::initGL()
 
 	GL(glEnable(GL_LINE_SMOOTH));
 	GL(glHint(GL_LINE_SMOOTH_HINT, GL_NICEST));
+
+	return true;
+}
+
+
+// Open
+bool glDisplay::Open()
+{
+	if( mStreaming && mInitialShow )
+		return true;
+
+	// show the window
+	XMapWindow(mDisplayX, mWindowX);
+
+	mStreaming = true;
+	mInitialShow = true;
 
 	return true;
 }
@@ -417,6 +432,10 @@ void glDisplay::activateViewport()
 // MakeCurrent
 void glDisplay::BeginRender( bool processEvents )
 {
+	// make sure the window is shown (if not already)
+	Open();
+
+	// process UI events (if requested)
 	if( processEvents )
 		ProcessEvents();
 
