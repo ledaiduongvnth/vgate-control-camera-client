@@ -1,9 +1,0 @@
-{
-  "gpio_1": 19,
-  "gpio_2": 9,
-  "gpio_3": 10,
-  "activate_level": "high",
-  "device_name": "relay",
-  "server_host": "172.16.10.107",
-  "port": "6379"
-}

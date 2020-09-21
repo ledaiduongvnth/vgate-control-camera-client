@@ -1,29 +1,6 @@
-/*
- * Copyright (c) 2019, NVIDIA CORPORATION. All rights reserved.
- *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
- */
-
 #include <gstCamera.h>
 #include "retinaNet.h"
 #include "cudaUtility.h"
-
 
 cudaError_t cudaPreImageNetRGB( float4* input, size_t inputWidth, size_t inputHeight,
                                 float* output, size_t outputWidth, size_t outputHeight,
@@ -32,39 +9,14 @@ cudaError_t cudaPreImageNetRGB( float4* input, size_t inputWidth, size_t inputHe
 void imagePadding32f4C(void *src, int srcWidth, int srcHeight, void *dst, int dstWidth, int dstHeight, int top, int left);
 
 
-// constructor
-retinaNet::retinaNet(int cameraWidth, int cameraHeight, std::string camera_source)
-{
-    gstCamera *camera = gstCamera::Create(cameraWidth, cameraHeight, camera_source.c_str());
-    if( !camera )
-    {
-        printf("failed to initialize camera device\n");
-        throw std::exception();
+retinaNet::retinaNet(int cameraWidth, int cameraHeight, std::string camera_source){
+    const size_t ImageSizeRGBA32 = imageFormatSize(IMAGE_RGBA32F, cameraWidth, cameraHeight);
+    if( !cudaAllocMapped((void**)&cudaInput, ImageSizeRGBA32)){
+        printf("failed to allocate bytes for image\n");
     }
-    if( !camera->Open() )
-    {
-        printf("failed to open camera for streaming\n");
-        throw std::exception();
-    }
-    camera->CaptureRGBA(&cudaInput, 1000, true);
-    camera->Close();
-}
 
-
-// Destructor
-retinaNet::~retinaNet()
-{
-
-}
-
-
-// Create
-retinaNet* retinaNet::Create(int cameraWidth, int cameraHeight, std::string camera_source)
-{
-	retinaNet* net = new retinaNet(cameraWidth, cameraHeight, camera_source);
-
-	const char* model_path  = "../facedetect/model/retina.onnx";
-	const char* input_blob  = "data_input";
+    const char* model_path  = "../facedetect/model/retina.onnx";
+    const char* input_blob  = "data_input";
     std::vector<std::string> output_blobs;
     output_blobs = {
             "face_rpn_bbox_pred_stride32_Y",
@@ -81,14 +33,18 @@ retinaNet* retinaNet::Create(int cameraWidth, int cameraHeight, std::string came
 
     const uint32_t maxBatchSize = 1;
 
-	if( !net->LoadNetwork(NULL, model_path, NULL, input_blob, output_blobs, maxBatchSize) )
-	{
-		printf(LOG_TRT "failed to load retinaNet model\n");
-		return NULL;
-	}
+    if( !this->LoadNetwork(NULL, model_path, NULL, input_blob, output_blobs, maxBatchSize) )
+    {
+        printf(LOG_TRT "failed to load retinaNet model\n");
+    }
 
-	return net;
 }
+
+retinaNet::~retinaNet()
+{
+
+}
+
 
 int retinaNet::Detect(float* rgba, uint32_t width, uint32_t height, postProcessRetina* rf, std::vector<FaceDetectInfo>& faceInfo, float threshold)
 {

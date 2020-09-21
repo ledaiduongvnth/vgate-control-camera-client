@@ -35,7 +35,6 @@ using multiple_camera_server::UnlabeledFace;
 
 class CameraClient {
 public:
-
     std::string camera_source;
     std::string multiple_camera_host;
     cv::Size screenSize;
@@ -77,7 +76,7 @@ public:
         context->AddMetadata("area_id", grpc::string(std::to_string(this->areaId)));
         context->AddMetadata("direction", grpc::string(this->direction));
         this->stream = this->stub_->recognize_face_js(context);
-        this->net = retinaNet::Create(this->cameraWidth, this->cameraHeight, this->camera_source);
+        this->net = new retinaNet(this->cameraWidth, this->cameraHeight, this->camera_source);
         this->rotateImage = rotateImage;
     }
 

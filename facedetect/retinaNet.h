@@ -1,61 +1,15 @@
-/*
- * Copyright (c) 2019, NVIDIA CORPORATION. All rights reserved.
- *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
- */
-
 #include "tensorNet.h"
 #include "postProcessRetina.h"
 
 
-/**
- * @note retinaNet is only supported with TensorRT 5.0 and newer,
- * as it uses ONNX models and requires ONNX import support in TensorRT.
- */
-#if NV_TENSORRT_MAJOR >= 5
-#define HAS_SUPERRES_NET
-#endif
-
-
-/**
- * Super Resolution Network
- * @ingroup retinaNet
- */
 class retinaNet : public tensorNet
 {
 public:
-	/**
-	 * Load super resolution network
-	 */
-	static retinaNet* Create(int cameraWidth, int cameraHeight, std::string camera_source);
-
 	float* cudaInput;
-
-	/**
-	 * Destroy
-	 */
-	~retinaNet();
-    int Detect(float* rgba, uint32_t width, uint32_t height, postProcessRetina* rf, std::vector<FaceDetectInfo>& faceInfo, float threshold);
-
-
-protected:
-	retinaNet(int cameraWidth, int cameraHeight, std::string camera_source);
+    retinaNet(int cameraWidth, int cameraHeight, std::string camera_source);
+    ~retinaNet();
+    int Detect(float* rgba, uint32_t width, uint32_t height,
+               postProcessRetina* rf, std::vector<FaceDetectInfo>& faceInfo, float threshold);
 };
 
 
