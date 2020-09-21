@@ -20,6 +20,7 @@
 #include "retinaNet.h"
 #include "fstream"
 #include "base64.h"
+#include "cudaColorspace.h"
 
 using grpc::Channel;
 using grpc::ClientContext;
@@ -249,14 +250,23 @@ public:
             throw std::exception();
         }
         bool capSuccess;
-        cv::Mat origin_image;
+        cv::Mat originImage;
+        const size_t ImageSizeRGB8 = imageFormatSize(IMAGE_RGB8, this->cameraWidth, this->cameraHeight);
+        void* imgRGB = NULL;
+        if( !cudaAllocMapped((void**)&imgRGB, ImageSizeRGB8)){
+            printf("failed to allocate bytes for image\n");
+        }
         while (1) {
             float *imgRGBA = NULL;
             capSuccess = camera->CaptureRGBA(&imgRGBA, 1000, true);
             if (!capSuccess) {
                 printf("failed to capture frame\n");
             }
-            origin_image = cv::Mat(this->cameraHeight, this->cameraWidth, CV_8UC3, imgRGBA);
+            if( CUDA_FAILED(cudaConvertColor(imgRGBA, IMAGE_RGBA32F, imgRGB, IMAGE_RGB8, this->cameraWidth, this->cameraHeight))){
+                printf("failed to convert color");
+            }
+            CUDA(cudaDeviceSynchronize());
+            originImage = cv::Mat(this->cameraHeight, this->cameraWidth, CV_8UC3, imgRGB);
             if (!capSuccess) {
                 camera = gstCamera::Create(this->cameraWidth, this->cameraHeight, this->camera_source.c_str());
                 if (!camera) {
@@ -272,7 +282,7 @@ public:
                 std::cout << "at: " << std::put_time(std::gmtime(&time), "%c") << '\n';
                 continue;
             }
-            this->imagesQueue.push(origin_image);
+            this->imagesQueue.push(originImage);
             this->imagesQueue2.push(imgRGBA);
         }
     }

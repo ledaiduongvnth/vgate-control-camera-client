@@ -1,7 +1,7 @@
 {
-  "camera_source": "rtspsrc location=rtsp://172.16.10.84/101 user-id=admin  user-pw=abcd1234 latency=0 ! rtph264depay !  h264parse ! nvv4l2decoder ! nvvidconv ! video/x-raw, format=BGRx",
-  "camera_width": 1280,
-  "camera_height": 720,
+  "camera_source": "/dev/video1",
+  "camera_width": 640,
+  "camera_height": 480,
   "rotate_image": false,
   "multiple_camera_host": "172.16.10.12:50051",
   "detection_frequency": 1,
@@ -13,4 +13,4 @@
   "font_scale": 32,
   "area_id": 3,
   "direction" : "OUT"
-}
+
