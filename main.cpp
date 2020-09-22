@@ -239,12 +239,17 @@ public:
     }
 
     void ReadImages() {
-        gstCamera *camera = gstCamera::Create(this->cameraWidth, this->cameraHeight, this->camera_source.c_str());
-        if (!camera) {
+        videoOptions vo;
+        vo.width = this->cameraWidth;
+        vo.height = this->cameraHeight;
+//        vo.zeroCopy = true;
+//        vo.codec = videoOptions::CODEC_H264;
+        videoSource* inputStream = videoSource::Create(this->camera_source.c_str(), vo);
+        if (!inputStream) {
             printf("failed to initialize camera device\n");
             throw std::exception();
         }
-        if (!camera->Open()) {
+        if (!inputStream->Open()) {
             printf("failed to open camera for streaming\n");
             throw std::exception();
         }
@@ -257,7 +262,7 @@ public:
         }
         while (1) {
             float *imgRGBA = NULL;
-            capSuccess = camera->CaptureRGBA(&imgRGBA, 1000, true);
+            capSuccess = inputStream->Capture((void**)&imgRGBA, IMAGE_RGBA32F, 1000);
             if (!capSuccess) {
                 printf("failed to capture frame\n");
             }
@@ -267,12 +272,12 @@ public:
             CUDA(cudaDeviceSynchronize());
             originImage = cv::Mat(this->cameraHeight, this->cameraWidth, CV_8UC3, imgRGB);
             if (!capSuccess) {
-                camera = gstCamera::Create(this->cameraWidth, this->cameraHeight, this->camera_source.c_str());
-                if (!camera) {
+                videoSource* inputStream = videoSource::Create(this->camera_source.c_str());
+                if (!inputStream) {
                     printf("failed to initialize camera device\n");
                     throw std::exception();
                 }
-                if (!camera->Open()) {
+                if (!inputStream->Open()) {
                     printf("failed to open camera for streaming\n");
                     throw std::exception();
                 }
@@ -308,7 +313,7 @@ private:
 
 };
 
-int main(int argc, char **argv) {
+int main() {
     std::ifstream file_input("../config/config.json");
     Json::Reader reader;
     Json::Value configs;
