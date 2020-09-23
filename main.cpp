@@ -242,8 +242,8 @@ public:
         videoOptions vo;
         vo.width = this->cameraWidth;
         vo.height = this->cameraHeight;
-//        vo.zeroCopy = true;
-//        vo.codec = videoOptions::CODEC_H264;
+        vo.zeroCopy = true;
+        vo.codec = videoOptions::CODEC_H264;
         videoSource* inputStream = videoSource::Create(this->camera_source.c_str(), vo);
         if (!inputStream) {
             printf("failed to initialize camera device\n");
