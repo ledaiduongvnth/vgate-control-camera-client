@@ -48,9 +48,9 @@ void imagePadding32f4C(void *src, int srcWidth, int srcHeight, void *dst, int ds
 
     NppStatus ret = nppiCopyConstBorder_32f_C4R((const Npp32f *)src, nSrcStep, oSrcSize,
                                                 (Npp32f *)dst, nDstStep, oDstSize, top, left, aValue);
-
     if(ret != NPP_SUCCESS) {
         printf("imageResize_32f_C4R failed %d.\n", ret);
+        throw std::exception();
     }
 }
 

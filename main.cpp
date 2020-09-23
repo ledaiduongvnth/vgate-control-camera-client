@@ -243,7 +243,7 @@ public:
         vo.width = this->cameraWidth;
         vo.height = this->cameraHeight;
         vo.zeroCopy = true;
-        vo.codec = videoOptions::CODEC_H264;
+//        vo.codec = videoOptions::CODEC_H264;
         videoSource* inputStream = videoSource::Create(this->camera_source.c_str(), vo);
         if (!inputStream) {
             printf("failed to initialize camera device\n");
@@ -260,8 +260,8 @@ public:
         if( !cudaAllocMapped((void**)&imgRGB, ImageSizeRGB8)){
             printf("failed to allocate bytes for image\n");
         }
+        float *imgRGBA = NULL;
         while (1) {
-            float *imgRGBA = NULL;
             capSuccess = inputStream->Capture((void**)&imgRGBA, IMAGE_RGBA32F, 1000);
             if (!capSuccess) {
                 printf("failed to capture frame\n");
