@@ -8,7 +8,7 @@ cudaError_t cudaPreImageNetRGB( float3* input, size_t inputWidth, size_t inputHe
                                 cudaStream_t stream );
 
 
-retinaNet::retinaNet(int cameraWidth, int cameraHeight, std::string camera_source){
+retinaNet::retinaNet(){
     const size_t ImageSizeRGBA32 = imageFormatSize(IMAGE_RGB32F, 640, 640);
     if( !cudaAllocMapped((void**)&cudaInput, ImageSizeRGBA32)){
         printf("failed to allocate bytes for image\n");

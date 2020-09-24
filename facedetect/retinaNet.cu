@@ -25,34 +25,6 @@ __global__ void gpuPreImageNetRGB( float2 scale, float3* input, int iWidth, floa
     output[n * 2 + m] = bgr.z;
 }
 
-void imagePadding32f4C(void *src, int srcWidth, int srcHeight, void *dst, int dstWidth, int dstHeight, int top, int left)
-{
-    NppiSize oSrcSize;
-    oSrcSize.width = srcWidth;
-    oSrcSize.height = srcHeight;
-
-    int nSrcStep = srcWidth * 4 * sizeof(float);
-
-    int nDstStep = dstWidth * 4 * sizeof(float);
-
-    NppiSize oDstSize;
-    oDstSize.width = dstWidth;
-    oDstSize.height = dstHeight;
-
-    Npp32f aValue[4];
-    aValue[0] = 0;
-    aValue[1] = 0;
-    aValue[2] = 0;
-    aValue[3] = 255;
-
-
-    NppStatus ret = nppiCopyConstBorder_32f_C4R((const Npp32f *)src, nSrcStep, oSrcSize,
-                                                (Npp32f *)dst, nDstStep, oDstSize, top, left, aValue);
-    if(ret != NPP_SUCCESS) {
-        printf("imageResize_32f_C4R failed %d.\n", ret);
-        throw std::exception();
-    }
-}
 
 // cudaPreImageNetRGB
 cudaError_t cudaPreImageNetRGB( float3* input, size_t inputWidth, size_t inputHeight,
