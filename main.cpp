@@ -121,7 +121,6 @@ public:
             if (first_detections) {
                 sortTrackers.init(tmp_det);
                 first_detections = false;
-
             }
             if (detectionCount == 0) {
                 tmp_det.clear();
@@ -142,11 +141,11 @@ public:
                     tmp_det.push_back(trackingBox);
                 }
             }
-//            /* Detect faces in an image */
-//            this->facesQueue.pop(facesOut);
-//            // update tracking
-//            sortTrackers.step(tmp_det, originImage.size(), stream);
-//            if (!faceInfo.empty()) {
+            /* Detect faces in an image */
+            this->facesQueue.pop(facesOut);
+            // update tracking
+            sortTrackers.step(tmp_det, originImage.size(), stream);
+            if (!faceInfo.empty()) {
 //                /* Make Grpc request and get face faces label from queue */
 //                for (auto it = sortTrackers.trackers.begin(); it != sortTrackers.trackers.end();) {
 //                    cv::Rect_<float> pBox = (*it).box;
@@ -204,7 +203,7 @@ public:
 //                /* Draw box and face label */
 //                WriteTextAndBox(originImage, drawer, sortTrackers);
 //                /* Draw box and face label */
-//            }
+            }
 
             if( outputStream != NULL )
             {
