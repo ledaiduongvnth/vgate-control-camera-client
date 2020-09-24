@@ -15,7 +15,6 @@
 #include "jsoncpp/json/json.h"
 #include "X11/Xlib.h"
 #include <unistd.h>
-#include <videoOutput.h>
 #include "DrawText.h"
 #include "gstCamera.h"
 #include "retinaNet.h"
@@ -77,12 +76,12 @@ public:
         context->AddMetadata("area_id", grpc::string(std::to_string(this->areaId)));
         context->AddMetadata("direction", grpc::string(this->direction));
         this->stream = this->stub_->recognize_face_js(context);
-        this->net = new retinaNet();
+        this->net = new retinaNet(this->cameraWidth, this->cameraHeight, this->camera_source);
         this->rotateImage = rotateImage;
     }
 
     void SendRequests() {
-        cv::Mat originImage, cropedImage;
+        cv::Mat originImage, displayImage, cropedImage;
         std::vector<FaceDetectInfo> faceInfo;
         std::vector<LabeledFaceIn> facesOut;
         std::vector<TrackingBox> tmp_det;
@@ -92,26 +91,18 @@ public:
         int new_left, new_top, detectionCount = 0, recognitionCount = 0;
         float scale;
         postProcessRetina *rf = new postProcessRetina((std::string &) "model_path", "net3");
-        float *imgRGB32;
-        const size_t ImageSizeRGB8 = imageFormatSize(IMAGE_RGB8, this->cameraWidth, this->cameraHeight);
-        uchar3* imgRGB8 = NULL;
-        if( !cudaAllocMapped((void**)&imgRGB8, ImageSizeRGB8)){
-            printf("failed to allocate bytes for image\n");
-        }
-        videoOutput* outputStream = videoOutput::Create("display://0");
-        float scaleX = this->cameraWidth / 640;
-        float scaleY = this->cameraHeight / 640;
-
-        while (true) {
-            capSuccess2 = this->imagesQueue2.pop(imgRGB32);
+        while (1) {
+            float *cudaImage;
+            capSuccess1 = this->imagesQueue.pop(originImage);
+            if (!capSuccess1) {
+                continue;
+            }
+            capSuccess2 = this->imagesQueue2.pop(cudaImage);
             if (!capSuccess2) {
                 continue;
             }
-            if( CUDA_FAILED(cudaConvertColor(imgRGB32, IMAGE_RGB32F, imgRGB8, IMAGE_RGB8, this->cameraWidth, this->cameraHeight))){
-                printf("failed to convert color");
-            }
-            CUDA(cudaDeviceSynchronize());
-            originImage = cv::Mat(this->cameraHeight, this->cameraWidth, CV_8UC3, imgRGB8);
+            displayImage = originImage.clone();
+            cv::cvtColor(displayImage, displayImage, cv::COLOR_RGB2BGR);
             JSReq jsReq;
             /* Detect faces in an image */
             detectionCount = detectionCount + 1;
@@ -121,22 +112,26 @@ public:
             if (first_detections) {
                 sortTrackers.init(tmp_det);
                 first_detections = false;
+                float sw = 1.0 * displayImage.cols / 640;
+                float sh = 1.0 * displayImage.rows / 640;
+                scale = sw > sh ? sw : sh;
+                scale = scale > 1.0 ? scale : 1.0;
             }
             if (detectionCount == 0) {
                 tmp_det.clear();
                 faceInfo.clear();
-                this->net->Detect(imgRGB32, this->cameraWidth, this->cameraHeight, rf, faceInfo, this->faceDetectThreash);
+                this->net->Detect(cudaImage, this->cameraWidth, this->cameraHeight, rf, faceInfo, this->faceDetectThreash);
                 for (auto &t : faceInfo) {
                     TrackingBox trackingBox;
-                    trackingBox.box.x = t.rect.x1 * scaleX;
-                    trackingBox.box.y = t.rect.y1 * scaleY;
-                    trackingBox.box.width = (t.rect.x2 - t.rect.x1) * scaleX;
-                    trackingBox.box.height = (t.rect.y2 - t.rect.y1) * scaleY;
+                    trackingBox.box.x = t.rect.x1 * scale;
+                    trackingBox.box.y = t.rect.y1 * scale;
+                    trackingBox.box.width = (t.rect.x2 - t.rect.x1) * scale;
+                    trackingBox.box.height = (t.rect.y2 - t.rect.y1) * scale;
                     for (size_t j = 0; j < 5; j++) {
-                        trackingBox.landmarks.push_back(t.pts.y[j] * scaleY);
+                        trackingBox.landmarks.push_back(t.pts.y[j] * scale);
                     }
                     for (size_t j = 0; j < 5; j++) {
-                        trackingBox.landmarks.push_back(t.pts.x[j] * scaleX);
+                        trackingBox.landmarks.push_back(t.pts.x[j] * scale);
                     }
                     tmp_det.push_back(trackingBox);
                 }
@@ -144,81 +139,76 @@ public:
             /* Detect faces in an image */
             this->facesQueue.pop(facesOut);
             // update tracking
-            sortTrackers.step(tmp_det, originImage.size(), stream);
+            sortTrackers.step(tmp_det, displayImage.size(), stream);
             if (!faceInfo.empty()) {
-//                /* Make Grpc request and get face faces label from queue */
-//                for (auto it = sortTrackers.trackers.begin(); it != sortTrackers.trackers.end();) {
-//                    cv::Rect_<float> pBox = (*it).box;
-//                    if (pBox.x > 0 && pBox.y > 0 && pBox.x + pBox.width < originImage.size().width &&
-//                        pBox.y + pBox.height < originImage.size().height) {
-//                        if (!facesOut.empty()) {
-//                            for (auto &k : facesOut) {
-//                                if (k.track_id == it->source_track_id) {
-//                                    it->name = k.person_name;
-//                                }
-//                            }
-//                        }
-//                        if (it->name.empty()) {
-//                            std::tie(cropedImage, new_left, new_top) = CropFaceImageWithMargin(originImage.clone(),
-//                                                                                               pBox.x, pBox.y,
-//                                                                                               pBox.x + pBox.width,
-//                                                                                               pBox.y + pBox.height,
-//                                                                                               1.4);
-//                            UnlabeledFace *face = jsReq.add_faces();
-//                            std::vector<uchar> buf;
-//                            success = cv::imencode(".jpg", cropedImage, buf);
-//                            if (success) {
-//                                auto *enc_msg = reinterpret_cast<unsigned char *>(buf.data());
-//                                std::string encoded = Base64Encode(enc_msg, buf.size());
-//                                face->set_track_id(it->source_track_id);
-//                                face->set_image_bytes(encoded);
-//                                face->set_is_saving_history(false);
-//                                for (size_t j = 0; j < 5; j++) {
-//                                    face->add_landmarks(it->landmarks[j] - (float) new_top);
-//                                }
-//                                for (size_t j = 5; j < 10; j++) {
-//                                    face->add_landmarks(it->landmarks[j] - (float) new_left);
-//                                }
-//                            }
-//                        }
-//                    }
-//                    it++;
-//                }
-//                /* Make Grpc request and get face faces label from queue */
-//
-//                /* Send Grpc request */
-//                recognitionCount = recognitionCount + 1;
-//                if (recognitionCount == this->recognitionFrequency) {
-//                    recognitionCount = 0;
-//                }
-//                if (recognitionCount == 0) {
-//                    send_success = stream->Write(jsReq);
-//                    if (!send_success) {
-//                        printf("failed to send grpc\n");
-//                        throw std::exception();
-//                    }
-//                }
-//                /* Send Grpc request */
-//
-//                /* Draw box and face label */
-//                WriteTextAndBox(originImage, drawer, sortTrackers);
-//                /* Draw box and face label */
+                /* Make Grpc request and get face faces label from queue */
+                for (auto it = sortTrackers.trackers.begin(); it != sortTrackers.trackers.end();) {
+                    cv::Rect_<float> pBox = (*it).box;
+                    if (pBox.x > 0 && pBox.y > 0 && pBox.x + pBox.width < displayImage.size().width &&
+                        pBox.y + pBox.height < displayImage.size().height) {
+                        if (!facesOut.empty()) {
+                            for (auto &k : facesOut) {
+                                if (k.track_id == it->source_track_id) {
+                                    it->name = k.person_name;
+                                }
+                            }
+                        }
+                        if (it->name.empty()) {
+                            std::tie(cropedImage, new_left, new_top) = CropFaceImageWithMargin(displayImage.clone(),
+                                                                                               pBox.x, pBox.y,
+                                                                                               pBox.x + pBox.width,
+                                                                                               pBox.y + pBox.height,
+                                                                                               1.4);
+                            UnlabeledFace *face = jsReq.add_faces();
+                            std::vector<uchar> buf;
+                            success = cv::imencode(".jpg", cropedImage, buf);
+                            if (success) {
+                                auto *enc_msg = reinterpret_cast<unsigned char *>(buf.data());
+                                std::string encoded = Base64Encode(enc_msg, buf.size());
+                                face->set_track_id(it->source_track_id);
+                                face->set_image_bytes(encoded);
+                                face->set_is_saving_history(false);
+                                for (size_t j = 0; j < 5; j++) {
+                                    face->add_landmarks(it->landmarks[j] - (float) new_top);
+                                }
+                                for (size_t j = 5; j < 10; j++) {
+                                    face->add_landmarks(it->landmarks[j] - (float) new_left);
+                                }
+                            }
+                        }
+                    }
+                    it++;
+                }
+                /* Make Grpc request and get face faces label from queue */
+
+                /* Send Grpc request */
+                recognitionCount = recognitionCount + 1;
+                if (recognitionCount == this->recognitionFrequency) {
+                    recognitionCount = 0;
+                }
+                if (recognitionCount == 0) {
+                    send_success = stream->Write(jsReq);
+                    if (!send_success) {
+                        printf("failed to send grpc\n");
+                        throw std::exception();
+                    }
+                }
+                /* Send Grpc request */
+
+                /* Draw box and face label */
+                WriteTextAndBox(displayImage, drawer, sortTrackers);
+                /* Draw box and face label */
             }
-
-            if( outputStream != NULL )
-            {
-                outputStream->Render(imgRGB8, this->cameraWidth, this->cameraHeight);
-
-                // update status bar
-                char str[256];
-                sprintf(str, "Video Viewer (%ux%u) | %.1f FPS", this->cameraWidth, this->cameraHeight, outputStream->GetFrameRate());
-                outputStream->SetStatus(str);
-
-                // check if the user quit
-                if( !outputStream->IsStreaming() )
-                    break;
+            if(this->rotateImage){
+                cv::Mat dst;
+                cv::flip(displayImage, dst, -1);
+                displayImage = dst;
             }
-
+            resize(displayImage, displayImage, screenSize);
+            namedWindow("camera_client", cv::WND_PROP_FULLSCREEN);
+            setWindowProperty("camera_client", cv::WND_PROP_FULLSCREEN, cv::WINDOW_FULLSCREEN);
+            imshow("camera_client", displayImage);
+            cv::waitKey(1);
         }
     }
 
@@ -248,7 +238,7 @@ public:
         }
     }
 
-    [[noreturn]] void ReadImages() {
+    void ReadImages() {
         videoOptions vo;
         vo.width = this->cameraWidth;
         vo.height = this->cameraHeight;
@@ -263,27 +253,41 @@ public:
             printf("failed to open camera for streaming\n");
             throw std::exception();
         }
+        bool capSuccess;
+        cv::Mat originImage;
+        const size_t ImageSizeRGB8 = imageFormatSize(IMAGE_RGB8, this->cameraWidth, this->cameraHeight);
+        void* imgRGB = NULL;
+        if( !cudaAllocMapped((void**)&imgRGB, ImageSizeRGB8)){
+            printf("failed to allocate bytes for image\n");
+        }
+        float *imgRGBA = NULL;
         while (1) {
-            float *imgRGB32 = NULL;
-            bool capSuccess = inputStream->Capture((void**)&imgRGB32, IMAGE_RGB32F, 1000);
+            capSuccess = inputStream->Capture((void**)&imgRGBA, IMAGE_RGBA32F, 1000);
             if (!capSuccess) {
-//                printf("failed to capture frame\n");
-//                videoSource* inputStream = videoSource::Create(this->camera_source.c_str());
-//                if (!inputStream) {
-//                    printf("failed to initialize camera device\n");
-//                    throw std::exception();
-//                }
-//                if (!inputStream->Open()) {
-//                    printf("failed to open camera for streaming\n");
-//                    throw std::exception();
-//                }
-//                auto time = std::time(nullptr);
-//                printf("cap not success ");
-//                std::cout << "at: " << std::put_time(std::gmtime(&time), "%c") << '\n';
-//                continue;
-            } else {
-                this->imagesQueue2.push(imgRGB32);
+                printf("failed to capture frame\n");
             }
+            if( CUDA_FAILED(cudaConvertColor(imgRGBA, IMAGE_RGBA32F, imgRGB, IMAGE_RGB8, this->cameraWidth, this->cameraHeight))){
+                printf("failed to convert color");
+            }
+            CUDA(cudaDeviceSynchronize());
+            originImage = cv::Mat(this->cameraHeight, this->cameraWidth, CV_8UC3, imgRGB);
+            if (!capSuccess) {
+                videoSource* inputStream = videoSource::Create(this->camera_source.c_str());
+                if (!inputStream) {
+                    printf("failed to initialize camera device\n");
+                    throw std::exception();
+                }
+                if (!inputStream->Open()) {
+                    printf("failed to open camera for streaming\n");
+                    throw std::exception();
+                }
+                auto time = std::time(nullptr);
+                printf("cap not success ");
+                std::cout << "at: " << std::put_time(std::gmtime(&time), "%c") << '\n';
+                continue;
+            }
+            this->imagesQueue.push(originImage);
+            this->imagesQueue2.push(imgRGBA);
         }
     }
 
