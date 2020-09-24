@@ -3,13 +3,13 @@
 #include "retinaNet.h"
 #include "cudaUtility.h"
 
-cudaError_t cudaPreImageNetRGB( float4* input, size_t inputWidth, size_t inputHeight,
+cudaError_t cudaPreImageNetRGB( float3* input, size_t inputWidth, size_t inputHeight,
                                 float* output, size_t outputWidth, size_t outputHeight,
                                 cudaStream_t stream );
 
 
 retinaNet::retinaNet(int cameraWidth, int cameraHeight, std::string camera_source){
-    const size_t ImageSizeRGBA32 = imageFormatSize(IMAGE_RGBA32F, 640, 640);
+    const size_t ImageSizeRGBA32 = imageFormatSize(IMAGE_RGB32F, 640, 640);
     if( !cudaAllocMapped((void**)&cudaInput, ImageSizeRGBA32)){
         printf("failed to allocate bytes for image\n");
     }
@@ -45,19 +45,19 @@ retinaNet::~retinaNet()
 }
 
 
-int retinaNet::Detect(float* rgba, uint32_t width, uint32_t height, postProcessRetina* rf, std::vector<FaceDetectInfo>& faceInfo, float threshold)
+int retinaNet::Detect(float3* imgrgb32, uint32_t width, uint32_t height, postProcessRetina* rf, std::vector<FaceDetectInfo>& faceInfo, float threshold)
 {
 
-    if( !rgba || width == 0 || height == 0  )
+    if(!imgrgb32 || width == 0 || height == 0  )
     {
-        printf(LOG_TRT "detectNet::Detect( 0x%p, %u, %u ) -> invalid parameters\n", rgba, width, height);
+        printf(LOG_TRT "detectNet::Detect( 0x%p, %u, %u ) -> invalid parameters\n", imgrgb32, width, height);
         return -1;
     }
-    if(CUDA_FAILED(cudaResize((float4*)rgba, width, height, (float4*)cudaInput, 640, 360))){
+    if(CUDA_FAILED(cudaResize(imgrgb32, width, height, (float3*)cudaInput, 640, 360))){
         printf(LOG_TRT "imageNet::PreProcess() -- cudaResize failed\n");
         return -1;
     }
-    if( CUDA_FAILED(cudaPreImageNetRGB((float4*)cudaInput, 640, 640, mInputCUDA, 640, 640, GetStream())) )
+    if( CUDA_FAILED(cudaPreImageNetRGB((float3*)cudaInput, 640, 640, mInputCUDA, 640, 640, GetStream())) )
     {
         printf(LOG_TRT "imageNet::PreProcess() -- cudaPreImageNetNormMeanRGB() failed\n");
         return false;

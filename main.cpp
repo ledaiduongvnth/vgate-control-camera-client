@@ -92,7 +92,7 @@ public:
         float scale;
         postProcessRetina *rf = new postProcessRetina((std::string &) "model_path", "net3");
         while (1) {
-            float *cudaImage;
+            float3 *cudaImage;
             capSuccess1 = this->imagesQueue.pop(originImage);
             if (!capSuccess1) {
                 continue;
@@ -260,13 +260,13 @@ public:
         if( !cudaAllocMapped((void**)&imgRGB, ImageSizeRGB8)){
             printf("failed to allocate bytes for image\n");
         }
-        float *imgRGBA = NULL;
+        float3 *imgRGB32 = NULL;
         while (1) {
-            capSuccess = inputStream->Capture((void**)&imgRGBA, IMAGE_RGBA32F, 1000);
+            capSuccess = inputStream->Capture((void**)&imgRGB32, IMAGE_RGB32F, 1000);
             if (!capSuccess) {
                 printf("failed to capture frame\n");
             }
-            if( CUDA_FAILED(cudaConvertColor(imgRGBA, IMAGE_RGBA32F, imgRGB, IMAGE_RGB8, this->cameraWidth, this->cameraHeight))){
+            if( CUDA_FAILED(cudaConvertColor(imgRGB32, IMAGE_RGB32F, imgRGB, IMAGE_RGB8, this->cameraWidth, this->cameraHeight))){
                 printf("failed to convert color");
             }
             CUDA(cudaDeviceSynchronize());
@@ -287,7 +287,7 @@ public:
                 continue;
             }
             this->imagesQueue.push(originImage);
-            this->imagesQueue2.push(imgRGBA);
+            this->imagesQueue2.push(imgRGB32);
         }
     }
 
@@ -309,7 +309,7 @@ private:
     std::shared_ptr<ClientReaderWriter<JSReq, JSResp>> stream;
     CConcurrentQueue<std::vector<LabeledFaceIn>> facesQueue;
     CConcurrentQueue<cv::Mat> imagesQueue;
-    CConcurrentQueue<float *> imagesQueue2;
+    CConcurrentQueue<float3 *> imagesQueue2;
 
 };
 

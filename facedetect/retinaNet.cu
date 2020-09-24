@@ -3,7 +3,7 @@
 
 
 // gpuPreImageNetRGB
-__global__ void gpuPreImageNetRGB( float2 scale, float4* input, int iWidth, float* output, int oWidth, int oHeight )
+__global__ void gpuPreImageNetRGB( float2 scale, float3* input, int iWidth, float* output, int oWidth, int oHeight )
 {
     const int x = blockIdx.x * blockDim.x + threadIdx.x;
     const int y = blockIdx.y * blockDim.y + threadIdx.y;
@@ -17,7 +17,7 @@ __global__ void gpuPreImageNetRGB( float2 scale, float4* input, int iWidth, floa
     const int dx = ((float)x * scale.x);
     const int dy = ((float)y * scale.y);
 
-    const float4 px  = input[ dy * iWidth + dx ];
+    const float3 px  = input[ dy * iWidth + dx ];
     const float3 bgr = make_float3(px.x, px.y, px.z);
 
     output[n * 0 + m] = bgr.x;
@@ -55,7 +55,7 @@ void imagePadding32f4C(void *src, int srcWidth, int srcHeight, void *dst, int ds
 }
 
 // cudaPreImageNetRGB
-cudaError_t cudaPreImageNetRGB( float4* input, size_t inputWidth, size_t inputHeight,
+cudaError_t cudaPreImageNetRGB( float3* input, size_t inputWidth, size_t inputHeight,
                                 float* output, size_t outputWidth, size_t outputHeight,
                                 cudaStream_t stream )
 {
@@ -69,7 +69,7 @@ cudaError_t cudaPreImageNetRGB( float4* input, size_t inputWidth, size_t inputHe
                                       float(inputHeight) / float(outputHeight) );
 
     // launch kernel
-    const dim3 blockDim(8, 8);
+    const dim3 blockDim(6, 6);
     const dim3 gridDim(iDivUp(outputWidth,blockDim.x), iDivUp(outputHeight,blockDim.y));
 
     gpuPreImageNetRGB<<<gridDim, blockDim, 0, stream>>>(scale, input, inputWidth, output, outputWidth, outputHeight);
