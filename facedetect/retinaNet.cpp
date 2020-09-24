@@ -7,8 +7,6 @@ cudaError_t cudaPreImageNetRGB( float4* input, size_t inputWidth, size_t inputHe
                                 float* output, size_t outputWidth, size_t outputHeight,
                                 cudaStream_t stream );
 
-void imagePadding32f4C(void *src, int srcWidth, int srcHeight, void *dst, int dstWidth, int dstHeight, int top, int left);
-
 
 retinaNet::retinaNet(int cameraWidth, int cameraHeight, std::string camera_source){
     const size_t ImageSizeRGBA32 = imageFormatSize(IMAGE_RGBA32F, 640, 640);
@@ -55,15 +53,10 @@ int retinaNet::Detect(float* rgba, uint32_t width, uint32_t height, postProcessR
         printf(LOG_TRT "detectNet::Detect( 0x%p, %u, %u ) -> invalid parameters\n", rgba, width, height);
         return -1;
     }
-
-//    imagePadding32f4C(rgba, width, height, cudaInput, width, width, 0, 0);
-
-
-    if(CUDA_FAILED(cudaResize((float4*)rgba, 1920, 1080, (float4*)cudaInput, 640, 360))){
-        throw std::exception();
+    if(CUDA_FAILED(cudaResize((float4*)rgba, width, height, (float4*)cudaInput, 640, 360))){
+        printf(LOG_TRT "imageNet::PreProcess() -- cudaResize failed\n");
+        return -1;
     }
-    imagePadding32f4C(cudaInput, 640, 360, cudaInput, 640, 640, 0, 0);
-
     if( CUDA_FAILED(cudaPreImageNetRGB((float4*)cudaInput, 640, 640, mInputCUDA, 640, 640, GetStream())) )
     {
         printf(LOG_TRT "imageNet::PreProcess() -- cudaPreImageNetNormMeanRGB() failed\n");
