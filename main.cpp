@@ -76,7 +76,7 @@ public:
         context->AddMetadata("area_id", grpc::string(std::to_string(this->areaId)));
         context->AddMetadata("direction", grpc::string(this->direction));
         this->stream = this->stub_->recognize_face_js(context);
-        this->net = new retinaNet(this->cameraWidth, this->cameraHeight, this->camera_source);
+        this->net = new retinaNet();
         this->rotateImage = rotateImage;
     }
 
@@ -262,7 +262,7 @@ public:
         }
         float *imgRGBA = NULL;
         while (1) {
-            capSuccess = inputStream->Capture((void**)&imgRGBA, IMAGE_RGBA32F, 1000);
+            capSuccess = inputStream->Capture((void**)&imgRGBA, IMAGE_RGB32F, 1000);
             if (!capSuccess) {
 //                printf("failed to capture frame\n");
 //                videoSource* inputStream = videoSource::Create(this->camera_source.c_str());
@@ -279,7 +279,7 @@ public:
 //                std::cout << "at: " << std::put_time(std::gmtime(&time), "%c") << '\n';
 //                continue;
             } else {
-                if( CUDA_FAILED(cudaConvertColor(imgRGBA, IMAGE_RGBA32F, imgRGB, IMAGE_RGB8, this->cameraWidth, this->cameraHeight))){
+                if( CUDA_FAILED(cudaConvertColor(imgRGBA, IMAGE_RGB32F, imgRGB, IMAGE_RGB8, this->cameraWidth, this->cameraHeight))){
                     printf("failed to convert color");
                 }
                 CUDA(cudaDeviceSynchronize());

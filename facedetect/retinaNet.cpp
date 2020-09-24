@@ -2,19 +2,13 @@
 #include "retinaNet.h"
 #include "cudaUtility.h"
 
-cudaError_t cudaPreImageNetRGB( float4* input, size_t inputWidth, size_t inputHeight,
-                                float* output, size_t outputWidth, size_t outputHeight,
-                                cudaStream_t stream );
-
-void imagePadding32f4C(void *src, int srcWidth, int srcHeight, void *dst, int dstWidth, int dstHeight, int top, int left);
+cudaError_t cudaPreImage(float3* input, size_t inputWidth, size_t inputHeight,
+                         float* output, size_t outputWidth, size_t outputHeight,
+                         cudaStream_t stream );
 
 
-retinaNet::retinaNet(int cameraWidth, int cameraHeight, std::string camera_source){
-    const size_t ImageSizeRGBA32 = imageFormatSize(IMAGE_RGBA32F, cameraWidth, cameraHeight);
-    if( !cudaAllocMapped((void**)&cudaInput, ImageSizeRGBA32)){
-        printf("failed to allocate bytes for image\n");
-    }
 
+retinaNet::retinaNet(){
     const char* model_path  = "../facedetect/model/retina.onnx";
     const char* input_blob  = "data_input";
     std::vector<std::string> output_blobs;
@@ -55,7 +49,7 @@ int retinaNet::Detect(float* rgba, uint32_t width, uint32_t height, postProcessR
         return -1;
     }
 
-    if( CUDA_FAILED(cudaPreImageNetRGB((float4*)rgba, width, height, mInputCUDA, 640, 640, GetStream())) )
+    if( CUDA_FAILED(cudaPreImage((float3 *) rgba, width, height, mInputCUDA, 640, 640, GetStream())) )
     {
         printf(LOG_TRT "imageNet::PreProcess() -- cudaPreImageNetNormMeanRGB() failed\n");
         return false;
