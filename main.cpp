@@ -243,7 +243,7 @@ public:
         vo.width = this->cameraWidth;
         vo.height = this->cameraHeight;
         vo.zeroCopy = true;
-//        vo.codec = videoOptions::CODEC_H264;
+        vo.codec = videoOptions::CODEC_H264;
         videoSource* inputStream = videoSource::Create(this->camera_source.c_str(), vo);
         if (!inputStream) {
             printf("failed to initialize camera device\n");
@@ -264,30 +264,29 @@ public:
         while (1) {
             capSuccess = inputStream->Capture((void**)&imgRGBA, IMAGE_RGBA32F, 1000);
             if (!capSuccess) {
-                printf("failed to capture frame\n");
-            }
-            if( CUDA_FAILED(cudaConvertColor(imgRGBA, IMAGE_RGBA32F, imgRGB, IMAGE_RGB8, this->cameraWidth, this->cameraHeight))){
-                printf("failed to convert color");
-            }
-            CUDA(cudaDeviceSynchronize());
-            originImage = cv::Mat(this->cameraHeight, this->cameraWidth, CV_8UC3, imgRGB);
-            if (!capSuccess) {
-                videoSource* inputStream = videoSource::Create(this->camera_source.c_str());
-                if (!inputStream) {
-                    printf("failed to initialize camera device\n");
-                    throw std::exception();
+//                printf("failed to capture frame\n");
+//                videoSource* inputStream = videoSource::Create(this->camera_source.c_str());
+//                if (!inputStream) {
+//                    printf("failed to initialize camera device\n");
+//                    throw std::exception();
+//                }
+//                if (!inputStream->Open()) {
+//                    printf("failed to open camera for streaming\n");
+//                    throw std::exception();
+//                }
+//                auto time = std::time(nullptr);
+//                printf("cap not success ");
+//                std::cout << "at: " << std::put_time(std::gmtime(&time), "%c") << '\n';
+//                continue;
+            } else {
+                if( CUDA_FAILED(cudaConvertColor(imgRGBA, IMAGE_RGBA32F, imgRGB, IMAGE_RGB8, this->cameraWidth, this->cameraHeight))){
+                    printf("failed to convert color");
                 }
-                if (!inputStream->Open()) {
-                    printf("failed to open camera for streaming\n");
-                    throw std::exception();
-                }
-                auto time = std::time(nullptr);
-                printf("cap not success ");
-                std::cout << "at: " << std::put_time(std::gmtime(&time), "%c") << '\n';
-                continue;
+                CUDA(cudaDeviceSynchronize());
+                originImage = cv::Mat(this->cameraHeight, this->cameraWidth, CV_8UC3, imgRGB);
+                this->imagesQueue.push(originImage);
+                this->imagesQueue2.push(imgRGBA);
             }
-            this->imagesQueue.push(originImage);
-            this->imagesQueue2.push(imgRGBA);
         }
     }
 

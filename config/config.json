@@ -1,7 +1,7 @@
 {
-  "camera_source": "/dev/video1",
-  "camera_width": 640,
-  "camera_height": 480,
+  "camera_source": "rtsp://admin:abcd1234@172.16.10.84:554/Streaming/Channels/101",
+  "camera_width": 1920,
+  "camera_height": 1080,
   "rotate_image": false,
   "multiple_camera_host": "172.16.10.30:50051",
   "detection_frequency": 1,

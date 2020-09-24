@@ -52,6 +52,7 @@ void imagePadding32f4C(void *src, int srcWidth, int srcHeight, void *dst, int ds
         printf("imageResize_32f_C4R failed %d.\n", ret);
         throw std::exception();
     }
+    printf("done padding\n");
 }
 
 // cudaPreImageNetRGB

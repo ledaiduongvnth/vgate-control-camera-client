@@ -55,9 +55,7 @@ int retinaNet::Detect(float* rgba, uint32_t width, uint32_t height, postProcessR
         return -1;
     }
 
-    imagePadding32f4C(rgba, width, height, cudaInput, width, width, 0, 0);
-
-    if( CUDA_FAILED(cudaPreImageNetRGB((float4*)cudaInput, width, width, mInputCUDA, 640, 640, GetStream())) )
+    if( CUDA_FAILED(cudaPreImageNetRGB((float4*)rgba, width, height, mInputCUDA, 640, 640, GetStream())) )
     {
         printf(LOG_TRT "imageNet::PreProcess() -- cudaPreImageNetNormMeanRGB() failed\n");
         return false;
