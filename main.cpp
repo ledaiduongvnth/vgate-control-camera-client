@@ -34,6 +34,13 @@ using multiple_camera_server::JSResp;
 using multiple_camera_server::LabeledFace;
 using multiple_camera_server::UnlabeledFace;
 
+
+struct Data {
+    float3* imgRGB32;
+    uchar3* imgRGB8;
+//    cv::Mat OpenCVimg;
+};
+
 class CameraClient {
 public:
     std::string camera_source;
@@ -82,7 +89,7 @@ public:
     }
 
     void SendRequests() {
-        cv::Mat originImage, cropedImage;
+        cv::Mat cropedImage;
         std::vector<FaceDetectInfo> faceInfo;
         std::vector<LabeledFaceIn> facesOut;
         std::vector<TrackingBox> tmp_det;
@@ -93,22 +100,17 @@ public:
         videoOutput* outputStream = videoOutput::Create("display://0");
         float scale;
         postProcessRetina *rf = new postProcessRetina((std::string &) "model_path", "net3");
-        uchar3 * imgRGB = NULL;
-        const size_t ImageSizeRGB8 = imageFormatSize(IMAGE_RGB8, this->cameraWidth, this->cameraHeight);
-        if( !cudaAllocMapped((void**)&imgRGB, ImageSizeRGB8)){
-            printf("failed to allocate bytes for image\n");
-        }
         while (1) {
-            float3 *imgRGB32;
+            Data* data;
             JSReq jsReq;
-            capSuccess2 = this->imagesQueue2.pop(imgRGB32);
+            capSuccess2 = this->imagesQueue2.pop(data);
             if (!capSuccess2) {
                 continue;
             }
-            if( CUDA_FAILED(cudaConvertColor(imgRGB32, IMAGE_RGB32F, imgRGB, IMAGE_RGB8, this->cameraWidth, this->cameraHeight))){
-                printf("failed to convert color");
-            }
-            originImage = cv::Mat(this->cameraHeight, this->cameraWidth, CV_8UC3, imgRGB);
+            cv::Mat originImage = cv::Mat(this->cameraHeight, this->cameraWidth, CV_8UC3, data->imgRGB8);
+//            float3 *imgRGB32 = data->imgRGB32;
+//            uchar3* imgRGB8 = data->imgRGB8;
+//            cv::Mat originImage = data->OpenCVimg;
 
             /* Detect faces in an image */
             detectionCount = detectionCount + 1;
@@ -118,15 +120,16 @@ public:
             if (first_detections) {
                 sortTrackers.init(tmp_det);
                 first_detections = false;
-                float sw = 1.0 * originImage.cols / 640;
-                float sh = 1.0 * originImage.rows / 640;
+                float sw = 1.0 * this->cameraWidth/ 640;
+                float sh = 1.0 * this->cameraHeight/ 640;
                 scale = sw > sh ? sw : sh;
                 scale = scale > 1.0 ? scale : 1.0;
             }
             if (detectionCount == 0) {
                 tmp_det.clear();
                 faceInfo.clear();
-                this->net->Detect(imgRGB32, this->cameraWidth, this->cameraHeight, rf, faceInfo, this->faceDetectThreash);
+                this->net->Detect(data->imgRGB32, this->cameraWidth, this->cameraHeight, rf, faceInfo, this->faceDetectThreash);
+                printf("this is faces:%zu\n", faceInfo.size());
                 for (auto &t : faceInfo) {
                     TrackingBox trackingBox;
                     trackingBox.box.x = t.rect.x1 * scale;
@@ -209,13 +212,14 @@ public:
             }
             if( outputStream != NULL )
             {
-                outputStream->Render(imgRGB, this->cameraWidth, this->cameraHeight);
+                outputStream->Render(data->imgRGB8, this->cameraWidth, this->cameraHeight);
                 char str[256];
                 sprintf(str, "Video Viewer (%ux%u) | %.1f FPS", this->cameraWidth, this->cameraHeight, outputStream->GetFrameRate());
                 outputStream->SetStatus(str);
                 if( !outputStream->IsStreaming() )
                     break;
             }
+//            CUDA(cudaFreeHost(data->imgRGB8));
         }
     }
 
@@ -252,6 +256,7 @@ public:
         vo.zeroCopy = true;
         vo.codec = videoOptions::CODEC_H264;
         videoSource* inputStream = videoSource::Create(this->camera_source.c_str(), vo);
+
         if (!inputStream) {
             printf("failed to initialize camera device\n");
             throw std::exception();
@@ -260,13 +265,26 @@ public:
             printf("failed to open camera for streaming\n");
             throw std::exception();
         }
+
         while (true) {
             float3 *imgRGB32 = NULL;
             bool capSuccess = inputStream->Capture((void**)&imgRGB32, IMAGE_RGB32F, 1000);
             if (!capSuccess) {
                 printf("failed to capture frame\n");
             } else {
-                this->imagesQueue2.push(imgRGB32);
+
+                uchar3 * imgRGB8 = NULL;
+                const size_t ImageSizeRGB8 = imageFormatSize(IMAGE_RGB8, this->cameraWidth, this->cameraHeight);
+                if( !cudaAllocMapped((void**)&imgRGB8, ImageSizeRGB8)){
+                    printf("failed to allocate bytes for image\n");
+                }
+                if( CUDA_FAILED(cudaConvertColor(imgRGB32, IMAGE_RGB32F, imgRGB8, IMAGE_RGB8, this->cameraWidth, this->cameraHeight))){
+                    printf("failed to convert color");
+                }
+                CUDA(cudaDeviceSynchronize());
+                cv::Mat originImage = cv::Mat(this->cameraHeight, this->cameraWidth, CV_8UC3, imgRGB8);
+                Data data{imgRGB32, imgRGB8};
+                this->imagesQueue2.push(&data);
             }
         }
     }
@@ -289,7 +307,7 @@ private:
     std::shared_ptr<ClientReaderWriter<JSReq, JSResp>> stream;
     CConcurrentQueue<std::vector<LabeledFaceIn>> facesQueue;
     CConcurrentQueue<cv::Mat> imagesQueue;
-    CConcurrentQueue<float3 *> imagesQueue2;
+    CConcurrentQueue<Data*> imagesQueue2;
 
 };
 
