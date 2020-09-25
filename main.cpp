@@ -37,8 +37,7 @@ using multiple_camera_server::UnlabeledFace;
 
 struct Data {
     float3* imgRGB32;
-    uchar3* imgRGB8;
-//    cv::Mat OpenCVimg;
+    cv::Mat OpenCVimg;
 };
 
 class CameraClient {
@@ -107,11 +106,6 @@ public:
             if (!capSuccess2) {
                 continue;
             }
-            cv::Mat originImage = cv::Mat(this->cameraHeight, this->cameraWidth, CV_8UC3, data->imgRGB8);
-//            float3 *imgRGB32 = data->imgRGB32;
-//            uchar3* imgRGB8 = data->imgRGB8;
-//            cv::Mat originImage = data->OpenCVimg;
-
             /* Detect faces in an image */
             detectionCount = detectionCount + 1;
             if (detectionCount == this->detectionFrequency) {
@@ -149,7 +143,7 @@ public:
             /* Detect faces in an image */
 //            this->facesQueue.pop(facesOut);
             // update tracking
-            sortTrackers.step(tmp_det, originImage.size(), stream);
+            sortTrackers.step(tmp_det, data->OpenCVimg.size(), stream);
             if (!faceInfo.empty()) {
 //                /* Make Grpc request and get face faces label from queue */
 //                for (auto it = sortTrackers.trackers.begin(); it != sortTrackers.trackers.end();) {
@@ -206,20 +200,15 @@ public:
 //                /* Send Grpc request */
 //
 //                /* Draw box and face label */
-                WriteTextAndBox(originImage, drawer, sortTrackers);
+                WriteTextAndBox(data->OpenCVimg, drawer, sortTrackers);
 //                /* Draw box and face label */
 //            }
             }
-            if( outputStream != NULL )
-            {
-                outputStream->Render(data->imgRGB8, this->cameraWidth, this->cameraHeight);
-                char str[256];
-                sprintf(str, "Video Viewer (%ux%u) | %.1f FPS", this->cameraWidth, this->cameraHeight, outputStream->GetFrameRate());
-                outputStream->SetStatus(str);
-                if( !outputStream->IsStreaming() )
-                    break;
-            }
-//            CUDA(cudaFreeHost(data->imgRGB8));
+            resize(data->OpenCVimg, data->OpenCVimg, screenSize);
+            namedWindow("camera_client", cv::WND_PROP_FULLSCREEN);
+            setWindowProperty("camera_client", cv::WND_PROP_FULLSCREEN, cv::WINDOW_FULLSCREEN);
+            imshow("camera_client", data->OpenCVimg);
+            cv::waitKey(1);
         }
     }
 
@@ -256,7 +245,6 @@ public:
         vo.zeroCopy = true;
         vo.codec = videoOptions::CODEC_H264;
         videoSource* inputStream = videoSource::Create(this->camera_source.c_str(), vo);
-
         if (!inputStream) {
             printf("failed to initialize camera device\n");
             throw std::exception();
@@ -265,25 +253,23 @@ public:
             printf("failed to open camera for streaming\n");
             throw std::exception();
         }
-
+        uchar3 * imgRGB8 = NULL;
+        const size_t ImageSizeRGB8 = imageFormatSize(IMAGE_RGB8, this->cameraWidth, this->cameraHeight);
+        if( !cudaAllocMapped((void**)&imgRGB8, ImageSizeRGB8)){
+            printf("failed to allocate bytes for image\n");
+        }
         while (true) {
             float3 *imgRGB32 = NULL;
             bool capSuccess = inputStream->Capture((void**)&imgRGB32, IMAGE_RGB32F, 1000);
             if (!capSuccess) {
                 printf("failed to capture frame\n");
             } else {
-
-                uchar3 * imgRGB8 = NULL;
-                const size_t ImageSizeRGB8 = imageFormatSize(IMAGE_RGB8, this->cameraWidth, this->cameraHeight);
-                if( !cudaAllocMapped((void**)&imgRGB8, ImageSizeRGB8)){
-                    printf("failed to allocate bytes for image\n");
-                }
                 if( CUDA_FAILED(cudaConvertColor(imgRGB32, IMAGE_RGB32F, imgRGB8, IMAGE_RGB8, this->cameraWidth, this->cameraHeight))){
                     printf("failed to convert color");
                 }
                 CUDA(cudaDeviceSynchronize());
                 cv::Mat originImage = cv::Mat(this->cameraHeight, this->cameraWidth, CV_8UC3, imgRGB8);
-                Data data{imgRGB32, imgRGB8};
+                Data data{imgRGB32, originImage.clone()};
                 this->imagesQueue2.push(&data);
             }
         }
