@@ -37,7 +37,7 @@ using multiple_camera_server::UnlabeledFace;
 
 struct Data {
     float3* imgRGB32;
-    cv::Mat OpenCVimg;
+    cv::Mat* OpenCVimg;
 };
 
 class CameraClient {
@@ -94,18 +94,25 @@ public:
         std::vector<TrackingBox> tmp_det;
         SORTtracker sortTrackers(this->maxAge, this->minHits, this->iouThreash);
         DrawText drawer(this->fontScale);
-        bool success, send_success, first_detections = true, capSuccess1, capSuccess2;
+        bool success, send_success, first_detections = true, capSuccess2;
         int new_left, new_top, detectionCount = 0, recognitionCount = 0;
-        videoOutput* outputStream = videoOutput::Create("display://0");
         float scale;
         postProcessRetina *rf = new postProcessRetina((std::string &) "model_path", "net3");
         while (1) {
-            Data* data;
-            JSReq jsReq;
-            capSuccess2 = this->imagesQueue2.pop(data);
+//            Data* data;
+            cv::Mat displayImage;
+            float3* imgRGB32;
+            capSuccess2 = this->imagesQueue.pop(displayImage);
             if (!capSuccess2) {
                 continue;
             }
+            capSuccess2 = this->imagesQueue2.pop(imgRGB32);
+            if (!capSuccess2) {
+                continue;
+            }
+            printf("this is originImage width %d, height %d\n", displayImage.cols, displayImage.rows);
+            cv::cvtColor(displayImage, displayImage, cv::COLOR_RGB2BGR);
+            JSReq jsReq;
             /* Detect faces in an image */
             detectionCount = detectionCount + 1;
             if (detectionCount == this->detectionFrequency) {
@@ -114,16 +121,15 @@ public:
             if (first_detections) {
                 sortTrackers.init(tmp_det);
                 first_detections = false;
-                float sw = 1.0 * this->cameraWidth/ 640;
-                float sh = 1.0 * this->cameraHeight/ 640;
+                float sw = 1.0 * displayImage.cols / 640;
+                float sh = 1.0 * displayImage.rows / 640;
                 scale = sw > sh ? sw : sh;
                 scale = scale > 1.0 ? scale : 1.0;
             }
             if (detectionCount == 0) {
                 tmp_det.clear();
                 faceInfo.clear();
-                this->net->Detect(data->imgRGB32, this->cameraWidth, this->cameraHeight, rf, faceInfo, this->faceDetectThreash);
-                printf("this is faces:%zu\n", faceInfo.size());
+                this->net->Detect(imgRGB32, this->cameraWidth, this->cameraHeight, rf, faceInfo, this->faceDetectThreash);
                 for (auto &t : faceInfo) {
                     TrackingBox trackingBox;
                     trackingBox.box.x = t.rect.x1 * scale;
@@ -139,75 +145,81 @@ public:
                     tmp_det.push_back(trackingBox);
                 }
             }
-
             /* Detect faces in an image */
-//            this->facesQueue.pop(facesOut);
+            this->facesQueue.pop(facesOut);
             // update tracking
-            sortTrackers.step(tmp_det, data->OpenCVimg.size(), stream);
+            sortTrackers.step(tmp_det, displayImage.size(), stream);
             if (!faceInfo.empty()) {
-//                /* Make Grpc request and get face faces label from queue */
-//                for (auto it = sortTrackers.trackers.begin(); it != sortTrackers.trackers.end();) {
-//                    cv::Rect_<float> pBox = (*it).box;
-//                    if (pBox.x > 0 && pBox.y > 0 && pBox.x + pBox.width < displayImage.size().width &&
-//                        pBox.y + pBox.height < displayImage.size().height) {
-//                        if (!facesOut.empty()) {
-//                            for (auto &k : facesOut) {
-//                                if (k.track_id == it->source_track_id) {
-//                                    it->name = k.person_name;
-//                                }
-//                            }
-//                        }
-//                        if (it->name.empty()) {
-//                            std::tie(cropedImage, new_left, new_top) = CropFaceImageWithMargin(displayImage.clone(),
-//                                                                                               pBox.x, pBox.y,
-//                                                                                               pBox.x + pBox.width,
-//                                                                                               pBox.y + pBox.height,
-//                                                                                               1.4);
-//                            UnlabeledFace *face = jsReq.add_faces();
-//                            std::vector<uchar> buf;
-//                            success = cv::imencode(".jpg", cropedImage, buf);
-//                            if (success) {
-//                                auto *enc_msg = reinterpret_cast<unsigned char *>(buf.data());
-//                                std::string encoded = Base64Encode(enc_msg, buf.size());
-//                                face->set_track_id(it->source_track_id);
-//                                face->set_image_bytes(encoded);
-//                                face->set_is_saving_history(false);
-//                                for (size_t j = 0; j < 5; j++) {
-//                                    face->add_landmarks(it->landmarks[j] - (float) new_top);
-//                                }
-//                                for (size_t j = 5; j < 10; j++) {
-//                                    face->add_landmarks(it->landmarks[j] - (float) new_left);
-//                                }
-//                            }
-//                        }
-//                    }
-//                    it++;
-//                }
-//                /* Make Grpc request and get face faces label from queue */
-//
-//                /* Send Grpc request */
-//                recognitionCount = recognitionCount + 1;
-//                if (recognitionCount == this->recognitionFrequency) {
-//                    recognitionCount = 0;
-//                }
-//                if (recognitionCount == 0) {
-//                    send_success = stream->Write(jsReq);
-//                    if (!send_success) {
-//                        printf("failed to send grpc\n");
-//                        throw std::exception();
-//                    }
-//                }
-//                /* Send Grpc request */
-//
-//                /* Draw box and face label */
-                WriteTextAndBox(data->OpenCVimg, drawer, sortTrackers);
-//                /* Draw box and face label */
-//            }
+                /* Make Grpc request and get face faces label from queue */
+                for (auto it = sortTrackers.trackers.begin(); it != sortTrackers.trackers.end();) {
+                    cv::Rect_<float> pBox = (*it).box;
+                    if (pBox.x > 0 && pBox.y > 0 && pBox.x + pBox.width < displayImage.size().width &&
+                        pBox.y + pBox.height < displayImage.size().height) {
+                        if (!facesOut.empty()) {
+                            for (auto &k : facesOut) {
+                                if (k.track_id == it->source_track_id) {
+                                    it->name = k.person_name;
+                                }
+                            }
+                        }
+                        if (it->name.empty()) {
+                            std::tie(cropedImage, new_left, new_top) = CropFaceImageWithMargin(displayImage.clone(),
+                                                                                               pBox.x, pBox.y,
+                                                                                               pBox.x + pBox.width,
+                                                                                               pBox.y + pBox.height,
+                                                                                               1.4);
+                            UnlabeledFace *face = jsReq.add_faces();
+                            std::vector<uchar> buf;
+                            success = cv::imencode(".jpg", cropedImage, buf);
+                            if (success) {
+                                auto *enc_msg = reinterpret_cast<unsigned char *>(buf.data());
+                                std::string encoded = Base64Encode(enc_msg, buf.size());
+                                face->set_track_id(it->source_track_id);
+                                face->set_image_bytes(encoded);
+                                face->set_is_saving_history(false);
+                                for (size_t j = 0; j < 5; j++) {
+                                    face->add_landmarks(it->landmarks[j] - (float) new_top);
+                                }
+                                for (size_t j = 5; j < 10; j++) {
+                                    face->add_landmarks(it->landmarks[j] - (float) new_left);
+                                }
+                            }
+                        }
+                    }
+                    it++;
+                }
+                /* Make Grpc request and get face faces label from queue */
+
+                /* Send Grpc request */
+                recognitionCount = recognitionCount + 1;
+                if (recognitionCount == this->recognitionFrequency) {
+                    recognitionCount = 0;
+                }
+                if (recognitionCount == 0) {
+                    send_success = stream->Write(jsReq);
+                    if (!send_success) {
+                        printf("failed to send grpc\n");
+                        throw std::exception();
+                    }
+                }
+                /* Send Grpc request */
+
+                /* Draw box and face label */
+                WriteTextAndBox(displayImage, drawer, sortTrackers);
+                /* Draw box and face label */
             }
-            resize(data->OpenCVimg, data->OpenCVimg, screenSize);
-            namedWindow("camera_client", cv::WND_PROP_FULLSCREEN);
-            setWindowProperty("camera_client", cv::WND_PROP_FULLSCREEN, cv::WINDOW_FULLSCREEN);
-            imshow("camera_client", data->OpenCVimg);
+            if(this->rotateImage){
+                cv::Mat dst;
+                cv::flip(displayImage, dst, -1);
+                displayImage = dst;
+            }
+            cv::resize(displayImage, displayImage, screenSize);
+            printf("this is screen width %d, height %d\n", screenSize.width, screenSize.height);
+            printf("this is displayImage width %d, height %d\n", displayImage.cols, displayImage.rows);
+
+            cv::namedWindow("camera_client", cv::WND_PROP_FULLSCREEN);
+            cv::setWindowProperty("camera_client", cv::WND_PROP_FULLSCREEN, cv::WINDOW_FULLSCREEN);
+            cv::imshow("camera_client", displayImage);
             cv::waitKey(1);
         }
     }
@@ -269,8 +281,10 @@ public:
                 }
                 CUDA(cudaDeviceSynchronize());
                 cv::Mat originImage = cv::Mat(this->cameraHeight, this->cameraWidth, CV_8UC3, imgRGB8);
-                Data data{imgRGB32, originImage.clone()};
-                this->imagesQueue2.push(&data);
+//                printf("this is originImage width %d, height %d\n", originImage.cols, originImage.rows);
+//                Data data{imgRGB32, &originImage};
+                this->imagesQueue.push(originImage.clone());
+                this->imagesQueue2.push(imgRGB32);
             }
         }
     }
@@ -293,8 +307,7 @@ private:
     std::shared_ptr<ClientReaderWriter<JSReq, JSResp>> stream;
     CConcurrentQueue<std::vector<LabeledFaceIn>> facesQueue;
     CConcurrentQueue<cv::Mat> imagesQueue;
-    CConcurrentQueue<Data*> imagesQueue2;
-
+    CConcurrentQueue<float3*> imagesQueue2;
 };
 
 int main() {

@@ -67,30 +67,26 @@ void WriteTextAndBox(cv::Mat &displayImage, DrawText &drawer, SORTtracker sortTr
             }
 
             cv::Rect rect = cv::Rect(pBox.x, pBox.y, pBox.width, pBox.height);
-//            DrawRectangle(displayImage, rect, 3, 3, color);
-            cv::rectangle(displayImage, rect, cv::Scalar(0, 255, 0));
-            cv::Point point = cv::Point(pBox.x , pBox.y);
-            cv::putText(displayImage, displayName, point, cv::FONT_HERSHEY_DUPLEX, 1.0, CV_RGB(118, 185, 0), 2);
+            DrawRectangle(displayImage, rect, 3, 3, color);
 
+            cv::Mat overlay = displayImage.clone();
+            cv::Mat output = displayImage.clone();
+            int baseline = 0;
+            int text_height = drawer.pixel_width;
+            int text_width = drawer.pixel_width * displayName.size() / 2;
 
-//            cv::Mat overlay = displayImage.clone();
-//            cv::Mat output = displayImage.clone();
-//            int baseline = 0;
-//            int text_height = drawer.pixel_width;
-//            int text_width = drawer.pixel_width * displayName.size() / 2;
-//
-//            pBox.y = pBox.y - text_height / 2;
-//            pBox.x = pBox.x - text_width / 2 + pBox.width / 2;
-//            cv::rectangle(overlay, cv::Point(pBox.x, pBox.y) + cv::Point(0, baseline),
-//                          cv::Point(pBox.x, pBox.y) + cv::Point(text_width, -text_height), cv::Scalar(0), cv::FILLED);
-//            float alpha = 0.5;
-//            cv::addWeighted(overlay, alpha, output, 1 - alpha, 0, output);
-//            displayImage = output;
-//
-//            std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-//            std::wstring ws(displayName.size(), L' ');
-//            ws.resize(std::mbstowcs(&ws[0], displayName.c_str(), displayName.size()));
-//            drawer.PrintText(displayImage, ws, pBox.x, pBox.y, cv::Scalar(255, 255, 255));
+            pBox.y = pBox.y - text_height / 2;
+            pBox.x = pBox.x - text_width / 2 + pBox.width / 2;
+            cv::rectangle(overlay, cv::Point(pBox.x, pBox.y) + cv::Point(0, baseline),
+                          cv::Point(pBox.x, pBox.y) + cv::Point(text_width, -text_height), cv::Scalar(0), cv::FILLED);
+            float alpha = 0.5;
+            cv::addWeighted(overlay, alpha, output, 1 - alpha, 0, output);
+            displayImage = output;
+
+            std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+            std::wstring ws(displayName.size(), L' ');
+            ws.resize(std::mbstowcs(&ws[0], displayName.c_str(), displayName.size()));
+            drawer.PrintText(displayImage, ws, pBox.x, pBox.y, cv::Scalar(255, 255, 255));
         }
         it++;
     }
