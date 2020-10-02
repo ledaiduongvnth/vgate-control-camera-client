@@ -21,7 +21,6 @@
 #include "DrawText.h"
 #include "gstCamera.h"
 #include "retinaNet.h"
-#include "fstream"
 #include "base64.h"
 #include "cudaColorspace.h"
 
@@ -35,12 +34,6 @@ using multiple_camera_server::JSReq;
 using multiple_camera_server::JSResp;
 using multiple_camera_server::LabeledFace;
 using multiple_camera_server::UnlabeledFace;
-
-
-struct Data {
-    float3* imgRGB32;
-    cv::Mat* OpenCVimg;
-};
 
 class CameraClient {
 public:
@@ -95,7 +88,6 @@ public:
         std::vector<LabeledFaceIn> facesOut;
         std::vector<TrackingBox> tmp_det;
         SORTtracker sortTrackers(this->maxAge, this->minHits, this->iouThreash);
-        DrawText drawer(this->fontScale);
         bool success, send_success, first_detections = true, capSuccess2;
         int new_left, new_top, detectionCount = 0, recognitionCount = 0;
         float scale;
@@ -240,9 +232,7 @@ public:
                     }
                 }
                 /* Send Grpc request */
-
                 std::vector<std::pair<std::string, int2>> labels;
-
                 /* Draw box and face label */
                 for (auto it = sortTrackers.trackers.begin(); it != sortTrackers.trackers.end();) {
                     cv::Rect_<float> pBox = (*it).box;
@@ -261,11 +251,6 @@ public:
                     it++;
                 }
                 font->OverlayText(imgRGB8size1920x1080, IMAGE_RGB8, 1920, 1080, labels, make_float4(255,0,0,255));
-            }
-            if(this->rotateImage){
-                cv::Mat dst;
-                cv::flip(displayImage, dst, -1);
-                displayImage = dst;
             }
 
             if( outputStream != NULL )
@@ -310,58 +295,6 @@ public:
         }
     }
 
-    [[noreturn]] void ReadImages() {
-//        videoOptions vo;
-//        vo.width = this->cameraWidth;
-//        vo.height = this->cameraHeight;
-//        vo.zeroCopy = true;
-//        vo.codec = videoOptions::CODEC_H264;
-//        videoSource* inputStream = videoSource::Create(this->camera_source.c_str(), vo);
-//        if (!inputStream) {
-//            printf("failed to initialize camera device\n");
-//            throw std::exception();
-//        }
-//        if (!inputStream->Open()) {
-//            printf("failed to open camera for streaming\n");
-//            throw std::exception();
-//        }
-//        uchar3 * imgRGB8 = NULL;
-//        const size_t ImageSizeRGB8 = imageFormatSize(IMAGE_RGB8, this->cameraWidth, this->cameraHeight);
-//        if( !cudaAllocMapped((void**)&imgRGB8, ImageSizeRGB8)){
-//            printf("failed to allocate bytes for image\n");
-//        }
-//        while (true) {
-//            float3 *imgRGB32 = NULL;
-//            bool capSuccess = inputStream->Capture((void**)&imgRGB32, IMAGE_RGB32F, 1000);
-//            if (!capSuccess) {
-//                printf("failed to capture frame\n");
-//            } else {
-//                if( CUDA_FAILED(cudaConvertColor(imgRGB32, IMAGE_RGB32F, imgRGB8, IMAGE_RGB8, this->cameraWidth, this->cameraHeight))){
-//                    printf("failed to convert color");
-//                }
-//                if(CUDA_FAILED(cudaResize(imgrgb32, width, height, (float3*)cudaInput, 640, 360))){
-//                    printf(LOG_TRT "imageNet::PreProcess() -- cudaResize failed\n");
-//                    return -1;
-//                }
-//                if( CUDA_FAILED(cudaPreImageNetRGB((float3*)cudaInput, 640, 640, MInputCUDA, 640, 640, GetStream())) )
-//                {
-//                    printf(LOG_TRT "imageNet::PreProcess() -- cudaPreImageNetNormMeanRGB() failed\n");
-//                    return false;
-//                }
-//                CUDA(cudaDeviceSynchronize());
-//                cv::Mat originImage = cv::Mat(this->cameraHeight, this->cameraWidth, CV_8UC3, imgRGB8);
-////                printf("this is originImage width %d, height %d\n", originImage.cols, originImage.rows);
-////                Data data{imgRGB32, &originImage};
-//                this->imagesQueue.push(originImage.clone());
-//                this->imagesQueue2.push(imgRGB32);
-//            }
-//        }
-    }
-
-    std::thread ReadImagesThread() {
-        return std::thread([this] { ReadImages(); });
-    }
-
     std::thread SendRequestsThread() {
         return std::thread([this] { SendRequests(); });
     }
@@ -375,8 +308,6 @@ private:
     std::unique_ptr<FaceProcessing::Stub> stub_{};
     std::shared_ptr<ClientReaderWriter<JSReq, JSResp>> stream;
     CConcurrentQueue<std::vector<LabeledFaceIn>> facesQueue;
-    CConcurrentQueue<cv::Mat> imagesQueue;
-    CConcurrentQueue<float3*> imagesQueue2;
 };
 
 int main() {
@@ -404,10 +335,8 @@ int main() {
                               recognitionFrequency, maxAge, minHits, iouThreash, faceDetectThreash, fontScale,
                               cv::Size(screen->width, screen->height), cameraWidth, cameraHeight, direction, rotateImage);
     try {
-        std::thread t0 = cameraClient.ReadImagesThread();
         std::thread t1 = cameraClient.ReceiveResponsesThread();
         std::thread t2 = cameraClient.SendRequestsThread();
-        t0.join();
         t1.join();
         t2.join();
     } catch (const std::exception &) {
