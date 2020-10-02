@@ -17,6 +17,7 @@
 #include <unistd.h>
 #include <videoOutput.h>
 #include <cudaResize.h>
+#include <cudaFont.h>
 #include "DrawText.h"
 #include "gstCamera.h"
 #include "retinaNet.h"
@@ -126,6 +127,8 @@ public:
         if( !cudaAllocMapped((void**)&imgRGB32size640x640, ImageSizeRGB32size640x640)){
             printf("failed to allocate bytes for image\n");
         }
+        videoOutput* outputStream = videoOutput::Create("display://0");
+        cudaFont* font = cudaFont::Create(adaptFontSize(10));
 
         while (1) {
             bool capSuccess = inputStream->Capture((void**)&imgRGB8size1920x1080, IMAGE_RGB8, 1000);
@@ -238,23 +241,46 @@ public:
                 }
                 /* Send Grpc request */
 
+                std::vector<std::pair<std::string, int2>> labels;
+
                 /* Draw box and face label */
-                WriteTextAndBox(displayImage, drawer, sortTrackers);
-                /* Draw box and face label */
+                for (auto it = sortTrackers.trackers.begin(); it != sortTrackers.trackers.end();) {
+                    cv::Rect_<float> pBox = (*it).box;
+                    if (pBox.x > 0 && pBox.y > 0 && pBox.x + pBox.width < displayImage.size().width &&
+                        pBox.y + pBox.height < displayImage.size().height && sortTrackers.frame_count - it->init_frame_count>3) {
+                        cv::Scalar color;
+                        const int2  position = make_int2(pBox.x , pBox.y);
+                        if (it->name.empty()) {
+                            labels.push_back(std::pair<std::string, int2>("unknown", position));
+                            color = CV_RGB(255, 0, 0);
+                        } else {
+                            labels.push_back(std::pair<std::string, int2>(it->name, position));
+                            color = CV_RGB(0, 255, 0);
+                        }
+                    }
+                    it++;
+                }
+                font->OverlayText(imgRGB8size1920x1080, IMAGE_RGB8, 1920, 1080, labels, make_float4(255,0,0,255));
             }
             if(this->rotateImage){
                 cv::Mat dst;
                 cv::flip(displayImage, dst, -1);
                 displayImage = dst;
             }
-            cv::resize(displayImage, displayImage, screenSize);
-            printf("this is screen width %d, height %d\n", screenSize.width, screenSize.height);
-            printf("this is displayImage width %d, height %d\n", displayImage.cols, displayImage.rows);
 
-            cv::namedWindow("camera_client", cv::WND_PROP_FULLSCREEN);
-            cv::setWindowProperty("camera_client", cv::WND_PROP_FULLSCREEN, cv::WINDOW_FULLSCREEN);
-            cv::imshow("camera_client", displayImage);
-            cv::waitKey(1);
+            if( outputStream != NULL )
+            {
+                outputStream->Render(imgRGB8size1920x1080, this->cameraWidth, this->cameraHeight);
+
+                // update status bar
+                char str[256];
+                sprintf(str, "Video Viewer (%ux%u) | %.1f FPS", this->cameraWidth, this->cameraHeight, outputStream->GetFrameRate());
+                outputStream->SetStatus(str);
+
+                // check if the user quit
+                if( !outputStream->IsStreaming() )
+                    break;
+            }
         }
     }
 
