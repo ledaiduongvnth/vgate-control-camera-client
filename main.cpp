@@ -16,6 +16,7 @@
 #include "X11/Xlib.h"
 #include <unistd.h>
 #include <videoOutput.h>
+#include <cudaResize.h>
 #include "DrawText.h"
 #include "gstCamera.h"
 #include "retinaNet.h"
@@ -98,19 +99,52 @@ public:
         int new_left, new_top, detectionCount = 0, recognitionCount = 0;
         float scale;
         postProcessRetina *rf = new postProcessRetina((std::string &) "model_path", "net3");
+        videoOptions vo;
+        vo.width = this->cameraWidth;
+        vo.height = this->cameraHeight;
+        vo.zeroCopy = true;
+        vo.codec = videoOptions::CODEC_H264;
+        videoSource* inputStream = videoSource::Create(this->camera_source.c_str(), vo);
+        if (!inputStream) {
+            printf("failed to initialize camera device\n");
+            throw std::exception();
+        }
+        if (!inputStream->Open()) {
+            printf("failed to open camera for streaming\n");
+            throw std::exception();
+        }
+        uchar3 * imgRGB8size1920x1080 = NULL;
+
+        uchar3 * imgRGB8size640x360 = NULL;
+        const size_t ImageSizeRGB8size640x360 = imageFormatSize(IMAGE_RGB8, 640, 360);
+        if( !cudaAllocMapped((void**)&imgRGB8size640x360, ImageSizeRGB8size640x360)){
+            printf("failed to allocate bytes for image\n");
+        }
+
+        float3 *imgRGB32size640x640 = NULL;
+        const size_t ImageSizeRGB32size640x640 = imageFormatSize(IMAGE_RGB32F, 640, 640);
+        if( !cudaAllocMapped((void**)&imgRGB32size640x640, ImageSizeRGB32size640x640)){
+            printf("failed to allocate bytes for image\n");
+        }
+
         while (1) {
-//            Data* data;
-            cv::Mat displayImage;
-            float3* imgRGB32;
-            capSuccess2 = this->imagesQueue.pop(displayImage);
-            if (!capSuccess2) {
+            bool capSuccess = inputStream->Capture((void**)&imgRGB8size1920x1080, IMAGE_RGB8, 1000);
+            if (!capSuccess) {
+                printf("failed to capture frame\n");
                 continue;
             }
-            capSuccess2 = this->imagesQueue2.pop(imgRGB32);
-            if (!capSuccess2) {
-                continue;
+            if(CUDA_FAILED(cudaResize(imgRGB8size1920x1080, 1920, 1080, imgRGB8size640x360, 640, 360))){
+                printf(LOG_TRT "imageNet::PreProcess() -- cudaResize failed\n");
+                throw std::exception();
             }
-            printf("this is originImage width %d, height %d\n", displayImage.cols, displayImage.rows);
+            if( CUDA_FAILED(cudaConvertColor(imgRGB8size640x360, IMAGE_RGB8, imgRGB32size640x640, IMAGE_RGB32F, 640, 360))){
+                printf("failed to convert color");
+                throw std::exception();
+            }
+            CUDA(cudaDeviceSynchronize());
+            cv::Mat originImage = cv::Mat(this->cameraHeight, this->cameraWidth, CV_8UC3, imgRGB8size1920x1080);
+
+            cv::Mat displayImage = originImage.clone();
             cv::cvtColor(displayImage, displayImage, cv::COLOR_RGB2BGR);
             JSReq jsReq;
             /* Detect faces in an image */
@@ -129,7 +163,7 @@ public:
             if (detectionCount == 0) {
                 tmp_det.clear();
                 faceInfo.clear();
-                this->net->Detect(imgRGB32, this->cameraWidth, this->cameraHeight, rf, faceInfo, this->faceDetectThreash);
+                this->net->Detect(imgRGB32size640x640, this->cameraWidth, this->cameraHeight, rf, faceInfo, this->faceDetectThreash);
                 for (auto &t : faceInfo) {
                     TrackingBox trackingBox;
                     trackingBox.box.x = t.rect.x1 * scale;
@@ -251,42 +285,51 @@ public:
     }
 
     [[noreturn]] void ReadImages() {
-        videoOptions vo;
-        vo.width = this->cameraWidth;
-        vo.height = this->cameraHeight;
-        vo.zeroCopy = true;
-        vo.codec = videoOptions::CODEC_H264;
-        videoSource* inputStream = videoSource::Create(this->camera_source.c_str(), vo);
-        if (!inputStream) {
-            printf("failed to initialize camera device\n");
-            throw std::exception();
-        }
-        if (!inputStream->Open()) {
-            printf("failed to open camera for streaming\n");
-            throw std::exception();
-        }
-        uchar3 * imgRGB8 = NULL;
-        const size_t ImageSizeRGB8 = imageFormatSize(IMAGE_RGB8, this->cameraWidth, this->cameraHeight);
-        if( !cudaAllocMapped((void**)&imgRGB8, ImageSizeRGB8)){
-            printf("failed to allocate bytes for image\n");
-        }
-        while (true) {
-            float3 *imgRGB32 = NULL;
-            bool capSuccess = inputStream->Capture((void**)&imgRGB32, IMAGE_RGB32F, 1000);
-            if (!capSuccess) {
-                printf("failed to capture frame\n");
-            } else {
-                if( CUDA_FAILED(cudaConvertColor(imgRGB32, IMAGE_RGB32F, imgRGB8, IMAGE_RGB8, this->cameraWidth, this->cameraHeight))){
-                    printf("failed to convert color");
-                }
-                CUDA(cudaDeviceSynchronize());
-                cv::Mat originImage = cv::Mat(this->cameraHeight, this->cameraWidth, CV_8UC3, imgRGB8);
-//                printf("this is originImage width %d, height %d\n", originImage.cols, originImage.rows);
-//                Data data{imgRGB32, &originImage};
-                this->imagesQueue.push(originImage.clone());
-                this->imagesQueue2.push(imgRGB32);
-            }
-        }
+//        videoOptions vo;
+//        vo.width = this->cameraWidth;
+//        vo.height = this->cameraHeight;
+//        vo.zeroCopy = true;
+//        vo.codec = videoOptions::CODEC_H264;
+//        videoSource* inputStream = videoSource::Create(this->camera_source.c_str(), vo);
+//        if (!inputStream) {
+//            printf("failed to initialize camera device\n");
+//            throw std::exception();
+//        }
+//        if (!inputStream->Open()) {
+//            printf("failed to open camera for streaming\n");
+//            throw std::exception();
+//        }
+//        uchar3 * imgRGB8 = NULL;
+//        const size_t ImageSizeRGB8 = imageFormatSize(IMAGE_RGB8, this->cameraWidth, this->cameraHeight);
+//        if( !cudaAllocMapped((void**)&imgRGB8, ImageSizeRGB8)){
+//            printf("failed to allocate bytes for image\n");
+//        }
+//        while (true) {
+//            float3 *imgRGB32 = NULL;
+//            bool capSuccess = inputStream->Capture((void**)&imgRGB32, IMAGE_RGB32F, 1000);
+//            if (!capSuccess) {
+//                printf("failed to capture frame\n");
+//            } else {
+//                if( CUDA_FAILED(cudaConvertColor(imgRGB32, IMAGE_RGB32F, imgRGB8, IMAGE_RGB8, this->cameraWidth, this->cameraHeight))){
+//                    printf("failed to convert color");
+//                }
+//                if(CUDA_FAILED(cudaResize(imgrgb32, width, height, (float3*)cudaInput, 640, 360))){
+//                    printf(LOG_TRT "imageNet::PreProcess() -- cudaResize failed\n");
+//                    return -1;
+//                }
+//                if( CUDA_FAILED(cudaPreImageNetRGB((float3*)cudaInput, 640, 640, MInputCUDA, 640, 640, GetStream())) )
+//                {
+//                    printf(LOG_TRT "imageNet::PreProcess() -- cudaPreImageNetNormMeanRGB() failed\n");
+//                    return false;
+//                }
+//                CUDA(cudaDeviceSynchronize());
+//                cv::Mat originImage = cv::Mat(this->cameraHeight, this->cameraWidth, CV_8UC3, imgRGB8);
+////                printf("this is originImage width %d, height %d\n", originImage.cols, originImage.rows);
+////                Data data{imgRGB32, &originImage};
+//                this->imagesQueue.push(originImage.clone());
+//                this->imagesQueue2.push(imgRGB32);
+//            }
+//        }
     }
 
     std::thread ReadImagesThread() {

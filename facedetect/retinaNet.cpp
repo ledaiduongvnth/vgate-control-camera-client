@@ -53,14 +53,11 @@ int retinaNet::Detect(float3* imgrgb32, uint32_t width, uint32_t height, postPro
         printf(LOG_TRT "detectNet::Detect( 0x%p, %u, %u ) -> invalid parameters\n", imgrgb32, width, height);
         return -1;
     }
-    if(CUDA_FAILED(cudaResize(imgrgb32, width, height, (float3*)cudaInput, 640, 360))){
-        printf(LOG_TRT "imageNet::PreProcess() -- cudaResize failed\n");
-        return -1;
-    }
-    if( CUDA_FAILED(cudaPreImageNetRGB((float3*)cudaInput, 640, 640, mInputCUDA, 640, 640, GetStream())) )
+
+    if( CUDA_FAILED(cudaPreImageNetRGB((float3*)imgrgb32, 640, 640, mInputCUDA, 640, 640, GetStream())) )
     {
         printf(LOG_TRT "imageNet::PreProcess() -- cudaPreImageNetNormMeanRGB() failed\n");
-        return false;
+        throw std::exception();
     }
 
     void* inferenceBuffers[] = { mInputCUDA, mOutputs[0].CUDA, mOutputs[1].CUDA, mOutputs[2].CUDA, mOutputs[3].CUDA, mOutputs[4].CUDA,
