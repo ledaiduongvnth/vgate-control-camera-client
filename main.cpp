@@ -72,12 +72,6 @@ public:
         this->cameraHeight = cameraHeight;
         this->areaId = areaId;
         this->direction = direction;
-        this->channel = grpc::CreateChannel(this->multiple_camera_host, grpc::InsecureChannelCredentials());
-        this->stub_ = FaceProcessing::NewStub(channel);
-        ClientContext *context = new ClientContext;
-        context->AddMetadata("area_id", grpc::string(std::to_string(this->areaId)));
-        context->AddMetadata("direction", grpc::string(this->direction));
-        this->stream = this->stub_->recognize_face_js(context);
         this->net = new retinaNet();
         this->rotateImage = rotateImage;
     }
@@ -177,7 +171,7 @@ public:
             /* Detect faces in an image */
             this->facesQueue.pop(facesOut);
             // update tracking
-            sortTrackers.step(tmp_det, displayImage.size(), stream);
+            sortTrackers.step(tmp_det, displayImage.size());
             if (!faceInfo.empty()) {
                 /* Make Grpc request and get face faces label from queue */
                 for (auto it = sortTrackers.trackers.begin(); it != sortTrackers.trackers.end();) {
@@ -217,20 +211,6 @@ public:
                     }
                     it++;
                 }
-                /* Make Grpc request and get face faces label from queue */
-
-                /* Send Grpc request */
-                recognitionCount = recognitionCount + 1;
-                if (recognitionCount == this->recognitionFrequency) {
-                    recognitionCount = 0;
-                }
-                if (recognitionCount == 0) {
-                    send_success = stream->Write(jsReq);
-                    if (!send_success) {
-                        printf("failed to send grpc\n");
-                        throw std::exception();
-                    }
-                }
                 /* Send Grpc request */
                 std::vector<std::pair<std::string, int2>> labels;
                 /* Draw box and face label */
@@ -269,44 +249,13 @@ public:
         }
     }
 
-    void ReceiveResponses() {
-        JSResp jSResp;
-        std::vector<LabeledFaceIn> faces;
-        LabeledFaceIn labeledFaceIn;
-        LabeledFace labeledFace;
-        bool receive_success;
-        while (true) {
-            receive_success = stream->Read(&jSResp);
-            if (!receive_success) {
-                printf("failed to receive grpc\n");
-                throw std::exception();
-            }
-            if (!jSResp.faces().empty() && receive_success) {
-                for (int i = 0; i < jSResp.faces().size(); ++i) {
-                    labeledFace = jSResp.faces(i);
-                    labeledFaceIn.track_id = labeledFace.track_id();
-                    labeledFaceIn.registration_id = labeledFace.registration_id();
-                    labeledFaceIn.person_name = labeledFace.person_name();
-                    labeledFaceIn.confidence = labeledFace.confidence();
-                    faces.emplace_back(labeledFaceIn);
-                }
-                this->facesQueue.push(faces);
-            }
-        }
-    }
 
     std::thread SendRequestsThread() {
         return std::thread([this] { SendRequests(); });
     }
 
-    std::thread ReceiveResponsesThread() {
-        return std::thread([this] { ReceiveResponses(); });
-    }
 
 private:
-    std::shared_ptr<Channel> channel;
-    std::unique_ptr<FaceProcessing::Stub> stub_{};
-    std::shared_ptr<ClientReaderWriter<JSReq, JSResp>> stream;
     CConcurrentQueue<std::vector<LabeledFaceIn>> facesQueue;
 };
 
@@ -335,9 +284,7 @@ int main() {
                               recognitionFrequency, maxAge, minHits, iouThreash, faceDetectThreash, fontScale,
                               cv::Size(screen->width, screen->height), cameraWidth, cameraHeight, direction, rotateImage);
     try {
-        std::thread t1 = cameraClient.ReceiveResponsesThread();
         std::thread t2 = cameraClient.SendRequestsThread();
-        t1.join();
         t2.join();
     } catch (const std::exception &) {
         return 2;
