@@ -2,10 +2,8 @@
 #include <cudaResize.h>
 #include "retinaNet.h"
 #include "cudaUtility.h"
+#include "tensorConvert.h"
 
-cudaError_t cudaPreImageNetRGB( float3* input, size_t inputWidth, size_t inputHeight,
-                                float* output, size_t outputWidth, size_t outputHeight,
-                                cudaStream_t stream );
 
 
 retinaNet::retinaNet(){
@@ -54,13 +52,16 @@ int retinaNet::Detect(float3* imgrgb32, uint32_t width, uint32_t height, postPro
         return -1;
     }
 
-    if( CUDA_FAILED(cudaPreImageNetRGB((float3*)imgrgb32, 640, 640, mInputCUDA, 640, 640, GetStream())) )
+    if( CUDA_FAILED(cudaTensorMeanRGB((float3*)imgrgb32, IMAGE_RGB32F, 640, 640,
+                                      mInputs[0].CUDA, 640, 640,
+                                      make_float3(0, 0, 0),
+                                      GetStream())) )
     {
-        printf(LOG_TRT "imageNet::PreProcess() -- cudaPreImageNetNormMeanRGB() failed\n");
+        LogError(LOG_TRT "cudaTensorMeanRGB failed\n");
         throw std::exception();
     }
 
-    void* inferenceBuffers[] = { mInputCUDA, mOutputs[0].CUDA, mOutputs[1].CUDA, mOutputs[2].CUDA, mOutputs[3].CUDA, mOutputs[4].CUDA,
+    void* inferenceBuffers[] = { mInputs[0].CUDA, mOutputs[0].CUDA, mOutputs[1].CUDA, mOutputs[2].CUDA, mOutputs[3].CUDA, mOutputs[4].CUDA,
                                  mOutputs[5].CUDA, mOutputs[6].CUDA, mOutputs[7].CUDA, mOutputs[8].CUDA};
 
 
