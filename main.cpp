@@ -131,10 +131,6 @@ public:
                 throw std::exception();
             }
             CUDA(cudaDeviceSynchronize());
-            cv::Mat originImage = cv::Mat(this->cameraHeight, this->cameraWidth, CV_8UC3, imgRGB8size1920x1080);
-
-            cv::Mat displayImage = originImage.clone();
-            cv::cvtColor(displayImage, displayImage, cv::COLOR_RGB2BGR);
             JSReq jsReq;
             /* Detect faces in an image */
             detectionCount = detectionCount + 1;
@@ -144,95 +140,21 @@ public:
             if (first_detections) {
                 sortTrackers.init(tmp_det);
                 first_detections = false;
-                float sw = 1.0 * displayImage.cols / 640;
-                float sh = 1.0 * displayImage.rows / 640;
+                float sw = this->cameraWidth / 640;
+                float sh = this->cameraHeight / 640;
                 scale = sw > sh ? sw : sh;
-                scale = scale > 1.0 ? scale : 1.0;
             }
+            std::vector<std::pair<std::string, int2>> labels;
             if (detectionCount == 0) {
                 tmp_det.clear();
                 faceInfo.clear();
                 this->net->Detect(imgRGB32size640x640, this->cameraWidth, this->cameraHeight, rf, faceInfo, this->faceDetectThreash);
                 for (auto &t : faceInfo) {
-                    TrackingBox trackingBox;
-                    trackingBox.box.x = t.rect.x1 * scale;
-                    trackingBox.box.y = t.rect.y1 * scale;
-                    trackingBox.box.width = (t.rect.x2 - t.rect.x1) * scale;
-                    trackingBox.box.height = (t.rect.y2 - t.rect.y1) * scale;
-                    for (size_t j = 0; j < 5; j++) {
-                        trackingBox.landmarks.push_back(t.pts.y[j] * scale);
-                    }
-                    for (size_t j = 0; j < 5; j++) {
-                        trackingBox.landmarks.push_back(t.pts.x[j] * scale);
-                    }
-                    tmp_det.push_back(trackingBox);
+                    const int2  position = make_int2(t.rect.x1 * scale , t.rect.y1 * scale);
+                    labels.push_back(std::pair<std::string, int2>("unknown", position));
                 }
             }
-            /* Detect faces in an image */
-            this->facesQueue.pop(facesOut);
-            // update tracking
-            sortTrackers.step(tmp_det, displayImage.size());
-            if (!faceInfo.empty()) {
-                /* Make Grpc request and get face faces label from queue */
-                for (auto it = sortTrackers.trackers.begin(); it != sortTrackers.trackers.end();) {
-                    cv::Rect_<float> pBox = (*it).box;
-                    if (pBox.x > 0 && pBox.y > 0 && pBox.x + pBox.width < displayImage.size().width &&
-                        pBox.y + pBox.height < displayImage.size().height) {
-                        if (!facesOut.empty()) {
-                            for (auto &k : facesOut) {
-                                if (k.track_id == it->source_track_id) {
-                                    it->name = k.person_name;
-                                }
-                            }
-                        }
-                        if (it->name.empty()) {
-                            std::tie(cropedImage, new_left, new_top) = CropFaceImageWithMargin(displayImage.clone(),
-                                                                                               pBox.x, pBox.y,
-                                                                                               pBox.x + pBox.width,
-                                                                                               pBox.y + pBox.height,
-                                                                                               1.4);
-                            UnlabeledFace *face = jsReq.add_faces();
-                            std::vector<uchar> buf;
-                            success = cv::imencode(".jpg", cropedImage, buf);
-                            if (success) {
-                                auto *enc_msg = reinterpret_cast<unsigned char *>(buf.data());
-                                std::string encoded = Base64Encode(enc_msg, buf.size());
-                                face->set_track_id(it->source_track_id);
-                                face->set_image_bytes(encoded);
-                                face->set_is_saving_history(false);
-                                for (size_t j = 0; j < 5; j++) {
-                                    face->add_landmarks(it->landmarks[j] - (float) new_top);
-                                }
-                                for (size_t j = 5; j < 10; j++) {
-                                    face->add_landmarks(it->landmarks[j] - (float) new_left);
-                                }
-                            }
-                        }
-                    }
-                    it++;
-                }
-                /* Send Grpc request */
-                std::vector<std::pair<std::string, int2>> labels;
-                /* Draw box and face label */
-                for (auto it = sortTrackers.trackers.begin(); it != sortTrackers.trackers.end();) {
-                    cv::Rect_<float> pBox = (*it).box;
-                    if (pBox.x > 0 && pBox.y > 0 && pBox.x + pBox.width < displayImage.size().width &&
-                        pBox.y + pBox.height < displayImage.size().height && sortTrackers.frame_count - it->init_frame_count>3) {
-                        cv::Scalar color;
-                        const int2  position = make_int2(pBox.x , pBox.y);
-                        if (it->name.empty()) {
-                            labels.push_back(std::pair<std::string, int2>("unknown", position));
-                            color = CV_RGB(255, 0, 0);
-                        } else {
-                            labels.push_back(std::pair<std::string, int2>(it->name, position));
-                            color = CV_RGB(0, 255, 0);
-                        }
-                    }
-                    it++;
-                }
-                font->OverlayText(imgRGB8size1920x1080, IMAGE_RGB8, 1920, 1080, labels, make_float4(255,0,0,255));
-            }
-
+            font->OverlayText(imgRGB8size1920x1080, IMAGE_RGB8, 1920, 1080, labels, make_float4(255,0,0,255));
             if( outputStream != NULL )
             {
                 outputStream->Render(imgRGB8size1920x1080, this->cameraWidth, this->cameraHeight);
