@@ -100,13 +100,7 @@ public:
             printf("failed to open camera for streaming\n");
             throw std::exception();
         }
-        uchar3 * imgRGB8size1920x1080 = NULL;
-
-        uchar3 * imgRGB8size640x360 = NULL;
-        const size_t ImageSizeRGB8size640x360 = imageFormatSize(IMAGE_RGB8, 640, 360);
-        if( !cudaAllocMapped((void**)&imgRGB8size640x360, ImageSizeRGB8size640x360)){
-            printf("failed to allocate bytes for image\n");
-        }
+        float3 * imgRGB32size1920x1080 = NULL;
 
         float3 *imgRGB32size640x640 = NULL;
         const size_t ImageSizeRGB32size640x640 = imageFormatSize(IMAGE_RGB32F, 640, 640);
@@ -114,20 +108,16 @@ public:
             printf("failed to allocate bytes for image\n");
         }
         videoOutput* outputStream = videoOutput::Create("display://0");
-        cudaFont* font = cudaFont::Create(adaptFontSize(10));
+        cudaFont* font = cudaFont::Create(adaptFontSize(20));
 
         while (1) {
-            bool capSuccess = inputStream->Capture((void**)&imgRGB8size1920x1080, IMAGE_RGB8, 1000);
+            bool capSuccess = inputStream->Capture((void**)&imgRGB32size1920x1080, IMAGE_RGB32F, 1000);
             if (!capSuccess) {
                 printf("failed to capture frame\n");
                 continue;
             }
-            if(CUDA_FAILED(cudaResize(imgRGB8size1920x1080, 1920, 1080, imgRGB8size640x360, 640, 360))){
+            if(CUDA_FAILED(cudaResize(imgRGB32size1920x1080, 1920, 1080, imgRGB32size640x640, 640, 360))){
                 printf(LOG_TRT "imageNet::PreProcess() -- cudaResize failed\n");
-                throw std::exception();
-            }
-            if( CUDA_FAILED(cudaConvertColor(imgRGB8size640x360, IMAGE_RGB8, imgRGB32size640x640, IMAGE_RGB32F, 640, 360))){
-                printf("failed to convert color");
                 throw std::exception();
             }
             CUDA(cudaDeviceSynchronize());
@@ -154,10 +144,10 @@ public:
                     labels.push_back(std::pair<std::string, int2>("unknown", position));
                 }
             }
-            font->OverlayText(imgRGB8size1920x1080, IMAGE_RGB8, 1920, 1080, labels, make_float4(255,0,0,255));
+            font->OverlayText(imgRGB32size1920x1080, IMAGE_RGB32F, 1920, 1080, labels, make_float4(255, 0, 0, 255));
             if( outputStream != NULL )
             {
-                outputStream->Render(imgRGB8size1920x1080, this->cameraWidth, this->cameraHeight);
+                outputStream->Render(imgRGB32size1920x1080, this->cameraWidth, this->cameraHeight);
 
                 // update status bar
                 char str[256];
