@@ -10,7 +10,6 @@
 #include <codecvt>
 #include <KalmanTracker.h>
 #include <SORTtracker.h>
-#include "DrawText.h"
 
 std::tuple<cv::Mat, int, int>
 CropFaceImageWithMargin(cv::Mat srcImg, int x1, int y1, int x2, int y2, float expanded_face_scale) {
@@ -51,45 +50,45 @@ void DrawRectangle(cv::Mat img, cv::Rect rect, int r, int thickness, cv::Scalar 
 }
 
 
-void WriteTextAndBox(cv::Mat &displayImage, DrawText &drawer, SORTtracker sortTrackers) {
-    for (auto it = sortTrackers.trackers.begin(); it != sortTrackers.trackers.end();) {
-        cv::Rect_<float> pBox = (*it).box;
-        if (pBox.x > 0 && pBox.y > 0 && pBox.x + pBox.width < displayImage.size().width &&
-            pBox.y + pBox.height < displayImage.size().height && sortTrackers.frame_count - it->init_frame_count>3) {
-            std::string displayName;
-            cv::Scalar color;
-            if (it->name.empty()) {
-                displayName = "unknown";
-                color = CV_RGB(255, 0, 0);
-            } else {
-                displayName = it->name;
-                color = CV_RGB(0, 255, 0);
-            }
-
-            cv::Rect rect = cv::Rect(pBox.x, pBox.y, pBox.width, pBox.height);
-            DrawRectangle(displayImage, rect, 3, 3, color);
-
-            cv::Mat overlay = displayImage.clone();
-            cv::Mat output = displayImage.clone();
-            int baseline = 0;
-            int text_height = drawer.pixel_width;
-            int text_width = drawer.pixel_width * displayName.size() / 2;
-
-            pBox.y = pBox.y - text_height / 2;
-            pBox.x = pBox.x - text_width / 2 + pBox.width / 2;
-            cv::rectangle(overlay, cv::Point(pBox.x, pBox.y) + cv::Point(0, baseline),
-                          cv::Point(pBox.x, pBox.y) + cv::Point(text_width, -text_height), cv::Scalar(0), cv::FILLED);
-            float alpha = 0.5;
-            cv::addWeighted(overlay, alpha, output, 1 - alpha, 0, output);
-            displayImage = output;
-
-            std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-            std::wstring ws(displayName.size(), L' ');
-            ws.resize(std::mbstowcs(&ws[0], displayName.c_str(), displayName.size()));
-            drawer.PrintText(displayImage, ws, pBox.x, pBox.y, cv::Scalar(255, 255, 255));
-        }
-        it++;
-    }
-}
+//void WriteTextAndBox(cv::Mat &displayImage, DrawText &drawer, SORTtracker sortTrackers) {
+//    for (auto it = sortTrackers.trackers.begin(); it != sortTrackers.trackers.end();) {
+//        cv::Rect_<float> pBox = (*it).box;
+//        if (pBox.x > 0 && pBox.y > 0 && pBox.x + pBox.width < displayImage.size().width &&
+//            pBox.y + pBox.height < displayImage.size().height && sortTrackers.frame_count - it->init_frame_count>3) {
+//            std::string displayName;
+//            cv::Scalar color;
+//            if (it->name.empty()) {
+//                displayName = "unknown";
+//                color = CV_RGB(255, 0, 0);
+//            } else {
+//                displayName = it->name;
+//                color = CV_RGB(0, 255, 0);
+//            }
+//
+//            cv::Rect rect = cv::Rect(pBox.x, pBox.y, pBox.width, pBox.height);
+//            DrawRectangle(displayImage, rect, 3, 3, color);
+//
+//            cv::Mat overlay = displayImage.clone();
+//            cv::Mat output = displayImage.clone();
+//            int baseline = 0;
+//            int text_height = drawer.pixel_width;
+//            int text_width = drawer.pixel_width * displayName.size() / 2;
+//
+//            pBox.y = pBox.y - text_height / 2;
+//            pBox.x = pBox.x - text_width / 2 + pBox.width / 2;
+//            cv::rectangle(overlay, cv::Point(pBox.x, pBox.y) + cv::Point(0, baseline),
+//                          cv::Point(pBox.x, pBox.y) + cv::Point(text_width, -text_height), cv::Scalar(0), cv::FILLED);
+//            float alpha = 0.5;
+//            cv::addWeighted(overlay, alpha, output, 1 - alpha, 0, output);
+//            displayImage = output;
+//
+//            std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+//            std::wstring ws(displayName.size(), L' ');
+//            ws.resize(std::mbstowcs(&ws[0], displayName.c_str(), displayName.size()));
+//            drawer.PrintText(displayImage, ws, pBox.x, pBox.y, cv::Scalar(255, 255, 255));
+//        }
+//        it++;
+//    }
+//}
 
 #endif //CAMERA_CLIENT_IMAGE_PROC_H

@@ -97,7 +97,7 @@ public:
      * detections: new bounding boxes of objects
      * results: tracked boxes with id and other properties
      */
-    void step(std::vector<TrackingBox> detections, const cv::Size &img_size);
+    void step(std::vector<TrackingBox> detections, const cv::Size &img_size, std::shared_ptr<ClientReaderWriter<JSReq, JSResp>> stream);
 
 };
 
