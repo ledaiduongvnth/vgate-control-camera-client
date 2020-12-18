@@ -6,7 +6,6 @@
 #include <videoOutput.h>
 #include <cudaResize.h>
 #include <cudaFont.h>
-#include "DrawText.h"
 #include "gstCamera.h"
 #include "retinaNet.h"
 #include "cudaColorspace.h"

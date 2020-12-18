@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.2)
 
 PROJECT (camera_client)
 
-option (USE_ARM64    "Set switch to build at ARM 64 platform mode"   ON)
+option (USE_ARM64    "Set switch to build at ARM 64 platform mode"   OFF)
 add_definitions(-DUSE_TENSORRT)
 add_definitions(-DUSE_NPP)
 
@@ -33,7 +33,6 @@ set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};
         -gencode arch=compute_70,code=sm_70;
         )
 
-find_package(Freetype REQUIRED)
 find_package(Protobuf REQUIRED)
 find_package(gRPC CONFIG REQUIRED)
 set(GRPC_CPP_LIB gRPC::grpc++_unsecure)
@@ -88,6 +87,5 @@ target_link_libraries(
         ${GRPC_CPP_LIB}
         ${Protobuf_LIBRARIES}
         ${OpenCV_LIBS}
-        ${FREETYPE_LIBRARIES}
 )
 
