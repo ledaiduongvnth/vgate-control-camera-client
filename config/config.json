@@ -10,7 +10,9 @@
   "min_hits": 2,
   "face_detect_threash": 0.5,
   "iou_threash": 0.33,
-  "font_scale": 32,
+  "font_scale": 10,
   "area_id": 3,
-  "direction" : "OUT"
+  "direction" : "OUT",
+  "camera_type": "ipcam",
+  "expanded_face_scale": 1.4
 }

@@ -37,8 +37,8 @@ using multiple_camera_server::UnlabeledFace;
 
 class CameraClient {
 public:
-
     std::string camera_source;
+    std::string cameraType;
     std::string multiple_camera_host;
     cv::Size screenSize;
     int detectionFrequency;
@@ -54,11 +54,13 @@ public:
     std::string direction;
     retinaNet* net;
     bool rotateImage;
+    int modelSize = 640;
+    float expandedFaceScale;
 
     CameraClient(std::string camera_source, std::string multiple_camera_host, int areaId,
                  int detectionFrequency, int recognitionFrequency, int maxAge, int minHits, float iouThreash,
                  float faceDetectThreash, int fontScale, cv::Size screenSize, int cameraWidth, int cameraHeight,
-                 std::string direction, bool rotateImage) {
+                 std::string direction, bool rotateImage, std::string cameraType, float expandedFaceScale) {
         this->camera_source = camera_source;
         this->multiple_camera_host = multiple_camera_host;
         this->screenSize = screenSize;
@@ -81,6 +83,8 @@ public:
         this->stream = this->stub_->recognize_face_js(context);
         this->net = new retinaNet();
         this->rotateImage = rotateImage;
+        this->cameraType = cameraType;
+        this->expandedFaceScale = expandedFaceScale;
     }
 
     void SendRequests() {
@@ -89,17 +93,22 @@ public:
         std::vector<LabeledFaceIn> facesOut;
         std::vector<TrackingBox> tmp_det;
         SORTtracker sortTrackers(this->maxAge, this->minHits, this->iouThreash);
-        bool success, send_success, first_detections = true, capSuccess1, capSuccess2;
+        bool success, send_success, first_detections = true;
         int new_left, new_top, detectionCount = 0, recognitionCount = 0;
         float scale;
         postProcessRetina *rf = new postProcessRetina((std::string &) "model_path", "net3");
-
         videoOptions vo;
-        vo.width = 1920;
-        vo.height = 1080;
-        vo.zeroCopy = true;
-        vo.codec = videoOptions::CODEC_H264;
-        videoSource* inputStream = videoSource::Create("rtsp://admin:abcd1234@172.16.10.84:554/Streaming/Channels/101", vo);
+        if(this->cameraType == "webcam"){
+            vo.width = this->cameraWidth;
+            vo.height = this->cameraHeight;
+            vo.zeroCopy = true;
+        } else if(this->cameraType == "ipcam"){
+            vo.width = this->cameraWidth;
+            vo.height = this->cameraHeight;
+            vo.zeroCopy = true;
+            vo.codec = videoOptions::CODEC_H264;
+        }
+        videoSource* inputStream = videoSource::Create(this->camera_source.c_str(), vo);
         if (!inputStream) {
             printf("failed to initialize camera device\n");
             throw std::exception();
@@ -110,19 +119,20 @@ public:
         }
         uchar3 * imgRGB8size1920x1080 = NULL;
         uchar3 * imgRGB8size640x360 = NULL;
-        const size_t ImageSizeRGB8size640x360 = imageFormatSize(IMAGE_RGB8, 640, 360);
+        int ImageSizeRGB8Height = modelSize * this->cameraHeight / this->cameraWidth;
+        const size_t ImageSizeRGB8size640x360 = imageFormatSize(IMAGE_RGB8, modelSize, ImageSizeRGB8Height);
         if( !cudaAllocMapped((void**)&imgRGB8size640x360, ImageSizeRGB8size640x360)){
             printf("failed to allocate bytes for image\n");
         }
         float3 *imgRGB32size640x640 = NULL;
-        const size_t ImageSizeRGB32size640x640 = imageFormatSize(IMAGE_RGB32F, 640, 640);
+        const size_t ImageSizeRGB32size640x640 = imageFormatSize(IMAGE_RGB32F, modelSize, modelSize);
         if( !cudaAllocMapped((void**)&imgRGB32size640x640, ImageSizeRGB32size640x640)){
             printf("failed to allocate bytes for image\n");
         }
         videoOutput* outputStream = videoOutput::Create("display://0");
-        cudaFont* font = cudaFont::Create(adaptFontSize(10));
-        float sw = 1920 / 640;
-        float sh = 1080 / 640;
+        cudaFont* font = cudaFont::Create(adaptFontSize(this->fontScale));
+        float sw = this->cameraWidth / modelSize;
+        float sh = this->cameraHeight / modelSize;
         scale = sw > sh ? sw : sh;
         std::vector<std::pair<std::string, int2>> labels;
 
@@ -134,17 +144,17 @@ public:
                 printf("failed to capture frame\n");
                 continue;
             }
-            if(CUDA_FAILED(cudaResize(imgRGB8size1920x1080, 1920, 1080, imgRGB8size640x360, 640, 360))){
+            if(CUDA_FAILED(cudaResize(imgRGB8size1920x1080, this->cameraWidth, this->cameraHeight, imgRGB8size640x360, modelSize, ImageSizeRGB8Height))){
                 printf(LOG_TRT "cudaResize failed\n");
                 throw std::exception();
             }
-            if( CUDA_FAILED(cudaConvertColor(imgRGB8size640x360, IMAGE_RGB8, imgRGB32size640x640, IMAGE_RGB32F, 640, 360))){
+            if( CUDA_FAILED(cudaConvertColor(imgRGB8size640x360, IMAGE_RGB8, imgRGB32size640x640, IMAGE_RGB32F, modelSize, ImageSizeRGB8Height))){
                 printf("failed to convert color\n");
                 throw std::exception();
             }
             CUDA(cudaDeviceSynchronize());
 
-            originImage = cv::Mat(1080, 1920, CV_8UC3, imgRGB8size1920x1080);
+            originImage = cv::Mat(this->cameraHeight, this->cameraWidth, CV_8UC3, imgRGB8size1920x1080);
             displayImage = originImage.clone();
             cv::cvtColor(displayImage, displayImage, cv::COLOR_RGB2BGR);
 
@@ -157,15 +167,15 @@ public:
             if (first_detections) {
                 sortTrackers.init(tmp_det);
                 first_detections = false;
-                float sw = 1.0 * displayImage.cols / 640;
-                float sh = 1.0 * displayImage.rows / 640;
+                float sw = 1.0 * displayImage.cols / modelSize;
+                float sh = 1.0 * displayImage.rows / modelSize;
                 scale = sw > sh ? sw : sh;
                 scale = scale > 1.0 ? scale : 1.0;
             }
             if (detectionCount == 0) {
                 tmp_det.clear();
                 faceInfo.clear();
-                this->net->Detect(imgRGB32size640x640, 1920, 1080, rf, faceInfo, 0.5);
+                this->net->Detect(imgRGB32size640x640, this->cameraWidth, this->cameraHeight, rf, faceInfo, this->faceDetectThreash);
                 for (auto &t : faceInfo) {
                     TrackingBox trackingBox;
                     trackingBox.box.x = t.rect.x1 * scale;
@@ -203,7 +213,7 @@ public:
                                                                                                pBox.x, pBox.y,
                                                                                                pBox.x + pBox.width,
                                                                                                pBox.y + pBox.height,
-                                                                                               1.4);
+                                                                                               this->expandedFaceScale);
                             UnlabeledFace *face = jsReq.add_faces();
                             std::vector<uchar> buf;
                             success = cv::imencode(".jpg", cropedImage, buf);
@@ -258,19 +268,19 @@ public:
                         labels.push_back(std::pair<std::string, int2>(displayName, position));
                     }
                 }
-                font->OverlayText(imgRGB8size1920x1080, IMAGE_RGB8, 1920, 1080, labels, make_float4(255,0,0,255));
+                font->OverlayText(imgRGB8size1920x1080, IMAGE_RGB8, this->cameraWidth, this->cameraHeight, labels, make_float4(255,0,0,255));
                 /* Draw box and face label */
             }
-//            if(this->rotateImage){
+            if(this->rotateImage){
 //                cv::Mat dst;
 //                cv::flip(displayImage, dst, -1);
 //                displayImage = dst;
-//            }
+            }
 
             if( outputStream != NULL ){
-                outputStream->Render(imgRGB8size1920x1080, 1920, 1080);
+                outputStream->Render(imgRGB8size1920x1080, this->cameraWidth, this->cameraHeight);
                 char str[256];
-                sprintf(str, "Video Viewer (%ux%u) | %.1f FPS", 1920, 1080, outputStream->GetFrameRate());
+                sprintf(str, "Video Viewer (%ux%u) | %.1f FPS", this->cameraWidth, this->cameraHeight, outputStream->GetFrameRate());
                 outputStream->SetStatus(str);
                 if( !outputStream->IsStreaming() )
                     break;
@@ -325,6 +335,8 @@ int main(int argc, char **argv) {
     Json::Value configs;
     reader.parse(file_input, configs);
     std::string camera_source = configs["camera_source"].asString();
+    std::string cameraType = configs["camera_type"].asString();
+    float expandedFaceScale = configs["expanded_face_scale"].asFloat();
     int cameraWidth = configs["camera_width"].asInt();
     int cameraHeight = configs["camera_height"].asInt();
     bool rotateImage = configs["rotate_image"].asBool();
@@ -342,7 +354,8 @@ int main(int argc, char **argv) {
     Screen *screen = DefaultScreenOfDisplay(XOpenDisplay(NULL));
     CameraClient cameraClient(camera_source, multiple_camera_host, areaId, detectionFrequency,
                               recognitionFrequency, maxAge, minHits, iouThreash, faceDetectThreash, fontScale,
-                              cv::Size(screen->width, screen->height), cameraWidth, cameraHeight, direction, rotateImage);
+                              cv::Size(screen->width, screen->height), cameraWidth, cameraHeight, direction,
+                              rotateImage, cameraType, expandedFaceScale);
     try {
         std::thread t1 = cameraClient.ReceiveResponsesThread();
         std::thread t2 = cameraClient.SendRequestsThread();
