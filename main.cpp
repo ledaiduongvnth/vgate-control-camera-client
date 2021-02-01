@@ -19,7 +19,6 @@
 #include <cudaFont.h>
 #include "gstCamera.h"
 #include "retinaNet.h"
-#include "fstream"
 #include "base64.h"
 #include "cudaResize.h"
 #include "cudaColorspace.h"
@@ -40,6 +39,7 @@ public:
     std::string camera_source;
     std::string cameraType;
     std::string multiple_camera_host;
+    // TODO using screenSize to fit image to real screen
     cv::Size screenSize;
     int detectionFrequency;
     int recognitionFrequency;
